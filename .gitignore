@@ -1,0 +1,76 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Logs
+*.log
+
+# Data (exclude large raw data, include processed summaries)
+data/raw/*/sessions/          # Session JSONL files (large, reproducible)
+data/raw/*/git/               # Git clones (large, reproducible)
+data/processed/*/episodes/    # Episode files (large, reproducible)
+
+# Keep these for tracking
+!data/raw/*/metadata.json
+!data/processed/*/statistics.json
+!data/processed/*/session-commit-map.json
+!data/merged/
+
+# Temporary files
+*.tmp
+.tmp/
+scratchpad/
+
+# Archives
+*.tar.gz
+*.zip
+
+# Environment
+.env
+.env.local
+
+# GSD (keep planning artifacts)
+.planning/phases/*/output.jsonl  # Large agent outputs

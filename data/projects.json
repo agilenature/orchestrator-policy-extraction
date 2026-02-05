@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "last_updated": "2026-02-05",
+  "projects": [
+    {
+      "id": "modernizing-tool",
+      "name": "C++ Modernization Tool",
+      "metadata_path": "data/raw/modernizing-tool/metadata.json",
+      "status": "pending_processing",
+      "added_date": "2026-02-05",
+      "notes": "Initial dataset - rich phase-based workflow with GSD framework"
+    },
+    {
+      "id": "orchestrator-policy-extraction",
+      "name": "Orchestrator Policy Extraction",
+      "metadata_path": "data/raw/orchestrator-policy-extraction/metadata.json",
+      "status": "pending_processing",
+      "added_date": "2026-02-05",
+      "notes": "Meta-project capturing our own orchestration patterns"
+    }
+  ]
+}

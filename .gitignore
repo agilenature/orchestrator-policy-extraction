@@ -75,3 +75,4 @@ scratchpad/
 # GSD (keep planning artifacts)
 .planning/phases/*/output.jsonl  # Large agent outputs
 # Hook fix test
+# Hook test 2

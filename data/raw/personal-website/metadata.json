@@ -1,0 +1,88 @@
+{
+  "project_id": "personal-website",
+  "name": "Personal Website",
+  "description": "ClojureScript JAMstack personal website development project",
+  "repository": {
+    "url": "https://github.com/agilenature/personal-website.git",
+    "branch": "main",
+    "commit_range": {
+      "start_date": "2026-01-28T17:12:51-06:00",
+      "end_date": "2026-01-30T09:39:15-06:00",
+      "start_sha": "f532641fd845e90565270fca58c17ed4c32ea7ce",
+      "end_sha": "937e60518431160387825efeea71af55ff76a003",
+      "total_commits": 31,
+      "commits_with_session_ids": 0,
+      "commits_with_claude_attribution": 7
+    }
+  },
+  "sessions": {
+    "directory": "/Users/david/.claude/projects/-Users-david-projects-personal-website/",
+    "storage_strategy": "reference_in_place",
+    "date_range": {
+      "start": "2026-01-29T04:12:00Z",
+      "end": "2026-01-30T10:29:00Z"
+    },
+    "session_count": 7,
+    "session_ids": [
+      "8e2e0a42-c643-4863-98ed-65dbb33add24",
+      "9134de98-8597-446d-8b6f-de8310d6d272",
+      "de6b6ab2-d5b4-4289-a65e-13314b536ba8",
+      "2c92f69f-61f2-4b00-bed1-c02ea1ec12cd",
+      "c9a3a41b-d116-4ca5-b360-e6d07ea30d98",
+      "4231dd1d-5e60-4d76-a856-06a24e659be6",
+      "6af5898a-5bdf-4108-abf7-d3c3907880f6"
+    ],
+    "total_size_mb": 14.0,
+    "subagent_count": 0
+  },
+  "authors": [
+    {
+      "name": "David Alfaro",
+      "email": "david@example.com",
+      "role": "primary"
+    }
+  ],
+  "data_collection": {
+    "date_added": "2026-02-05",
+    "added_by": "David Alfaro",
+    "instrumentation": {
+      "session_ids_in_commits": false,
+      "global_git_hook": false,
+      "claude_attribution": true,
+      "phase_labels": false
+    },
+    "notes": [
+      "Predates global git hook - no session IDs in commits",
+      "Will require hash-based heuristic correlation",
+      "7/31 commits (23%) have Claude co-authorship",
+      "ClojureScript/JAMstack development patterns",
+      "Sessions span 2 days with significant implementation work"
+    ]
+  },
+  "characteristics": {
+    "project_type": "web_development",
+    "tech_stack": [
+      "ClojureScript",
+      "JAMstack",
+      "Web development"
+    ],
+    "orchestration_patterns": [
+      "initial_setup_and_scaffolding",
+      "iterative_development",
+      "documentation_organization",
+      "technology_selection_and_configuration"
+    ],
+    "gsd_framework": false,
+    "multi_agent": false,
+    "phase_structure": null
+  },
+  "quality_metrics": {
+    "correlation_precision": null,
+    "correlation_strategy": "hash_based_heuristic",
+    "expected_precision": "70-80%",
+    "episode_count": null,
+    "action_coverage": null,
+    "reaction_coverage": null,
+    "notes": "No session IDs - will use temporal + hash-based correlation"
+  }
+}

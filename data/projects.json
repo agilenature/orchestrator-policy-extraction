@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "last_updated": "2026-02-05T17:40:00Z",
+  "last_updated": "2026-02-05T17:45:00Z",
   "projects": [
     {
       "id": "modernizing-tool",
@@ -32,14 +32,35 @@
         "commit_count": 6,
         "commits_with_session_ids": 4
       }
+    },
+    {
+      "id": "personal-website",
+      "name": "Personal Website",
+      "metadata_path": "data/raw/personal-website/metadata.json",
+      "status": "ready",
+      "added_date": "2026-02-05",
+      "notes": "ClojureScript JAMstack website - predates global git hook",
+      "data_status": {
+        "sessions_available": true,
+        "sessions_location": "~/.claude/projects/-Users-david-projects-personal-website/",
+        "git_clone_needed": true,
+        "git_location": "/Users/david/projects/personal-website",
+        "metadata_complete": true,
+        "session_count": 7,
+        "commit_count": 31,
+        "commits_with_session_ids": 0,
+        "commits_with_claude_attribution": 7,
+        "correlation_strategy": "hash_based_heuristic"
+      }
     }
   ],
   "statistics": {
-    "total_projects": 2,
-    "ready_projects": 1,
+    "total_projects": 3,
+    "ready_projects": 2,
     "pending_projects": 1,
-    "total_sessions": 2,
-    "total_commits": 6,
-    "commits_with_session_ids": 4
+    "total_sessions": 9,
+    "total_commits": 37,
+    "commits_with_session_ids": 4,
+    "commits_with_claude_attribution": 14
   }
 }

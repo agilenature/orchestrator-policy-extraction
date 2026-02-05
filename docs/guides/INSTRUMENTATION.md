@@ -8,64 +8,41 @@ This guide explains how to add a new project to the Orchestrator Policy Extracti
 
 ## Prerequisites
 
-### 1. Git Hook for Session ID Tracking
+### 1. Git Hook for Session ID Tracking ✅ ALREADY INSTALLED
 
 **Purpose:** Link commits to Claude Code sessions automatically
 
-**Installation (one-time setup per project):**
+**Status:** ✅ **Global git hook is already installed and active!**
 
-```bash
-# Navigate to your project's git repository
-cd /path/to/your/project
+A global git hook has been configured that automatically adds session IDs to ALL commits across ALL repositories. You don't need to set up hooks per-project anymore.
 
-# Create the prepare-commit-msg hook
-cat > .git/hooks/prepare-commit-msg << 'EOF'
-#!/bin/bash
-# Add Claude session ID to commit messages
-
-COMMIT_MSG_FILE=$1
-COMMIT_SOURCE=$2
-
-# Only add session ID for regular commits (not merge, squash, etc.)
-if [ -z "$COMMIT_SOURCE" ]; then
-    # Check if Claude session ID is available in environment
-    if [ -n "$CLAUDE_SESSION_ID" ]; then
-        echo "" >> "$COMMIT_MSG_FILE"
-        echo "X-Claude-Session: $CLAUDE_SESSION_ID" >> "$COMMIT_MSG_FILE"
-    fi
-
-    # Add Claude co-authorship attribution
-    if [ -n "$CLAUDE_ACTIVE" ]; then
-        echo "Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>" >> "$COMMIT_MSG_FILE"
-    fi
-fi
-EOF
-
-# Make hook executable
-chmod +x .git/hooks/prepare-commit-msg
-```
-
-**Setting environment variables:**
-
-Claude Code should automatically set `CLAUDE_SESSION_ID` when running. If not, you can manually export:
-
-```bash
-export CLAUDE_SESSION_ID="<your-session-id>"
-export CLAUDE_ACTIVE="true"
-```
+**What it does:**
+- Automatically detects the current Claude Code session ID
+- Adds `X-Claude-Session: {id}` trailer to all commits
+- Adds `Co-Authored-By: Claude Sonnet 4.5` attribution
+- Works for every repository on your system
 
 **Verification:**
 
-Make a test commit and check the message:
+Make any commit and check the message:
 ```bash
 git log -1 --format=%B
 ```
 
 You should see:
 ```
-X-Claude-Session: abc123...
+Your commit message
+
+X-Claude-Session: d20e0a83-1a4f-4bde-98ae-ef5a3000440f
 Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 ```
+
+**For detailed information:**
+See [GLOBAL_GIT_HOOKS.md](GLOBAL_GIT_HOOKS.md) for:
+- How the auto-detection works
+- Troubleshooting steps
+- Manual session ID override
+- Customization options
 
 ---
 

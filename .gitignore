@@ -76,3 +76,4 @@ scratchpad/
 .planning/phases/*/output.jsonl  # Large agent outputs
 # Hook fix test
 # Hook test 2
+# Debug test

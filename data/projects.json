@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "last_updated": "2026-02-05",
+  "last_updated": "2026-02-05T17:40:00Z",
   "projects": [
     {
       "id": "modernizing-tool",
@@ -8,15 +8,38 @@
       "metadata_path": "data/raw/modernizing-tool/metadata.json",
       "status": "pending_processing",
       "added_date": "2026-02-05",
-      "notes": "Initial dataset - rich phase-based workflow with GSD framework"
+      "notes": "Initial dataset - rich phase-based workflow with GSD framework",
+      "data_status": {
+        "sessions_available": false,
+        "git_clone_needed": true,
+        "metadata_complete": false
+      }
     },
     {
       "id": "orchestrator-policy-extraction",
       "name": "Orchestrator Policy Extraction",
       "metadata_path": "data/raw/orchestrator-policy-extraction/metadata.json",
-      "status": "pending_processing",
+      "status": "ready",
       "added_date": "2026-02-05",
-      "notes": "Meta-project capturing our own orchestration patterns"
+      "notes": "Meta-project capturing our own orchestration patterns",
+      "data_status": {
+        "sessions_available": true,
+        "sessions_location": "~/.claude/projects/-Users-david-projects-orchestrator-policy-extraction/",
+        "git_clone_needed": false,
+        "git_location": "current_repository",
+        "metadata_complete": true,
+        "session_count": 2,
+        "commit_count": 6,
+        "commits_with_session_ids": 4
+      }
     }
-  ]
+  ],
+  "statistics": {
+    "total_projects": 2,
+    "ready_projects": 1,
+    "pending_projects": 1,
+    "total_sessions": 2,
+    "total_commits": 6,
+    "commits_with_session_ids": 4
+  }
 }

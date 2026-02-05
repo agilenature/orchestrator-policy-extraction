@@ -1,0 +1,76 @@
+{
+  "project_id": "orchestrator-policy-extraction",
+  "name": "Orchestrator Policy Extraction",
+  "description": "Multi-project dataset for learning orchestration policies from Claude Code sessions - this is the meta-project capturing its own development",
+  "repository": {
+    "url": "https://github.com/agilenature/orchestrator-policy-extraction",
+    "branch": "main",
+    "commit_range": {
+      "start_date": "2026-02-05T17:11:08-06:00",
+      "end_date": "2026-02-05T17:33:12-06:00",
+      "start_sha": "ccd65336ccea750bcb3eeb4c47d77982f8c71186",
+      "end_sha": "92f2119610e5c52f641b793c6c4e0b32e1f6a8dd",
+      "total_commits": 6,
+      "commits_with_session_ids": 4
+    }
+  },
+  "sessions": {
+    "directory": "/Users/david/.claude/projects/-Users-david-projects-orchestrator-policy-extraction/",
+    "storage_strategy": "reference_in_place",
+    "date_range": {
+      "start": "2026-02-05T16:04:00Z",
+      "end": "2026-02-05T17:39:00Z"
+    },
+    "session_count": 2,
+    "session_ids": [
+      "d20e0a83-1a4f-4bde-98ae-ef5a3000440f",
+      "8887ca6e-cd26-45df-89a3-5596b8f3e184"
+    ],
+    "total_size_mb": 2.0,
+    "subagent_count": 0
+  },
+  "authors": [
+    {
+      "name": "David Alfaro",
+      "email": "david@example.com",
+      "role": "primary"
+    }
+  ],
+  "data_collection": {
+    "date_added": "2026-02-05",
+    "added_by": "David Alfaro",
+    "instrumentation": {
+      "session_ids_in_commits": true,
+      "global_git_hook": true,
+      "claude_attribution": true,
+      "phase_labels": true
+    },
+    "notes": [
+      "Meta-project: Learns from its own orchestration sessions",
+      "Includes planning, architecture design, implementation discussions",
+      "Rich turn-level interactions (user questions, Claude responses, decisions)",
+      "Global git hook tested and validated on this project",
+      "Session IDs automatically added to commits (last 4 commits)"
+    ]
+  },
+  "characteristics": {
+    "project_type": "meta-learning",
+    "orchestration_patterns": [
+      "planning_and_architecture",
+      "documentation_creation",
+      "infrastructure_setup",
+      "debugging_and_validation",
+      "iterative_refinement"
+    ],
+    "gsd_framework": true,
+    "multi_agent": false,
+    "phase_structure": "Phase 0: Data Infrastructure (in progress)"
+  },
+  "quality_metrics": {
+    "correlation_precision": null,
+    "episode_count": null,
+    "action_coverage": null,
+    "reaction_coverage": null,
+    "notes": "To be computed in Phase 1-2"
+  }
+}

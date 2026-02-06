@@ -200,7 +200,7 @@ See [docs/ROADMAP.md](docs/ROADMAP.md) for detailed milestones.
 
 **Data Processing:**
 - Python 3.10+ (pandas, jsonlines, GitPython)
-- Optional: DuckDB or SQLite for querying
+- DuckDB (primary database for analytical queries and incremental updates)
 
 **Policy Learning (Phase 4+):**
 - RAG: FAISS or Chroma for episode retrieval

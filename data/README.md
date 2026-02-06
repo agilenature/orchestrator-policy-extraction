@@ -6,11 +6,17 @@ This directory contains the multi-project dataset for Orchestrator Policy Extrac
 
 ```
 data/
-├── raw/                      # Original source data (sessions + git repos)
-├── processed/                # Extracted artifacts per project
-├── merged/                   # Cross-project unified datasets
+├── ope.db                    # DuckDB database (primary storage - sessions, commits, episodes)
+├── raw/                      # Original source data (sessions + git repos, archival backup)
+├── processed/                # Exported datasets (Parquet, JSONL for specific use cases)
+├── merged/                   # Cross-project unified datasets (deprecated - now in ope.db)
 └── validation/               # Manual validation sets
 ```
+
+**Primary Storage:** All structured data (sessions, commits, correlations, episodes) is stored in `ope.db` (DuckDB database). This enables:
+- Fast incremental daily updates (process only new sessions/commits)
+- Efficient analytical queries (aggregations, filtering, joins)
+- Flexible exports to JSONL/Parquet when needed
 
 ## Subdirectories
 
@@ -28,61 +34,62 @@ raw/
 ```
 
 **Contents:**
-- Session logs from `~/.claude/projects/`
-- Full or shallow git clones
-- Project metadata (dates, authors, instrumentation settings)
+- **Session logs:** Copied from `~/.claude/projects/` to `sessions/` subdirectory
+- **Git repositories:** Shallow clones (temporary, excluded from git)
+- **Project metadata:** `metadata.json` with dates, authors, instrumentation settings
 
-**Storage Decision:** (To be determined in Phase 0.1)
-- Copy sessions vs. reference in place
-- Full clone vs. commit metadata extraction
+**Storage & Backup Strategy:** ✅ **Decision made**
+- **Sessions:** ALWAYS COPY to `data/raw/PROJECT/sessions/` and COMMIT TO GIT
+  - Rationale: Data loss prevention, reproducibility, portability
+  - Size: ~50-200 MB per project (manageable for git)
+  - Backup layers: Original + local copy + GitHub remote
+- **Git repos:** Shallow clone → extract metadata → delete clone
+  - Metadata saved to `data/processed/PROJECT/git-metadata.json`
+  - Repo excluded from git (can re-clone if needed)
 
 ### `processed/`
-**Purpose:** Extracted and analyzed data per project
+**Purpose:** Exported datasets for specific use cases (all primary data lives in `ope.db`)
 
 **Structure:**
 ```
 processed/
-├── PROJECT-ID/
-│   ├── session-hashes.json           # File hashes from session tool calls
-│   ├── commit-hashes.json            # File hashes from git commits
-│   ├── session-commit-map.json       # Correlation results
-│   ├── statistics.json               # Quality metrics
-│   ├── episodes/                     # Turn-level datasets
-│   │   ├── SESSION-ID.jsonl          # One file per session
-│   │   └── ...
-│   ├── episode-statistics.json       # Episode dataset metrics
+├── training_episodes.parquet         # ML training data export
+├── test_episodes.parquet             # ML test data export
+├── statistics.json                   # Dataset-wide quality metrics
+├── PROJECT-ID/                       # Per-project exports (if needed)
+│   ├── statistics.json               # Project-specific metrics
 │   └── parse-errors.log              # Errors encountered during processing
 ```
 
-**Format Decision:** (To be determined in Phase 0.1)
-- JSONL (human-readable, streamable)
-- SQLite (queryable, compact)
-- Parquet (columnar, analytics-optimized)
+**Note:** Session hashes, commit metadata, correlations, and episodes are stored in `data/ope.db` tables, not as separate JSON/JSONL files. This directory is primarily for exports to other formats.
+
+**Storage Format:** ✅ **Decision made:** DuckDB database (`data/ope.db`)
+- Primary storage for all structured data (sessions, commits, correlations, episodes)
+- Exports to JSONL (human inspection), Parquet (ML pipelines) as needed
+- Enables incremental daily updates and fast analytical queries
 
 ### `merged/`
-**Purpose:** Cross-project unified datasets and indices
+**Purpose:** Cross-project exports (deprecated - replaced by DuckDB queries)
 
-**Structure:**
-```
-merged/
-├── all-correlations.json     # Combined session-commit maps
-├── all-episodes.jsonl        # All episodes from all projects
-├── by-phase/                 # Episodes grouped by phase type
-│   ├── planning.jsonl
-│   ├── implementation.jsonl
-│   ├── testing.jsonl
-│   └── ...
-├── by-action-type/           # Episodes grouped by action taxonomy
-│   ├── inspect-codebase.jsonl
-│   ├── run-tests.jsonl
-│   └── ...
-└── statistics.json           # Aggregate statistics across projects
+**Note:** With DuckDB as primary storage, cross-project queries are done via SQL:
+```sql
+-- All episodes across projects
+SELECT * FROM episodes;
+
+-- Episodes by phase
+SELECT * FROM episodes WHERE json_extract(observation, '$.phase_label') LIKE '03%';
+
+-- Episodes by action type
+SELECT * FROM episodes WHERE json_extract(claude_action, '$.tool') = 'Bash';
+
+-- Export merged dataset if needed
+COPY (SELECT * FROM episodes) TO 'merged/all-episodes.parquet' (FORMAT PARQUET);
 ```
 
-**Usage:**
-- Training/testing RAG orchestrator
-- Cross-project pattern analysis
-- Dataset-wide metrics
+**This directory may contain:**
+- Exported snapshots for specific analyses
+- Archived dataset versions for reproducibility
+- Generated reports and visualizations
 
 ### `validation/`
 **Purpose:** Manual validation sets for quality assurance
@@ -124,16 +131,23 @@ validation/
 
 ## Backup & Versioning
 
-**Recommended:**
-- Raw data: Archive externally (GitHub releases, S3, etc.)
-- Processed data: Git LFS or DVC for version tracking
-- Merged indices: Commit to git (small enough)
+**Backup Strategy (3 Layers):**
+1. **Primary:** `~/.claude/projects/` (original session files)
+2. **Local backup:** `data/raw/PROJECT/sessions/` (copied)
+3. **Remote backup:** GitHub (via git push)
+4. **Extracted data:** `data/ope.db` (DuckDB - can reconstruct if needed)
 
 **`.gitignore` Strategy:**
-- Exclude `raw/` (too large, reproducible from source)
-- Exclude `processed/*/episodes/` (large, reproducible)
-- Include `processed/*/statistics.json` (small, useful)
-- Include `merged/` (curated datasets)
+- ✅ **Include** `data/raw/*/sessions/` (session JSONL files - COMMITTED for backup)
+- ✅ **Include** `data/ope.db` (DuckDB database - primary extracted data)
+- ✅ **Include** `data/processed/statistics.json` (small, useful metrics)
+- ❌ **Exclude** `data/raw/*/git/` (can re-clone repositories)
+- ❌ **Exclude** `data/processed/*.parquet` (exported datasets, reproducible)
+
+**Dataset Versioning:**
+- Tag releases when significant milestones reached: `v1.0`, `v1.1`, etc.
+- GitHub releases can include additional archives if needed
+- Commit messages track when sessions/data added
 
 ## Data Quality Metrics
 

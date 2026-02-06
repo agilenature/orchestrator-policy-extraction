@@ -48,10 +48,11 @@ dmypy.json
 # Logs
 *.log
 
-# Data (exclude large raw data, include processed summaries)
-data/raw/*/sessions/          # Session JSONL files (large, reproducible)
-data/raw/*/git/               # Git clones (large, reproducible)
-data/processed/*/episodes/    # Episode files (large, reproducible)
+# Data backup strategy (see .planning/PHASE-0-DECISIONS.md Decision 2)
+# Sessions: INCLUDED (committed for backup/reproducibility)
+# Git repos: EXCLUDED (can re-clone, metadata extracted to JSON)
+# DuckDB: INCLUDED (primary extracted data)
+data/raw/*/git/               # Git clones (large, can re-clone)
 
 # Keep these for tracking
 !data/raw/*/metadata.json

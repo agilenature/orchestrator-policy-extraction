@@ -34,30 +34,53 @@ This document records the key decisions made during Phase 0 that will shape the 
 
 ---
 
-## Decision 2: Session Data Storage Strategy
+## Decision 2: Session Data Storage and Backup Strategy
 
-**Decision:** REFERENCE IN PLACE for active projects, COPY for archived projects
+**Decision:** ALWAYS COPY sessions to `data/raw/PROJECT/sessions/` and COMMIT TO GIT
 
 **Rationale:**
-- Session data lives in `~/.claude/projects/` which is user-managed
-- For active projects, sessions continue to accumulate → reference original location
-- For archived/completed projects → copy for long-term preservation
-- Avoids duplicating large datasets unnecessarily
+- **Data loss prevention:** Raw session data is irreplaceable research data - losing it would be catastrophic
+- **Reproducibility:** Anyone cloning the repo gets complete dataset (sessions + DuckDB)
+- **Portability:** Self-contained project can be zipped, moved, or shared
+- **Size is manageable:** 250 MB - 1 GB total sessions across 5 projects fits comfortably in Git
+- **Sessions are append-only:** Git handles this efficiently (no repeated changes to old files)
+- **Simple backup strategy:** No need for external S3/Dropbox/LFS setup
 
 **Implementation:**
-- `metadata.json` includes `sessions.directory` field (absolute path)
-- Processing scripts read from original location
-- `scripts/archive-project.py` (future) copies sessions to `data/raw/PROJECT/sessions/`
+```bash
+# When adding a project
+scripts/add-project.py --name "My Project" --copy-sessions
+# Copies ~/.claude/projects/PROJECT-HASH/* to data/raw/PROJECT/sessions/
+
+# Sessions committed to git (NOT in .gitignore)
+git add data/raw/PROJECT/sessions/*.jsonl
+git commit -m "data: Add PROJECT sessions (X files, Y MB)"
+```
+
+**Git Strategy:**
+- Sessions in `data/raw/*/sessions/` are **committed normally** (not excluded)
+- New sessions added as project progresses (incremental commits)
+- `.gitignore` excludes other temporary/large files, but NOT sessions
+
+**Backup Layers:**
+1. **Primary:** `~/.claude/projects/` (original)
+2. **Local backup:** `data/raw/PROJECT/sessions/` (copy)
+3. **Remote backup:** GitHub (via git push)
+4. **Extracted data:** `data/ope.db` (DuckDB - can reconstruct if needed)
 
 **Implications:**
-- Projects must specify whether sessions are copied or referenced
-- Copied projects are portable (can share dataset)
-- Referenced projects require access to original `~/.claude/` directory
+- ✅ Safe from local data loss (3 copies: original + local backup + GitHub)
+- ✅ Reproducible research (others can clone and verify)
+- ✅ Portable project (can move/share entire repo)
+- ⚠️ Git repo grows to ~500 MB - 1.5 GB (sessions + code + DuckDB)
+- ⚠️ Initial clone takes longer (~2-5 minutes vs. seconds)
+- ⚠️ Need to be mindful of session size when adding projects (>200 MB/project → consider Git LFS)
 
 **Alternatives Considered:**
-- ❌ Always copy → Wastes disk space for active projects
-- ❌ Always reference → Not portable, breaks if user deletes sessions
-- ❌ Extract to DB → Loses raw format, harder to debug/inspect
+- ❌ Reference in place → Risky, not portable, data loss if ~/.claude/ deleted
+- ❌ Copy but exclude from git → No remote backup, need external strategy
+- ❌ Git LFS → Unnecessary complexity for current data size, bandwidth limits
+- ❌ Extract to DB only → Loses raw format, can't re-run extraction with different logic
 
 ---
 
@@ -114,66 +137,92 @@ rm -rf data/raw/PROJECT/git/.git/
 
 ---
 
-## Decision 4: Episode Dataset Format
+## Decision 4: Episode Dataset Format and Query Engine
 
-**Decision:** JSONL (JSON Lines) for episodes, SQLite for queryable indices (future)
+**Decision:** DuckDB as primary database with persistent storage, JSONL/Parquet exports for specific use cases
 
 **Rationale:**
-- **JSONL advantages:**
-  - Human-readable (easy to inspect)
-  - Streamable (process line-by-line)
-  - Append-only (incremental updates)
-  - Standard format (many tools support)
-  - Good for RAG retrieval (load into vector DB)
+- **Daily incremental updates:** New sessions/commits added daily → incremental database updates are much faster than re-processing all JSONL files
+- **Analytical query performance:** DuckDB is optimized for OLAP (aggregations, filtering, joins) which matches our read-heavy analytical access patterns
+- **Direct JSONL querying:** DuckDB can query JSONL files directly without pre-loading, enabling flexible exploration early on
+- **Format flexibility:** Can export to JSONL (human inspection), Parquet (ML pipelines), or keep in DuckDB (analytical queries)
+- **Proven for this use case:** Demonstrated effective for Claude Code log analysis (see: liambx.com/blog/claude-code-log-analysis-with-duckdb)
 
-- **SQLite for future:**
-  - If dataset grows large (>10K episodes)
-  - If need complex queries (JOIN episodes with correlations)
-  - If performance becomes bottleneck
+**Architecture:**
+```
+Daily workflow:
+1. Detect new sessions/commits (modified since last update)
+2. Process ONLY new data
+3. INSERT/UPDATE into DuckDB database (incremental)
+4. Database always current, no full re-scan
+
+Ad-hoc queries:
+- SELECT from DuckDB database (fast, indexed)
+- Export subsets when needed (training data, validation sets)
+```
 
 **Implementation:**
-- Episodes: `data/processed/PROJECT/episodes/SESSION-ID.jsonl` (one per session)
-- Merged: `data/merged/all-episodes.jsonl` (all projects combined)
-- Optional: `data/merged/episodes.db` (SQLite view for queries)
+- **Primary storage:** `data/ope.db` (DuckDB database file)
+- **Tables:**
+  - `sessions` - Raw session data (session_id, project_id, timestamp, message, etc.)
+  - `commits` - Git commit metadata
+  - `correlations` - Session-commit correlation results
+  - `episodes` - Extracted turn-level episodes
+  - `update_log` - Track processing timestamps for incremental updates
+- **Optional exports:**
+  - `data/processed/training_episodes.parquet` - ML training data
+  - `data/validation/low_confidence.jsonl` - Manual review cases
+  - Raw JSONL kept as archival backup (not primary working copy)
 
-**Schema (per episode):**
-```json
-{
-  "episode_id": "modernizing-tool_session-abc_turn-05",
-  "project": "modernizing-tool",
-  "session_id": "abc123...",
-  "turn_index": 5,
-  "timestamp": "2026-02-01T14:23:00Z",
-  "observation": {
-    "conversation_context": [...],
-    "file_state": [...],
-    "phase_label": "03.1-01",
-    "test_status": "passing",
-    "current_task": "Implement parser"
-  },
-  "claude_action": {
-    "tool": "Edit",
-    "parameters": {...},
-    "reasoning": "..."
-  },
-  "user_reaction": {
-    "type": "approve",
-    "message": "...",
-    "next_action": {...}
-  },
-  "correlated_commit": "sha256_if_available"
-}
+**Schema (DuckDB episodes table):**
+```sql
+CREATE TABLE episodes (
+  episode_id VARCHAR PRIMARY KEY,
+  project_id VARCHAR,
+  session_id VARCHAR,
+  turn_index INTEGER,
+  timestamp TIMESTAMP,
+  observation JSON,          -- Nested: conversation_context, file_state, phase_label, test_status, current_task
+  claude_action JSON,        -- Nested: tool, parameters, reasoning
+  user_reaction JSON,        -- Nested: type, message, next_action
+  correlated_commit VARCHAR, -- SHA if available
+  created_at TIMESTAMP,
+  INDEX (project_id, timestamp),
+  INDEX (session_id)
+);
+```
+
+**Example queries:**
+```sql
+-- Find all test-running episodes
+SELECT * FROM episodes
+WHERE json_extract(claude_action, '$.tool') = 'Bash'
+  AND json_extract(claude_action, '$.parameters.command') LIKE '%test%';
+
+-- Count episodes by phase
+SELECT json_extract(observation, '$.phase_label') as phase, COUNT(*)
+FROM episodes
+GROUP BY phase;
+
+-- Export training data to Parquet
+COPY (SELECT * FROM episodes WHERE timestamp < '2026-01-01')
+TO 'data/processed/training_episodes.parquet' (FORMAT PARQUET);
 ```
 
 **Implications:**
-- Easy to add new fields (just append to JSON)
-- Can load into pandas, DuckDB, vector DBs
-- May need SQLite later for performance
+- ✅ Fast incremental updates (only process new sessions daily)
+- ✅ Fast analytical queries (pre-indexed, no JSON parsing each time)
+- ✅ Compact storage (DuckDB compression)
+- ✅ Can export to any format (JSONL, Parquet, CSV) when needed
+- ✅ Scales well as dataset grows (GB-range data)
+- ⚠️ Need migration script if schema changes (ALTER TABLE)
+- ⚠️ Single-writer limitation (fine for daily batch updates)
 
 **Alternatives Considered:**
-- ❌ CSV → Not nested structures, hard to read
-- ❌ Parquet → Binary, not human-readable, harder to append
-- ❌ SQLite only → Harder to inspect, less portable
+- ❌ JSONL only → Slow as dataset grows (full re-scan for every query)
+- ❌ SQLite → Slower for analytical queries (OLTP-optimized, not OLAP)
+- ❌ Parquet files only → No SQL interface, harder to query ad-hoc
+- ❌ Re-query raw JSONL every time → Acceptable for exploration, but inefficient for production
 
 ---
 
@@ -363,9 +412,10 @@ rm -rf data/raw/PROJECT/git/.git/
 | Decision | Choice | Rationale | Phase |
 |----------|--------|-----------|-------|
 | Architecture | Multi-project | Scalability, diversity | 0.2 |
-| Session storage | Reference in place | Avoid duplication | 0.3 |
+| **Session backup** | **Copy + commit to git** | **Data loss prevention, reproducibility** | **0.1** |
 | Git storage | Shallow clone + metadata | Balance size and utility | 0.3 |
-| Episode format | JSONL | Human-readable, streamable | 0.1 |
+| Query engine & storage | **DuckDB database** | Incremental updates, analytical queries | **0.1** |
+| Episode format | DuckDB tables + exports | Fast queries, flexible exports | 0.1 |
 | Taxonomy format | JSON schema | Structured, versionable | 0.1 |
 | Registry | JSON file | Simple, sufficient | 0.2 |
 | Correlation threshold | >0.7 precision | Quality gate | 1.4 |

@@ -3,6 +3,9 @@
 
 # Phase 0 (infrastructure)
 jsonlines>=3.1.0
+duckdb>=0.10.0
+jsonschema>=4.20.0
+pyyaml>=6.0.0
 
 # Phase 1 (correlation)
 # numpy>=1.24.0

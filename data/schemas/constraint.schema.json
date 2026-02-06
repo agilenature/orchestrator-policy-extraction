@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/constraint.schema.json",
+  "title": "OrchestrationConstraint",
+  "description": "Durable rule extracted from user corrections/blocks",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["constraint_id", "text", "severity", "scope"],
+  "properties": {
+    "constraint_id": {
+      "type": "string",
+      "description": "Unique identifier for this constraint"
+    },
+    "text": {
+      "type": "string",
+      "description": "Human-readable constraint statement"
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["warning", "requires_approval", "forbidden"],
+      "description": "Enforcement level for this constraint"
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paths"],
+      "properties": {
+        "paths": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "File paths or globs where this constraint applies. Empty array means repo-wide."
+        }
+      }
+    },
+    "detection_hints": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Patterns that help detect violations: commands, file globs, forbidden strings, library names"
+    },
+    "source_episode_id": {
+      "type": "string",
+      "description": "Episode ID where this constraint was extracted"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this constraint was extracted"
+    },
+    "examples": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["episode_id", "violation_description"],
+        "properties": {
+          "episode_id": { "type": "string" },
+          "violation_description": { "type": "string" }
+        }
+      },
+      "description": "Episodes where this constraint was learned or violated"
+    }
+  }
+}

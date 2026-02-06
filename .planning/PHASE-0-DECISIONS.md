@@ -407,6 +407,67 @@ TO 'data/processed/training_episodes.parquet' (FORMAT PARQUET);
 
 ---
 
+## Decision 11: Orchestrator-First Episode Design
+
+**Decision:** Episodes capture **orchestrator directives** (mode/scope/gates/instruction), NOT executor tool calls
+
+**Critical Error Identified:** The original turn-level approach would train the **executor** (Claude's tool calls: Read/Edit/Bash) instead of the **orchestrator** (OpenClaw's decision-making policy).
+
+**Rationale:**
+- **Learning target:** OpenClaw must learn "what to do next" (orchestration), not "how to implement" (execution)
+- **Orchestrator actions:** mode (Explore/Plan/Implement/Verify/Integrate/Triage/Refactor), scope (paths/avoid), constraints, gates (require_approval/run_tests/etc.), risk level
+- **Executor actions:** Tool calls (Read/Edit/Bash sequences) - separate layer, not primary training signal
+- **Decision points ≠ turns:** Episodes triggered by decision boundaries (O_DIR, X_PROPOSE, T_TEST, commit, risk), not every user prompt
+- **Constraint extraction:** Corrections/blocks become durable rules (e.g., "avoid regex for XML")
+- **Human-absent operation:** Reactions train preference model + objective quality proxies (tests/lint/diff_risk)
+
+**Implementation:**
+
+**Episode Schema:**
+- **Reference:** `data/schemas/orchestrator-episode.schema.json`
+- **Source:** `docs/design/WHY_TURN_LEVEL - Improved.md` (lines 353-829)
+- **Key fields:**
+  - `orchestrator_action`: {mode, goal, scope, executor_instruction, gates, risk}
+  - `observation`: {repo_state, quality_state, context}
+  - `outcome`: {executor_effects, quality, reaction, reward_signals}
+  - `constraints_extracted`: [{constraint_id, text, severity, scope, detection_hints}]
+
+**Event Tagging & Segmentation:**
+- **Orchestrator tags:** O_DIR (directive), O_GATE (gate), O_CORR (correction), O_REDIRECT, O_QUESTION
+- **Executor tags:** X_PROPOSE (proposal), X_ASK (question), X_PATCH, X_SUMMARY
+- **Tool tags:** T_TEST, T_LINT, T_BUILD, T_GIT_COMMIT, T_RISKY
+- **Episode start:** O_DIR or O_GATE
+- **Episode end:** X_PROPOSE, X_ASK, test result, risky boundary, commit, 30min timeout
+
+**Configuration:**
+- **Risk model:** `data/config.yaml` (protected paths, diff thresholds, risky commands)
+- **Mode inference:** Keyword rules → mode classification
+- **Reaction keywords:** approve, correct, redirect, block, question
+- **Constraint patterns:** forbidden ("don't"), required ("must"), preferred ("use")
+
+**Implications:**
+- ✅ Episodes are learnable orchestration decisions (not execution details)
+- ✅ Constraints become first-class artifacts (durable policy)
+- ✅ Three-layer architecture: Orchestrator episodes (train OpenClaw) + Executor episodes (optimize Claude) + Deliverable episodes (validation)
+- ✅ Supports human-absent operation (objective rewards + preference model)
+- ⚠️ More complex extraction (decision-point detection vs. turn splitting)
+- ⚠️ Mode inference requires validation (target >85% accuracy)
+
+**Alternatives Considered:**
+- ❌ Turn-level episodes with tool calls → Trains executor, not orchestrator
+- ❌ Commit-only correlation → Too coarse, hides decisions and mistakes
+- ❌ Hybrid (tool calls + directives) → Conflates layers, unclear learning target
+
+**Validation:**
+- Worked example from "Improved.md" (lines 1544-1949) produces 3 correct episodes
+- Mode inference >85% accurate on manual validation
+- Constraint extraction successful on corrections/blocks
+- Episodes contain negative examples (not just approvals)
+
+**Reference Document:** `docs/design/WHY_TURN_LEVEL - Improved.md` (see `.planning/PLANNING_POLICY.md`)
+
+---
+
 ## Decision Summary Table
 
 | Decision | Choice | Rationale | Phase |
@@ -421,6 +482,7 @@ TO 'data/processed/training_episodes.parquet' (FORMAT PARQUET);
 | Correlation threshold | >0.7 precision | Quality gate | 1.4 |
 | Instrumentation | Recommended, not required | Flexibility | 0.4 |
 | Versioning | Semantic + snapshots | Reproducibility | 0.1 |
+| **Orchestrator-first design** | **Decision-point episodes** | **Train orchestrator, not executor** | **0.5** |
 
 ---
 

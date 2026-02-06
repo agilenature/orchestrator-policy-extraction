@@ -1,0 +1,246 @@
+# Episode Builder Configuration
+# Based on "WHY_TURN_LEVEL - Improved.md" specification
+
+episode_builder:
+  # Episode boundaries
+  idle_timeout_minutes: 30  # Close episode if no events for this long
+  commit_link_window_minutes: 10  # Match episodes to commits within this window
+
+# Risk Model Configuration
+risk:
+  # Protected paths (touching these paths → high risk)
+  protected_paths:
+    - "infra/"
+    - "db/migrations/"
+    - "auth/"
+    - ".github/workflows/"
+    - "secrets/"
+    - "credentials/"
+
+  # Diff size risk thresholds
+  diff_thresholds:
+    low:
+      lines: 50
+      files: 3
+      risk: 0.2
+    medium:
+      lines: 300
+      files: 10
+      risk: 0.5
+    high:
+      risk: 0.8
+
+  # Risky commands (trigger risk boundary + episode end)
+  risky_commands:
+    - "rm -rf"
+    - "sudo"
+    - "curl * | bash"
+    - "wget * | sh"
+    - "git push origin main"
+    - "git push origin master"
+    - "git push --force"
+    - "git reset --hard"
+
+# Event Tagging Patterns
+tags:
+  # Test commands (trigger T_TEST tag)
+  test_commands:
+    - "pytest"
+    - "go test"
+    - "mvn test"
+    - "gradle test"
+    - "npm test"
+    - "pnpm test"
+    - "cargo test"
+    - "dotnet test"
+    - "ctest"
+
+  # Lint/format commands (trigger T_LINT tag)
+  lint_commands:
+    - "ruff"
+    - "flake8"
+    - "eslint"
+    - "prettier"
+    - "black"
+    - "mypy"
+    - "golangci-lint"
+    - "cargo fmt"
+    - "cargo clippy"
+
+  # Build commands (trigger T_BUILD tag)
+  build_commands:
+    - "make"
+    - "gradle build"
+    - "mvn package"
+    - "cargo build"
+    - "npm run build"
+    - "pnpm build"
+    - "go build"
+
+  # Git commands (trigger T_GIT_* tags)
+  git_commands:
+    commit: ["git commit"]
+    push: ["git push"]
+    merge: ["git merge"]
+    rebase: ["git rebase"]
+    checkout: ["git checkout", "git switch"]
+    branch: ["git branch"]
+    status: ["git status"]
+    diff: ["git diff"]
+
+# Reaction Classification Keywords
+reaction_keywords:
+  # Block (high confidence)
+  block:
+    - "NO"
+    - "don't"
+    - "stop"
+    - "never"
+    - "absolutely not"
+    - "do not"
+
+  # Correct (medium-high confidence)
+  correct:
+    - "no, do"
+    - "instead"
+    - "use"
+    - "replace"
+    - "avoid"
+    - "don't use"
+    - "change it to"
+    - "that's wrong"
+
+  # Approve (high confidence)
+  approve:
+    - "yes"
+    - "ok"
+    - "okay"
+    - "looks good"
+    - "go ahead"
+    - "commit"
+    - "ship it"
+    - "continue"
+    - "proceed"
+
+  # Redirect (medium confidence)
+  redirect:
+    - "instead focus"
+    - "let's do"
+    - "different direction"
+    - "switch to"
+    - "ignore that"
+
+  # Question (high confidence)
+  question:
+    - "why"
+    - "how"
+    - "what about"
+    - "can you clarify"
+    - "explain"
+
+# Orchestrator Mode Inference Rules
+mode_inference:
+  Explore:
+    keywords:
+      - "investigate"
+      - "scan"
+      - "find"
+      - "analyze"
+      - "look for"
+      - "search"
+      - "inspect"
+    priority: 1
+
+  Plan:
+    keywords:
+      - "plan"
+      - "options"
+      - "tradeoffs"
+      - "proposal"
+      - "design"
+      - "propose"
+    priority: 2
+
+  Implement:
+    keywords:
+      - "implement"
+      - "add feature"
+      - "write code"
+      - "create"
+      - "build"
+    priority: 3
+
+  Refactor:
+    keywords:
+      - "refactor"
+      - "restructure"
+      - "reorganize"
+      - "clean up"
+    priority: 3
+
+  Verify:
+    keywords:
+      - "run tests"
+      - "verify"
+      - "check"
+      - "validate"
+      - "test"
+    priority: 4
+
+  Triage:
+    keywords:
+      - "debug"
+      - "fix"
+      - "reproduce"
+      - "investigate error"
+      - "diagnose"
+    priority: 4
+
+  Integrate:
+    keywords:
+      - "commit"
+      - "PR"
+      - "pull request"
+      - "merge"
+      - "release"
+      - "push"
+    priority: 5
+
+# Gate Detection Patterns
+gate_patterns:
+  run_tests:
+    - "run tests"
+    - "test first"
+    - "make sure tests pass"
+
+  require_human_approval:
+    - "ask first"
+    - "get approval"
+    - "check with me"
+    - "review before"
+
+  no_write_before_plan:
+    - "don't write"
+    - "plan first"
+    - "no code until"
+
+  protected_paths:
+    # Implicit - triggered by risk model
+
+# Constraint Extraction Patterns
+constraint_patterns:
+  forbidden:
+    - "don't"
+    - "never"
+    - "avoid"
+    - "do not"
+
+  required:
+    - "must"
+    - "always"
+    - "required"
+
+  preferred:
+    - "use"
+    - "prefer"
+    - "better to"

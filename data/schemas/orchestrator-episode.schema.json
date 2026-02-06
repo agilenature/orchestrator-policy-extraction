@@ -1,0 +1,476 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/orchestrator_episode.schema.json",
+  "title": "OrchestratorDecisionPointEpisode",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "episode_id",
+    "timestamp",
+    "project",
+    "observation",
+    "orchestrator_action",
+    "outcome",
+    "provenance"
+  ],
+  "properties": {
+    "episode_id": {
+      "type": "string",
+      "description": "UUID for the episode."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of the decision point (when orchestrator_action was taken)."
+    },
+
+    "project": {
+      "$ref": "#/$defs/ProjectRef"
+    },
+
+    "phase": {
+      "type": "string",
+      "description": "Modernization phase label if you have one (e.g., 03.1-01)."
+    },
+    "task_id": {
+      "type": "string",
+      "description": "Stable task/work-item identifier (ticket id, issue id, or internal label)."
+    },
+
+    "observation": {
+      "$ref": "#/$defs/Observation"
+    },
+
+    "orchestrator_action": {
+      "$ref": "#/$defs/OrchestratorAction"
+    },
+
+    "outcome": {
+      "$ref": "#/$defs/Outcome"
+    },
+
+    "constraints_extracted": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Constraint" },
+      "description": "Constraints derived from corrections/blocks; becomes a durable rule set."
+    },
+
+    "labels": {
+      "$ref": "#/$defs/EpisodeLabels"
+    },
+
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+
+    "x_extensions": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Escape hatch for extra fields; keep core schema strict."
+    }
+  },
+
+  "$defs": {
+    "ProjectRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repo_path"],
+      "properties": {
+        "repo_path": {
+          "type": "string",
+          "description": "Canonical local path or repo id."
+        },
+        "repo_remote": {
+          "type": "string",
+          "description": "Optional remote URL / identifier."
+        },
+        "branch": {
+          "type": "string",
+          "description": "Branch at the time of the decision point."
+        },
+        "commit_head": {
+          "type": "string",
+          "description": "HEAD commit hash at decision time (if known)."
+        }
+      }
+    },
+
+    "Observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repo_state", "quality_state", "context"],
+      "properties": {
+        "repo_state": { "$ref": "#/$defs/RepoState" },
+        "quality_state": { "$ref": "#/$defs/QualityState" },
+        "context": { "$ref": "#/$defs/ContextState" }
+      }
+    },
+
+    "RepoState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["changed_files", "diff_stat"],
+      "properties": {
+        "changed_files": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "diff_stat": {
+          "$ref": "#/$defs/DiffStat"
+        },
+        "hotspots": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Files/modules frequently touched in the last N episodes (optional)."
+        }
+      }
+    },
+
+    "DiffStat": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["files", "insertions", "deletions"],
+      "properties": {
+        "files": { "type": "integer", "minimum": 0 },
+        "insertions": { "type": "integer", "minimum": 0 },
+        "deletions": { "type": "integer", "minimum": 0 }
+      }
+    },
+
+    "QualityState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tests", "lint"],
+      "properties": {
+        "tests": { "$ref": "#/$defs/TestState" },
+        "lint": { "$ref": "#/$defs/LintState" },
+        "build": { "$ref": "#/$defs/BuildState" }
+      }
+    },
+
+    "TestState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["unknown", "pass", "fail", "not_run"]
+        },
+        "last_command": { "type": "string" },
+        "failing": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+
+    "LintState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["unknown", "pass", "fail", "not_run"]
+        },
+        "last_command": { "type": "string" },
+        "issues_count": { "type": "integer", "minimum": 0 }
+      }
+    },
+
+    "BuildState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["unknown", "pass", "fail", "not_run"]
+        },
+        "last_command": { "type": "string" }
+      }
+    },
+
+    "ContextState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recent_summary", "open_questions", "constraints_in_force"],
+      "properties": {
+        "recent_summary": {
+          "type": "string",
+          "description": "Compact summary of what just happened (from logs/tool outputs)."
+        },
+        "open_questions": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "constraints_in_force": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Active rule names/ids currently governing work."
+        }
+      }
+    },
+
+    "OrchestratorAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "goal",
+        "scope",
+        "executor_instruction",
+        "gates",
+        "risk"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["Explore", "Plan", "Implement", "Verify", "Integrate", "Triage", "Refactor"]
+        },
+        "goal": { "type": "string" },
+
+        "scope": { "$ref": "#/$defs/Scope" },
+
+        "executor_instruction": {
+          "type": "string",
+          "description": "What the orchestrator tells the executor (Claude Code) to do next."
+        },
+
+        "gates": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Gate" },
+          "description": "Checks/requirements before proceeding (tests, approvals, diff caps)."
+        },
+
+        "risk": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"]
+        },
+
+        "expected_artifacts": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Optional: what outputs are expected (docs, patch, PR, test report)."
+        }
+      }
+    },
+
+    "Scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paths"],
+      "properties": {
+        "paths": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "avoid": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+
+    "Gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "require_human_approval",
+            "run_tests",
+            "run_lint",
+            "diff_size_cap",
+            "no_write_before_plan",
+            "protected_paths",
+            "no_network",
+            "no_secrets_access"
+          ]
+        },
+        "params": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+
+    "Outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["executor_effects", "quality", "reward_signals"],
+      "properties": {
+        "executor_effects": { "$ref": "#/$defs/ExecutorEffects" },
+        "quality": { "$ref": "#/$defs/OutcomeQuality" },
+
+        "reaction": {
+          "$ref": "#/$defs/Reaction",
+          "description": "Optional; present when a human reaction is known/labelled."
+        },
+
+        "reward_signals": {
+          "$ref": "#/$defs/RewardSignals",
+          "description": "Always include objective proxies; reaction-based signals may be absent."
+        }
+      }
+    },
+
+    "ExecutorEffects": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tool_calls_count", "files_touched", "commands_ran"],
+      "properties": {
+        "tool_calls_count": { "type": "integer", "minimum": 0 },
+        "files_touched": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "commands_ran": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "git_events": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/GitEvent" }
+        }
+      }
+    },
+
+    "GitEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["status", "diff", "add", "commit", "merge", "rebase", "push", "checkout", "branch"]
+        },
+        "ref": { "type": "string" },
+        "message": { "type": "string" }
+      }
+    },
+
+    "OutcomeQuality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tests_status", "lint_status", "diff_stat"],
+      "properties": {
+        "tests_status": { "type": "string", "enum": ["unknown", "pass", "fail", "not_run"] },
+        "lint_status": { "type": "string", "enum": ["unknown", "pass", "fail", "not_run"] },
+        "build_status": { "type": "string", "enum": ["unknown", "pass", "fail", "not_run"] },
+        "diff_stat": { "$ref": "#/$defs/DiffStat" }
+      }
+    },
+
+    "Reaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "message", "confidence"],
+      "properties": {
+        "label": {
+          "type": "string",
+          "enum": ["approve", "correct", "redirect", "block", "question", "unknown"]
+        },
+        "message": { "type": "string" },
+        "confidence": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+      }
+    },
+
+    "RewardSignals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["objective"],
+      "properties": {
+        "objective": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tests", "lint", "diff_risk"],
+          "properties": {
+            "tests": { "type": "number", "description": "Scaled score; e.g. pass=1, fail=0." },
+            "lint": { "type": "number" },
+            "diff_risk": {
+              "type": "number",
+              "description": "Scaled risk proxy from diff size + protected paths touched."
+            }
+          }
+        },
+        "preference_model": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "predicted_reaction": { "type": "string", "enum": ["approve", "correct", "redirect", "block", "question", "unknown"] },
+            "confidence": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+          }
+        }
+      }
+    },
+
+    "Constraint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["constraint_id", "text", "severity", "scope"],
+      "properties": {
+        "constraint_id": { "type": "string" },
+        "text": { "type": "string" },
+        "severity": { "type": "string", "enum": ["warning", "requires_approval", "forbidden"] },
+        "scope": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["paths"],
+          "properties": {
+            "paths": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "detection_hints": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Patterns that help detect violations (commands, file globs, strings)."
+        }
+      }
+    },
+
+    "EpisodeLabels": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "episode_type": {
+          "type": "string",
+          "enum": ["decision_point", "checkpoint", "handoff", "recovery", "milestone"]
+        },
+        "notes": { "type": "string" }
+      }
+    },
+
+    "Provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sources"],
+      "properties": {
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/SourceRef" }
+        }
+      }
+    },
+
+    "SourceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "ref"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["claude_jsonl", "terminal_log", "git", "ci"]
+        },
+        "ref": {
+          "type": "string",
+          "description": "Pointer to source material: file path + line range, message ids, or commit hashes."
+        }
+      }
+    }
+  }
+}

@@ -98,13 +98,35 @@ Mapping requirements to roadmap phases. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (Populated by roadmapper) | (Phase N) | Pending |
+| EXTRACT-01 | Phase 1: Event Stream Foundation | Pending |
+| EXTRACT-02 | Phase 1: Event Stream Foundation | Pending |
+| EXTRACT-03 | Phase 1: Event Stream Foundation | Pending |
+| EXTRACT-04 | Phase 2: Episode Population & Storage | Pending |
+| EXTRACT-05 | Phase 2: Episode Population & Storage | Pending |
+| EXTRACT-06 | Phase 3: Constraint Management | Pending |
+| DATA-01 | Phase 2: Episode Population & Storage | Pending |
+| DATA-02 | Phase 2: Episode Population & Storage | Pending |
+| DATA-03 | Phase 1: Event Stream Foundation | Pending |
+| DATA-04 | Phase 2: Episode Population & Storage | Pending |
+| CONST-01 | Phase 3: Constraint Management | Pending |
+| CONST-02 | Phase 3: Constraint Management | Pending |
+| CONST-03 | Phase 3: Constraint Management | Pending |
+| CONST-04 | Phase 3: Constraint Management | Pending |
+| VALID-01 | Phase 4: Validation & Quality | Pending |
+| VALID-02 | Phase 4: Validation & Quality | Pending |
+| VALID-03 | Phase 4: Validation & Quality | Pending |
+| TRAIN-01 | Phase 5: Training Infrastructure | Pending |
+| TRAIN-02 | Phase 5: Training Infrastructure | Pending |
+| MC-01 | Phase 6: Mission Control Integration | Pending |
+| MC-02 | Phase 6: Mission Control Integration | Pending |
+| MC-03 | Phase 6: Mission Control Integration | Pending |
+| MC-04 | Phase 6: Mission Control Integration | Pending |
 
 **Coverage:**
-- v1 requirements: 26 total
-- Mapped to phases: (TBD)
-- Unmapped: (TBD)
+- v1 requirements: 23 total
+- Mapped to phases: 23
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-10*
-*Last updated: 2026-02-10 after initial definition*
+*Last updated: 2026-02-10 after roadmap creation (traceability populated)*

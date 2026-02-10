@@ -1,143 +1,63 @@
 # Project State
 
-**Last Updated:** 2026-02-05
+## Project Reference
 
----
+See: .planning/PROJECT.md (updated 2026-02-10)
 
-## Current Phase
+**Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
+**Current focus:** Phase 1 - Event Stream Foundation
 
-**Phase 0: Data Infrastructure Design**
-- Milestone: 0.1-0.4 (Infrastructure Setup)
-- Status: IN PROGRESS (awaiting user approval)
+## Current Position
 
----
+Phase: 1 of 6 (Event Stream Foundation)
+Plan: 0 of TBD in current phase
+Status: Ready to plan
+Last activity: 2026-02-10 -- Roadmap created from 23 v1 requirements across 6 phases
 
-## Completed Milestones
+Progress: [..........] 0%
 
-### Phase 0.1: Project Initialization
-- ✅ PROJECT.md created (problem statement, goals)
-- ✅ ROADMAP.md created (detailed phase breakdown)
-- ✅ Directory structure established
-- ✅ README.md and subdirectory READMEs written
+## Performance Metrics
 
-### Phase 0.2: Registry Design
-- ✅ `data/projects.json` created with schema
-- ✅ Initial 2 projects registered (modernizing-tool, orchestrator-policy-extraction)
-- ✅ Project metadata format defined
+**Velocity:**
+- Total plans completed: 0
+- Average duration: --
+- Total execution time: 0 hours
 
-### Phase 0.3: Infrastructure Documentation
-- ✅ INSTRUMENTATION.md guide written
-- ✅ `.planning/PHASE-0-DECISIONS.md` documented
-- ✅ .gitignore configured
-- ✅ requirements.txt placeholder created
+**By Phase:**
 
----
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| - | - | - | - |
 
-## Active Work
+**Recent Trend:**
+- Last 5 plans: --
+- Trend: --
 
-**Task:** Awaiting user approval on Phase 0 design decisions
+*Updated after each plan completion*
 
-**Decisions requiring approval:**
-1. Multi-project architecture (vs. single project)
-2. Session storage (reference in place vs. copy)
-3. Git storage (shallow clone + metadata extraction)
-4. Episode format (JSONL vs. SQLite/Parquet)
-5. Correlation threshold (0.7 minimum precision)
-6. Instrumentation (recommended but not required)
+## Accumulated Context
 
-**Next Steps:**
-- User reviews `.planning/PHASE-0-DECISIONS.md`
-- If approved → Proceed to Phase 0.4 (validation scripts)
-- If revisions needed → Update decisions and implementation
+### Decisions
 
----
+Decisions are logged in PROJECT.md Key Decisions table.
+Recent decisions affecting current work:
 
-## Pending Milestones
+- Phase 0: DuckDB chosen as primary storage (incremental updates, analytical queries)
+- Phase 0: Session backup via copy + commit to git (data loss prevention)
+- Phase 0: Decision-point episodes (not turn-level) as correct unit
+- Roadmap: 6-phase structure derived from 23 requirements across 6 categories
 
-### Phase 0.4: Validation Scripts
-**Status:** NOT STARTED (blocked on Phase 0.1-0.3 approval)
+### Pending Todos
 
-**Tasks:**
-- Create `scripts/validate-project.py`
-- Implement validation checks (sessions exist, git cloned, metadata valid)
-- Test on modernizing-tool project
-- Document validation failures and fixes
+None yet.
 
-**Exit Criteria:**
-- Validation script runs without errors
-- modernizing-tool passes all checks
+### Blockers/Concerns
 
----
+- Phase 6 (Mission Control Integration) requires access to Mission Control repository (external blocker noted in PROJECT.md constraints)
+- Phases 1-5 are independent of this blocker and can proceed
 
-## Blocked Items
+## Session Continuity
 
-- **Phase 1 (Correlation):** Blocked on Phase 0 completion
-- **Phase 2 (Extraction):** Blocked on Phase 1
-- **Phase 3-6:** Blocked on earlier phases
-
----
-
-## Open Issues
-
-1. **Q: Should we extract file content snapshots per episode?**
-   - Decision deferred to Phase 2.1 (session parsing)
-   - Current approach: Store hashes only, retrieve from git if needed
-
-2. **Q: How to handle subagent sessions?**
-   - Decision deferred to Phase 2.1
-   - Options: Separate episodes, merge with parent, track as delegation action
-
-3. **Q: Handling deleted files or broken sessions?**
-   - Log in `parse-errors.log`, skip from training set
-   - Document in project NOTES.md
-
----
-
-## Recent Changes
-
-**2026-02-05:**
-- Initialized GSD project structure
-- Created all foundational documents (PROJECT, ROADMAP, INSTRUMENTATION)
-- Documented Phase 0 architecture decisions
-- Established multi-project dataset approach
-- Registered 2 initial projects
-
----
-
-## Metrics
-
-**Project Progress:**
-- Phases planned: 7 (0-6 defined, 7+ future)
-- Phases in progress: 1 (Phase 0)
-- Phases completed: 0
-- Overall completion: ~10% (Phase 0 is ~75% complete)
-
-**Dataset Status:**
-- Projects registered: 2
-- Projects processed: 0
-- Total episodes: 0
-- Correlation precision: N/A (not yet run)
-
----
-
-## Notes
-
-- This is a **meta-project**: We're learning from our own orchestration sessions
-- GSD framework is being used to manage the project systematically
-- Phase 0 decisions are critical → taking time to get them right
-- Multi-project architecture enables scaling to 5+ projects over time
-
----
-
-## Next Review
-
-**Target Date:** 2026-02-05 (today - awaiting user approval)
-
-**Review Focus:**
-- Architecture decisions
-- Directory structure
-- Instrumentation guide clarity
-
-**Expected Outcome:**
-- User approves Phase 0 approach → Continue to Phase 0.4
-- OR User requests changes → Revise and re-submit
+Last session: 2026-02-10
+Stopped at: Roadmap and state initialized -- ready for Phase 1 planning
+Resume file: None

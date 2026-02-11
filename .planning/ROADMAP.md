@@ -49,11 +49,13 @@ Plans:
   3. Episodes are stored in DuckDB with hybrid schema (flat columns for queryable fields + STRUCT/JSON for nested data) and support incremental updates via MERGE
   4. Every stored episode validates against the JSON Schema (orchestrator-episode.schema.json) ensuring structural correctness
   5. Every episode carries provenance links (source JSONL file + line ranges, git commits, tool call IDs) enabling audit trail back to raw data
-**Plans**: TBD
+**Plans:** 4 plans in 3 waves
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md — Episode Pydantic model + DuckDB hybrid schema + EpisodeValidator (Wave 1)
+- [ ] 02-02-PLAN.md — EpisodePopulator [TDD] (Wave 2)
+- [ ] 02-03-PLAN.md — ReactionLabeler [TDD] (Wave 2)
+- [ ] 02-04-PLAN.md — Pipeline integration + episode writer + end-to-end tests (Wave 3)
 
 ### Phase 3: Constraint Management
 **Goal**: Corrections and blocks in episode reactions are converted into durable, enforceable orchestration constraints with severity levels and explicit scope

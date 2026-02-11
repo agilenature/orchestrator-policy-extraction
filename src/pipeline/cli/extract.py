@@ -107,6 +107,16 @@ def _print_session_summary(result: dict) -> None:
     click.echo(f"  Invalid:     {result.get('invalid_count', 0)}")
     click.echo(f"  Duration:    {result.get('duration_seconds', 0):.2f}s")
 
+    # Episode stats (Phase 2)
+    ep_populated = result.get("episode_populated_count", 0)
+    ep_valid = result.get("episode_valid_count", 0)
+    ep_invalid = result.get("episode_invalid_count", 0)
+    if ep_populated > 0 or ep_valid > 0 or ep_invalid > 0:
+        click.echo(f"\n  Episode Stats:")
+        click.echo(f"    Populated: {ep_populated}")
+        click.echo(f"    Valid:     {ep_valid}")
+        click.echo(f"    Invalid:   {ep_invalid}")
+
     if result.get("tag_distribution"):
         click.echo("\n  Tag Distribution:")
         for tag, count in sorted(result["tag_distribution"].items(), key=lambda x: -x[1]):
@@ -116,6 +126,11 @@ def _print_session_summary(result: dict) -> None:
         click.echo("\n  Outcome Distribution:")
         for outcome, count in sorted(result["outcome_distribution"].items(), key=lambda x: -x[1]):
             click.echo(f"    {outcome:20s} {count:>5d}")
+
+    if result.get("reaction_distribution"):
+        click.echo("\n  Reaction Label Distribution:")
+        for label, count in sorted(result["reaction_distribution"].items(), key=lambda x: -x[1]):
+            click.echo(f"    {label:16s} {count:>5d}")
 
     if result.get("errors"):
         click.echo("\n  Errors:")
@@ -137,6 +152,13 @@ def _print_batch_summary(result: dict) -> None:
     click.echo(f"  Total events:       {result['total_events']}")
     click.echo(f"  Total episodes:     {result['total_episodes']}")
 
+    # Episode stats (Phase 2)
+    total_valid = result.get("total_valid_episodes", 0)
+    total_invalid = result.get("total_invalid_episodes", 0)
+    if total_valid > 0 or total_invalid > 0:
+        click.echo(f"  Valid episodes:     {total_valid}")
+        click.echo(f"  Invalid episodes:   {total_invalid}")
+
     if result.get("tag_distribution"):
         click.echo("\n  Aggregate Tag Distribution:")
         for tag, count in sorted(result["tag_distribution"].items(), key=lambda x: -x[1]):
@@ -146,6 +168,11 @@ def _print_batch_summary(result: dict) -> None:
         click.echo("\n  Aggregate Outcome Distribution:")
         for outcome, count in sorted(result["outcome_distribution"].items(), key=lambda x: -x[1]):
             click.echo(f"    {outcome:20s} {count:>5d}")
+
+    if result.get("reaction_distribution"):
+        click.echo("\n  Aggregate Reaction Label Distribution:")
+        for label, count in sorted(result["reaction_distribution"].items(), key=lambda x: -x[1]):
+            click.echo(f"    {label:16s} {count:>5d}")
 
     if result.get("errors"):
         click.echo(f"\n  Errors ({len(result['errors'])}):")

@@ -1,8 +1,8 @@
 """Pipeline runner -- orchestrates all stages end-to-end.
 
-Wires together: JSONL loading -> normalization -> tagging -> segmentation -> DuckDB storage.
-Provides PipelineRunner for single-session and batch processing with comprehensive
-error handling following the multi-level strategy (Q16/Q17).
+Wires together: JSONL loading -> normalization -> tagging -> segmentation ->
+DuckDB storage -> episode population -> reaction labeling -> validation ->
+episode storage.
 
 Error handling levels:
   Level 1 (Reject): Non-parseable JSONL lines -> skip, count as invalid
@@ -20,6 +20,7 @@ Exports:
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 import time
 from collections import Counter
@@ -30,12 +31,20 @@ from loguru import logger
 
 from src.pipeline.adapters.claude_jsonl import load_jsonl_to_duckdb, normalize_jsonl_events
 from src.pipeline.adapters.git_history import parse_git_history
+from src.pipeline.episode_validator import EpisodeValidator
 from src.pipeline.models.config import PipelineConfig, load_config
 from src.pipeline.models.events import TaggedEvent
 from src.pipeline.normalizer import normalize_events
+from src.pipeline.populator import EpisodePopulator
+from src.pipeline.reaction_labeler import ReactionLabeler
 from src.pipeline.segmenter import EpisodeSegmenter
 from src.pipeline.storage.schema import create_schema, get_connection
-from src.pipeline.storage.writer import write_events, write_segments
+from src.pipeline.storage.writer import (
+    read_events,
+    write_episodes,
+    write_events,
+    write_segments,
+)
 from src.pipeline.tagger import EventTagger
 
 
@@ -61,6 +70,9 @@ class PipelineRunner:
         create_schema(self._conn)
         self._tagger = EventTagger(config)
         self._segmenter = EpisodeSegmenter(config)
+        self._populator = EpisodePopulator(config)
+        self._reaction_labeler = ReactionLabeler(config)
+        self._validator = EpisodeValidator()
         self._config_hash = self._compute_config_hash(config)
         logger.info(
             "PipelineRunner initialized (db={}, config_hash={})",
@@ -83,7 +95,11 @@ class PipelineRunner:
         5. Tag events with multi-pass classifier
         6. Segment tagged events into episodes
         7. Write events and segments to DuckDB
-        8. Compute and return stats
+        8. Populate episodes from segments
+        9. Label reactions from next human messages
+        10. Validate episodes against JSON Schema
+        11. Write valid episodes to DuckDB via MERGE
+        12. Compute and return stats
 
         Args:
             jsonl_path: Path to the JSONL session file.
@@ -91,7 +107,7 @@ class PipelineRunner:
 
         Returns:
             Stats dict with session_id, event_count, tag_distribution,
-            episode_count, outcome_distribution, errors, warnings.
+            episode_count, outcome_distribution, episode stats, errors, warnings.
         """
         jsonl_path = Path(jsonl_path)
         session_id = self._extract_session_id(jsonl_path)
@@ -229,7 +245,130 @@ class PipelineRunner:
             logger.error("DuckDB write failed for {}: {}", session_id, e)
             return self._error_result(session_id, f"Write failed: {e}")
 
-        # Step 9: Compute stats
+        # Step 9: Populate episodes + label reactions
+        populated_episodes: list[dict] = []
+        reaction_distribution: Counter[str] = Counter()
+
+        try:
+            # Read all stored events for this session
+            all_session_events = read_events(self._conn, session_id=session_id)
+
+            # Build event lookup by event_id for fast access
+            event_by_id: dict[str, dict] = {
+                e["event_id"]: e for e in all_session_events
+            }
+
+            # Build tag lookup from tagged_events (for reaction labeling)
+            tag_by_event_id: dict[str, list[str]] = {}
+            for te in tagged_events:
+                te_tags: list[str] = []
+                if te.primary:
+                    te_tags.append(te.primary.label)
+                if te.secondaries:
+                    for sec in te.secondaries:
+                        te_tags.append(sec.label)
+                tag_by_event_id[te.event.event_id] = te_tags
+
+            for seg in segments:
+                try:
+                    # Get events within this segment
+                    segment_events = [
+                        event_by_id[eid]
+                        for eid in seg.events
+                        if eid in event_by_id
+                    ]
+
+                    # Get context events: events before segment start
+                    max_context = self._config.episode_population.observation_context_events
+                    context_events = [
+                        e for e in all_session_events
+                        if e["ts_utc"] < seg.start_ts
+                    ][-max_context:]
+
+                    # Populate episode
+                    episode = self._populator.populate(seg, segment_events, context_events)
+
+                    # Add storage metadata
+                    episode["session_id"] = session_id
+                    episode["segment_id"] = seg.segment_id
+                    episode["outcome_type"] = seg.outcome
+                    episode["config_hash"] = self._config_hash
+
+                    # Find next human message after segment end for reaction labeling
+                    next_human_msg = self._find_next_human_message(
+                        all_session_events, seg.end_ts, tag_by_event_id
+                    )
+
+                    # Label reaction
+                    reaction = self._reaction_labeler.label(
+                        next_human_msg, seg.end_trigger, seg.outcome
+                    )
+                    if reaction is not None:
+                        episode.setdefault("outcome", {})["reaction"] = reaction
+                        reaction_distribution[reaction["label"]] += 1
+
+                    populated_episodes.append(episode)
+
+                except Exception as e:
+                    logger.warning(
+                        "Failed to populate episode for segment {}: {}",
+                        seg.segment_id, e,
+                    )
+                    warnings.append(f"Episode population failed for {seg.segment_id}: {e}")
+
+            logger.info(
+                "Step 9: Populated {} episodes from {} segments",
+                len(populated_episodes), len(segments),
+            )
+
+        except Exception as e:
+            logger.error("Episode population failed for {}: {}", session_id, e)
+            warnings.append(f"Episode population failed: {e}")
+
+        # Step 10: Validate episodes
+        valid_episodes: list[dict] = []
+        episode_invalid_count = 0
+
+        for episode in populated_episodes:
+            try:
+                is_valid, validation_errors = self._validator.validate(episode)
+                if is_valid:
+                    valid_episodes.append(episode)
+                else:
+                    episode_invalid_count += 1
+                    logger.warning(
+                        "Episode {} failed validation: {}",
+                        episode.get("episode_id", "?"),
+                        "; ".join(validation_errors[:3]),
+                    )
+            except Exception as e:
+                episode_invalid_count += 1
+                logger.warning(
+                    "Episode validation error for {}: {}",
+                    episode.get("episode_id", "?"), e,
+                )
+
+        logger.info(
+            "Step 10: Validated episodes: {} valid, {} invalid",
+            len(valid_episodes), episode_invalid_count,
+        )
+
+        # Step 11: Write valid episodes to DuckDB
+        episode_write_stats: dict[str, int] = {"inserted": 0, "updated": 0, "total": 0}
+        try:
+            if valid_episodes:
+                episode_write_stats = write_episodes(self._conn, valid_episodes)
+                logger.info(
+                    "Step 11: Wrote {} episodes ({} inserted, {} updated)",
+                    episode_write_stats["total"],
+                    episode_write_stats["inserted"],
+                    episode_write_stats["updated"],
+                )
+        except Exception as e:
+            logger.error("Episode write failed for {}: {}", session_id, e)
+            warnings.append(f"Episode write failed: {e}")
+
+        # Step 12: Compute stats
         tag_distribution = self._compute_tag_distribution(tagged_events)
         outcome_distribution = seg_stats.get("by_outcome", {})
         duration_s = time.monotonic() - t0
@@ -244,16 +383,21 @@ class PipelineRunner:
             "orphan_count": seg_stats.get("orphan_count", 0),
             "duplicate_count": event_write_stats.get("updated", 0),
             "invalid_count": invalid_count,
+            "episode_populated_count": len(populated_episodes),
+            "episode_valid_count": len(valid_episodes),
+            "episode_invalid_count": episode_invalid_count,
+            "reaction_distribution": dict(reaction_distribution),
             "errors": errors,
             "warnings": warnings,
             "duration_seconds": round(duration_s, 2),
         }
 
         logger.info(
-            "Session {} complete: {} events, {} episodes in {:.1f}s",
+            "Session {} complete: {} events, {} episodes, {} valid episodes in {:.1f}s",
             session_id,
             len(canonical_events),
             len(segments),
+            len(valid_episodes),
             duration_s,
         )
 
@@ -311,21 +455,31 @@ class PipelineRunner:
                 logger.error("Unexpected error processing {}: {}", jsonl_file.name, e)
                 batch_errors.append(f"{jsonl_file.name}: {e}")
 
-        # Aggregate tag distribution
+        # Aggregate tag distribution and episode stats
         agg_tags: Counter[str] = Counter()
         agg_outcomes: Counter[str] = Counter()
+        agg_reactions: Counter[str] = Counter()
+        total_valid_episodes = 0
+        total_invalid_episodes = 0
         for r in results:
             for tag, count in r.get("tag_distribution", {}).items():
                 agg_tags[tag] += count
             for outcome, count in r.get("outcome_distribution", {}).items():
                 agg_outcomes[outcome] += count
+            for label, count in r.get("reaction_distribution", {}).items():
+                agg_reactions[label] += count
+            total_valid_episodes += r.get("episode_valid_count", 0)
+            total_invalid_episodes += r.get("episode_invalid_count", 0)
 
         return {
             "sessions_processed": len(results),
             "total_events": total_events,
             "total_episodes": total_episodes,
+            "total_valid_episodes": total_valid_episodes,
+            "total_invalid_episodes": total_invalid_episodes,
             "tag_distribution": dict(agg_tags),
             "outcome_distribution": dict(agg_outcomes),
+            "reaction_distribution": dict(agg_reactions),
             "results": results,
             "errors": batch_errors,
         }
@@ -339,6 +493,53 @@ class PipelineRunner:
             pass
 
     # --- Private helpers ---
+
+    @staticmethod
+    def _find_next_human_message(
+        all_events: list[dict],
+        after_ts: Any,
+        tag_by_event_id: dict[str, list[str]],
+    ) -> dict | None:
+        """Find the next human_orchestrator user_msg event after a timestamp.
+
+        Constructs the message dict with 'tags' and 'payload' keys that
+        ReactionLabeler expects.
+
+        Args:
+            all_events: All session events ordered by ts_utc.
+            after_ts: Timestamp to search after (segment end_ts).
+            tag_by_event_id: Mapping of event_id -> list of tag labels.
+
+        Returns:
+            Dict with tags and payload, or None if no next human message.
+        """
+        if after_ts is None:
+            return None
+
+        for event in all_events:
+            if event["ts_utc"] <= after_ts:
+                continue
+            if event["actor"] == "human_orchestrator" and event["event_type"] == "user_msg":
+                event_tags = tag_by_event_id.get(event["event_id"], [])
+                # Build message dict for ReactionLabeler
+                payload = event.get("payload", {})
+                if isinstance(payload, dict):
+                    text = payload.get("common", {}).get("text", "")
+                elif isinstance(payload, str):
+                    try:
+                        parsed = json.loads(payload)
+                        text = parsed.get("common", {}).get("text", "") if isinstance(parsed, dict) else ""
+                    except Exception:
+                        text = ""
+                else:
+                    text = ""
+
+                return {
+                    "tags": event_tags,
+                    "payload": {"text": text},
+                }
+
+        return None
 
     @staticmethod
     def _extract_session_id(jsonl_path: Path) -> str:
@@ -388,6 +589,10 @@ class PipelineRunner:
             "orphan_count": 0,
             "duplicate_count": 0,
             "invalid_count": invalid_count,
+            "episode_populated_count": 0,
+            "episode_valid_count": 0,
+            "episode_invalid_count": 0,
+            "reaction_distribution": {},
             "errors": [error_msg],
             "warnings": [],
             "duration_seconds": 0,

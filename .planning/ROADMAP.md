@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Event Stream Foundation** - Normalize raw logs into tagged canonical events and segment into decision-point boundaries
 - [x] **Phase 2: Episode Population & Storage** - Populate episode fields, label reactions, and store complete episodes in DuckDB
-- [ ] **Phase 3: Constraint Management** - Extract durable orchestration constraints from corrections and manage them with severity and scope
+- [x] **Phase 3: Constraint Management** - Extract durable orchestration constraints from corrections and manage them with severity and scope
 - [ ] **Phase 4: Validation & Quality** - Validate episode quality through multi-layer checks and build gold-standard labeled dataset
 - [ ] **Phase 5: Training Infrastructure** - Deploy RAG baseline orchestrator and validate via shadow mode testing
 - [ ] **Phase 6: Mission Control Integration** - Capture episodes in real-time from structured tasks with review UI and tool provenance
@@ -69,8 +69,8 @@ Plans:
 **Plans:** 2 plans in 2 waves
 
 Plans:
-- [ ] 03-01-PLAN.md — ConstraintExtractor with severity, scope, hints [TDD] (Wave 1)
-- [ ] 03-02-PLAN.md — ConstraintStore + pipeline integration + CLI stats (Wave 2)
+- [x] 03-01-PLAN.md — ConstraintExtractor with severity, scope, hints [TDD] (Wave 1)
+- [x] 03-02-PLAN.md — ConstraintStore + pipeline integration + CLI stats (Wave 2)
 
 ### Phase 4: Validation & Quality
 **Goal**: Episode quality is verified through multi-layer validation, a gold-standard labeled dataset exists for accuracy measurement, and quality metrics meet thresholds for training readiness
@@ -125,7 +125,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 |-------|----------------|--------|-----------|
 | 1. Event Stream Foundation | 5/5 | ✓ Complete | 2026-02-11 |
 | 2. Episode Population & Storage | 4/4 | ✓ Complete | 2026-02-11 |
-| 3. Constraint Management | 0/TBD | Not started | - |
+| 3. Constraint Management | 2/2 | ✓ Complete | 2026-02-11 |
 | 4. Validation & Quality | 0/TBD | Not started | - |
 | 5. Training Infrastructure | 0/TBD | Not started | - |
 | 6. Mission Control Integration | 0/TBD | Not started | - |

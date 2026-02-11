@@ -132,6 +132,13 @@ def _print_session_summary(result: dict) -> None:
         for label, count in sorted(result["reaction_distribution"].items(), key=lambda x: -x[1]):
             click.echo(f"    {label:16s} {count:>5d}")
 
+    # Constraint stats (Phase 3)
+    c_extracted = result.get("constraints_extracted", 0)
+    c_dup = result.get("constraints_duplicate", 0)
+    c_total = result.get("constraints_total", 0)
+    if c_extracted > 0 or c_dup > 0:
+        click.echo(f"\n  Constraints: {c_extracted} extracted, {c_dup} duplicate, {c_total} total in store")
+
     if result.get("errors"):
         click.echo("\n  Errors:")
         for err in result["errors"]:
@@ -173,6 +180,13 @@ def _print_batch_summary(result: dict) -> None:
         click.echo("\n  Aggregate Reaction Label Distribution:")
         for label, count in sorted(result["reaction_distribution"].items(), key=lambda x: -x[1]):
             click.echo(f"    {label:16s} {count:>5d}")
+
+    # Constraint stats (Phase 3)
+    c_extracted = result.get("constraints_extracted", 0)
+    c_dup = result.get("constraints_duplicate", 0)
+    c_total = result.get("constraints_total", 0)
+    if c_extracted > 0 or c_dup > 0:
+        click.echo(f"\n  Constraints: {c_extracted} extracted, {c_dup} duplicate, {c_total} total in store")
 
     if result.get("errors"):
         click.echo(f"\n  Errors ({len(result['errors'])}):")

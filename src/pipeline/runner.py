@@ -31,6 +31,8 @@ from loguru import logger
 
 from src.pipeline.adapters.claude_jsonl import load_jsonl_to_duckdb, normalize_jsonl_events
 from src.pipeline.adapters.git_history import parse_git_history
+from src.pipeline.constraint_extractor import ConstraintExtractor
+from src.pipeline.constraint_store import ConstraintStore
 from src.pipeline.episode_validator import EpisodeValidator
 from src.pipeline.models.config import PipelineConfig, load_config
 from src.pipeline.models.events import TaggedEvent
@@ -63,7 +65,12 @@ class PipelineRunner:
         db_path: DuckDB database path. Use ':memory:' for testing.
     """
 
-    def __init__(self, config: PipelineConfig, db_path: str = "data/ope.db") -> None:
+    def __init__(
+        self,
+        config: PipelineConfig,
+        db_path: str = "data/ope.db",
+        constraints_path: str | Path | None = None,
+    ) -> None:
         self._config = config
         self._db_path = db_path
         self._conn = get_connection(db_path)
@@ -73,6 +80,18 @@ class PipelineRunner:
         self._populator = EpisodePopulator(config)
         self._reaction_labeler = ReactionLabeler(config)
         self._validator = EpisodeValidator()
+        self._constraint_extractor = ConstraintExtractor(config)
+
+        # Constraint store path: configurable for test isolation
+        if constraints_path is not None:
+            c_path = Path(constraints_path)
+        else:
+            c_path = Path("data/constraints.json")
+        self._constraint_store = ConstraintStore(
+            path=c_path,
+            schema_path=Path("data/schemas/constraint.schema.json"),
+        )
+
         self._config_hash = self._compute_config_hash(config)
         logger.info(
             "PipelineRunner initialized (db={}, config_hash={})",
@@ -368,7 +387,35 @@ class PipelineRunner:
             logger.error("Episode write failed for {}: {}", session_id, e)
             warnings.append(f"Episode write failed: {e}")
 
-        # Step 12: Compute stats
+        # Step 12: Extract constraints from correct/block episodes
+        constraints_new = 0
+        constraints_dup = 0
+        for episode in valid_episodes:
+            try:
+                constraint = self._constraint_extractor.extract(episode)
+                if constraint is not None:
+                    added = self._constraint_store.add(constraint)
+                    if added:
+                        constraints_new += 1
+                    else:
+                        constraints_dup += 1
+            except Exception as e:
+                logger.warning(
+                    "Constraint extraction failed for episode {}: {}",
+                    episode.get("episode_id", "?"),
+                    e,
+                )
+
+        if constraints_new > 0 or constraints_dup > 0:
+            self._constraint_store.save()
+            logger.info(
+                "Step 12: Extracted {} new constraints ({} duplicate, {} total)",
+                constraints_new,
+                constraints_dup,
+                self._constraint_store.count,
+            )
+
+        # Step 13: Compute stats
         tag_distribution = self._compute_tag_distribution(tagged_events)
         outcome_distribution = seg_stats.get("by_outcome", {})
         duration_s = time.monotonic() - t0
@@ -387,6 +434,9 @@ class PipelineRunner:
             "episode_valid_count": len(valid_episodes),
             "episode_invalid_count": episode_invalid_count,
             "reaction_distribution": dict(reaction_distribution),
+            "constraints_extracted": constraints_new,
+            "constraints_duplicate": constraints_dup,
+            "constraints_total": self._constraint_store.count,
             "errors": errors,
             "warnings": warnings,
             "duration_seconds": round(duration_s, 2),
@@ -461,6 +511,8 @@ class PipelineRunner:
         agg_reactions: Counter[str] = Counter()
         total_valid_episodes = 0
         total_invalid_episodes = 0
+        total_constraints_extracted = 0
+        total_constraints_duplicate = 0
         for r in results:
             for tag, count in r.get("tag_distribution", {}).items():
                 agg_tags[tag] += count
@@ -470,6 +522,8 @@ class PipelineRunner:
                 agg_reactions[label] += count
             total_valid_episodes += r.get("episode_valid_count", 0)
             total_invalid_episodes += r.get("episode_invalid_count", 0)
+            total_constraints_extracted += r.get("constraints_extracted", 0)
+            total_constraints_duplicate += r.get("constraints_duplicate", 0)
 
         return {
             "sessions_processed": len(results),
@@ -480,6 +534,9 @@ class PipelineRunner:
             "tag_distribution": dict(agg_tags),
             "outcome_distribution": dict(agg_outcomes),
             "reaction_distribution": dict(agg_reactions),
+            "constraints_extracted": total_constraints_extracted,
+            "constraints_duplicate": total_constraints_duplicate,
+            "constraints_total": self._constraint_store.count,
             "results": results,
             "errors": batch_errors,
         }
@@ -593,6 +650,9 @@ class PipelineRunner:
             "episode_valid_count": 0,
             "episode_invalid_count": 0,
             "reaction_distribution": {},
+            "constraints_extracted": 0,
+            "constraints_duplicate": 0,
+            "constraints_total": 0,
             "errors": [error_msg],
             "warnings": [],
             "duration_seconds": 0,

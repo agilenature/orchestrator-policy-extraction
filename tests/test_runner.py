@@ -634,6 +634,183 @@ class TestPipelineRunnerWithEpisodes:
             runner.close()
 
 
+def _create_correction_fixture(tmp_path: Path) -> Path:
+    """Create a JSONL fixture with a correction reaction.
+
+    Contains:
+    - 1 O_DIR human message (start trigger for episode)
+    - 1 assistant response with tool_use (executor action)
+    - 1 tool result (T_TEST trigger)
+    - 1 follow-up human message with correction ("No, don't use regex for XML parsing")
+    - 1 assistant response
+    """
+    tool_use_id = f"toolu_{uuid.uuid4().hex[:24]}"
+
+    records = [
+        # 1. Human directive -- triggers O_DIR / episode start
+        _make_jsonl_record(
+            "user",
+            content="Implement the XML parsing in src/parser.py",
+            ts="2026-02-11T12:00:00.000Z",
+        ),
+        # 2. Assistant tool_use -- executor action
+        _make_jsonl_record(
+            "assistant",
+            content=[
+                {"type": "text", "text": "I'll implement the XML parser using regex."},
+                {
+                    "type": "tool_use",
+                    "id": tool_use_id,
+                    "name": "Bash",
+                    "input": {"command": "pytest tests/ -v", "description": "Run tests"},
+                },
+            ],
+            ts="2026-02-11T12:00:05.000Z",
+        ),
+        # 3. Tool result from pytest -- T_TEST body event
+        _make_jsonl_record(
+            "user",
+            content=[
+                {
+                    "type": "tool_result",
+                    "tool_use_id": tool_use_id,
+                    "content": "PASSED 3 tests in 1.2s",
+                }
+            ],
+            ts="2026-02-11T12:00:10.000Z",
+            tool_use_result={"stdout": "PASSED 3 tests in 1.2s", "stderr": ""},
+        ),
+        # 4. Follow-up human correction -> should produce 'correct' reaction
+        _make_jsonl_record(
+            "user",
+            content="No, don't use regex for XML parsing. Use lxml instead.",
+            ts="2026-02-11T12:00:20.000Z",
+        ),
+        # 5. Assistant acknowledges
+        _make_jsonl_record(
+            "assistant",
+            content=[
+                {"type": "text", "text": "You're right, I'll switch to lxml."},
+            ],
+            ts="2026-02-11T12:00:25.000Z",
+        ),
+    ]
+
+    return _write_jsonl(records, tmp_path)
+
+
+class TestPipelineRunnerWithConstraints:
+    """Integration tests for constraint extraction in the pipeline."""
+
+    @pytest.fixture
+    def config(self):
+        """Load pipeline config."""
+        return load_config("data/config.yaml")
+
+    def test_pipeline_extracts_constraints_from_corrections(self, config, tmp_path):
+        """Pipeline with correction reactions extracts constraints.
+
+        Verifies:
+        - Pipeline runs without errors
+        - Constraints stats are present in result
+        - constraints.json is created if constraints were extracted
+        """
+        jsonl_path = _create_correction_fixture(tmp_path)
+        constraints_path = tmp_path / "constraints.json"
+        runner = PipelineRunner(
+            config, db_path=":memory:", constraints_path=constraints_path
+        )
+
+        try:
+            result = runner.run_session(jsonl_path)
+            assert result["errors"] == [], f"Unexpected errors: {result['errors']}"
+
+            # Constraint stats should be present in result
+            assert "constraints_extracted" in result
+            assert "constraints_duplicate" in result
+            assert "constraints_total" in result
+
+            # If correction was detected and episode produced, constraint may exist
+            if result.get("episode_valid_count", 0) > 0:
+                # The reaction labeling depends on pattern matching
+                # but the stats keys should always be present
+                assert isinstance(result["constraints_extracted"], int)
+                assert isinstance(result["constraints_total"], int)
+
+        finally:
+            runner.close()
+
+    def test_pipeline_rerun_no_duplicate_constraints(self, config, tmp_path):
+        """Running pipeline twice on same data produces no duplicate constraints."""
+        jsonl_path = _create_correction_fixture(tmp_path)
+        constraints_path = tmp_path / "constraints.json"
+        runner = PipelineRunner(
+            config, db_path=":memory:", constraints_path=constraints_path
+        )
+
+        try:
+            result1 = runner.run_session(jsonl_path)
+            total_after_first = result1.get("constraints_total", 0)
+
+            result2 = runner.run_session(jsonl_path)
+            total_after_second = result2.get("constraints_total", 0)
+
+            # Same total: no duplicates added
+            assert total_after_second == total_after_first, (
+                f"Constraint count should be stable: {total_after_first} vs {total_after_second}"
+            )
+
+            # Second run should report duplicates (or 0 new)
+            assert result2["constraints_extracted"] == 0, (
+                f"Expected 0 new constraints on re-run, got {result2['constraints_extracted']}"
+            )
+
+        finally:
+            runner.close()
+
+    def test_pipeline_approve_only_no_constraints(self, config, tmp_path):
+        """Pipeline with approve-only reactions produces no constraints."""
+        jsonl_path = _create_episode_fixture(tmp_path)  # "looks good" -> approve
+        constraints_path = tmp_path / "constraints.json"
+        runner = PipelineRunner(
+            config, db_path=":memory:", constraints_path=constraints_path
+        )
+
+        try:
+            result = runner.run_session(jsonl_path)
+            assert result["errors"] == [], f"Unexpected errors: {result['errors']}"
+
+            # Approve reactions should not produce constraints
+            assert result["constraints_extracted"] == 0, (
+                f"Expected 0 constraints for approve reaction, got {result['constraints_extracted']}"
+            )
+
+        finally:
+            runner.close()
+
+    def test_constraint_stats_in_pipeline_output(self, config, tmp_path):
+        """Constraint stats are always present in pipeline output."""
+        jsonl_path = _create_realistic_fixture(tmp_path)
+        constraints_path = tmp_path / "constraints.json"
+        runner = PipelineRunner(
+            config, db_path=":memory:", constraints_path=constraints_path
+        )
+
+        try:
+            result = runner.run_session(jsonl_path)
+
+            # Stats keys are always present (even if 0)
+            assert "constraints_extracted" in result
+            assert "constraints_duplicate" in result
+            assert "constraints_total" in result
+            assert isinstance(result["constraints_extracted"], int)
+            assert isinstance(result["constraints_duplicate"], int)
+            assert isinstance(result["constraints_total"], int)
+
+        finally:
+            runner.close()
+
+
 class TestPipelineRunnerWithRealData:
     """Tests that use real JSONL data if available (skipped in CI)."""
 

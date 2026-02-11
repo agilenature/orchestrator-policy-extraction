@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 3 COMPLETE - Constraint Management
+**Current focus:** Phase 4 IN PROGRESS - Validation & Quality
 
 ## Current Position
 
-Phase: 3 of 6 (Constraint Management)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-11 -- Completed 03-02-PLAN.md (ConstraintStore + Pipeline Integration)
+Phase: 4 of 6 (Validation & Quality)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-11 -- Completed 04-01-PLAN.md (GenusValidator with Five Validation Layers)
 
-Progress: [########################] 100% (Phase 3)
-Overall:  [████████████████████░░░░] ~85% (11/~13 plans)
+Progress: [############............] 50% (Phase 4)
+Overall:  [█████████████████████░░░] ~88% (12/~14 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
-- Average duration: 5.0 min
-- Total execution time: 0.92 hours
+- Total plans completed: 12
+- Average duration: 4.9 min
+- Total execution time: 0.98 hours
 
 **By Phase:**
 
@@ -31,9 +31,10 @@ Overall:  [████████████████████░░░
 | 01-event-stream-foundation | 5 | 29 min | 5.8 min |
 | 02-episode-population-storage | 4 | 19 min | 4.8 min |
 | 03-constraint-management | 2 | 7 min | 3.5 min |
+| 04-validation-quality | 1 | 4 min | 4.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min, 4 min, 7 min, 3 min, 4 min
+- Last 5 plans: 4 min, 7 min, 3 min, 4 min, 4 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -82,6 +83,10 @@ Recent decisions affecting current work:
 - Plan 03-02: ConstraintStore path configurable via constraints_path param for test isolation
 - Plan 03-02: Duplicate constraints enrich existing examples array (new episode references appended)
 - Plan 03-02: Constraint store saved only when extraction produced results (avoids unnecessary writes)
+- Plan 04-01: Warnings use prefix convention (warning:type:) to distinguish from hard errors in message list
+- Plan 04-01: Scope overlap uses bidirectional prefix matching (ep.startswith(cp) or cp.startswith(ep))
+- Plan 04-01: Evidence grounding and non-contradiction layers always return is_valid=True (warnings only)
+- Plan 04-01: GenusValidator.default() factory method creates all 5 layers with lazy EpisodeValidator import
 
 ### Pending Todos
 
@@ -126,5 +131,5 @@ Phase 3 added constraint extraction and management:
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Phase 3 complete. Ready for Phase 4.
-Resume file: .planning/phases/03-constraint-management/03-02-SUMMARY.md
+Stopped at: Phase 4 plan 1 complete. Ready for plan 04-02.
+Resume file: .planning/phases/04-validation-quality/04-01-SUMMARY.md

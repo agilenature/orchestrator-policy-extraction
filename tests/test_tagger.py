@@ -513,13 +513,13 @@ class TestOrchestratorTagger:
         o_gate = next(c for c in classifications if c.label == "O_GATE")
         assert o_gate.confidence == pytest.approx(0.7)
 
-    def test_ask_before_is_o_gate(self, orchestrator_tagger: OrchestratorTagger):
-        """'Ask before making changes to production.' -> O_GATE"""
+    def test_ask_first_is_o_gate(self, orchestrator_tagger: OrchestratorTagger):
+        """'Ask first before making any changes.' -> O_GATE (matches 'ask first' gate pattern)"""
         event = make_event(
             actor="human_orchestrator",
             event_type="user_msg",
             payload={
-                "common": {"text": "Ask before making changes to production."}
+                "common": {"text": "Ask first before making any changes."}
             },
         )
         classifications = orchestrator_tagger.classify(event, context=[])

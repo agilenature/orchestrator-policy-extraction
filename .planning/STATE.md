@@ -10,29 +10,29 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 2 of 6 (Episode Population & Storage)
-Plan: 1 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-11 -- Completed 02-01-PLAN.md (Episode Model + Schema + Validator)
+Last activity: 2026-02-11 -- Completed 02-03-PLAN.md (ReactionLabeler)
 
-Progress: [######░░░░░░░░░░░░░░░░░░] 25% (Phase 2)
-Overall:  [████████████░░░░░░░░░░░░] ~50% (6/~12 plans)
+Progress: [##################░░░░░░] 75% (Phase 2)
+Overall:  [██████████████░░░░░░░░░░] ~58% (8/~13 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 5.5 min
-- Total execution time: 0.55 hours
+- Total plans completed: 8
+- Average duration: 5.1 min
+- Total execution time: 0.69 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-event-stream-foundation | 5 | 29 min | 5.8 min |
-| 02-episode-population-storage | 1 | 4 min | 4.0 min |
+| 02-episode-population-storage | 3 | 12 min | 4.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 8 min, 5 min, 6 min, 5 min, 4 min
+- Last 5 plans: 6 min, 5 min, 4 min, 4 min, 4 min
 - Trend: stable/improving
 
 *Updated after each plan completion*
@@ -68,6 +68,10 @@ Recent decisions affecting current work:
 - Plan 01-05: Config hash from Pydantic model_dump_json() for deterministic provenance
 - Plan 02-01: ConstraintScope separate from Scope (JSON Schema Constraint.scope has only paths, no avoid)
 - Plan 02-01: EpisodePopulationConfig wired into PipelineConfig with defaults: 20 events, 300 seconds
+- Plan 02-02: Position-based tie-breaking for same-priority mode inference keywords (earliest match in text wins)
+- Plan 02-02: Observation derived from context events only (preceding episode), never from segment body events
+- Plan 02-03: Refined ^NO block pattern to standalone-only (^NO[!.\s]*$) to prevent false-blocking corrections
+- Plan 02-03: Why-question pattern broadened to \bwhy\b.*\? for natural language coverage
 
 ### Pending Todos
 
@@ -95,8 +99,14 @@ Plan 02-01 (Episode Model + Schema + Validator) complete:
 - **DuckDB episodes table**: hybrid flat + STRUCT + JSON columns with 5 indexes
 - **EpisodeValidator**: jsonschema Draft 2020-12 + business rule checks
 
+Plan 02-03 (ReactionLabeler) complete:
+- **152 tests** passing (104 existing + 48 new reaction labeler tests)
+- **ReactionLabeler**: 5 reaction labels + unknown with two-tier confidence (strong 0.85, weak 0.55)
+- **Priority ordering**: block > correct > redirect > question > approve
+- **Special cases**: O_CORR override (0.9), O_DIR implicit approval (0.5)
+
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Plan 02-01 complete. Ready for 02-02 (Episode Populator).
-Resume file: .planning/phases/02-episode-population-storage/02-01-SUMMARY.md
+Stopped at: Plan 02-03 complete. Ready for 02-04 (Episode Storage + Integration).
+Resume file: .planning/phases/02-episode-population-storage/02-03-SUMMARY.md

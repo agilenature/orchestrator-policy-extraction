@@ -12,3 +12,21 @@ Exports:
     ConstraintEnforcementLayer: Constraint scope/severity checks (Layer D)
     EpisodeIntegrityLayer: Structural integrity checks (Layer E)
 """
+
+from src.pipeline.validation.genus_validator import GenusValidator
+from src.pipeline.validation.layers import (
+    ConstraintEnforcementLayer,
+    EpisodeIntegrityLayer,
+    EvidenceGroundingLayer,
+    NonContradictionLayer,
+    SchemaLayer,
+)
+
+__all__ = [
+    "GenusValidator",
+    "SchemaLayer",
+    "EvidenceGroundingLayer",
+    "NonContradictionLayer",
+    "ConstraintEnforcementLayer",
+    "EpisodeIntegrityLayer",
+]

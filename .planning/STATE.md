@@ -5,35 +5,35 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 2 IN PROGRESS - Episode Population & Storage
+**Current focus:** Phase 2 COMPLETE - Episode Population & Storage
 
 ## Current Position
 
 Phase: 2 of 6 (Episode Population & Storage)
-Plan: 3 of 4 in current phase
-Status: In progress
-Last activity: 2026-02-11 -- Completed 02-03-PLAN.md (ReactionLabeler)
+Plan: 4 of 4 in current phase
+Status: Phase complete
+Last activity: 2026-02-11 -- Completed 02-04-PLAN.md (Episode Storage + Integration)
 
-Progress: [##################░░░░░░] 75% (Phase 2)
-Overall:  [██████████████░░░░░░░░░░] ~58% (8/~13 plans)
+Progress: [########################] 100% (Phase 2)
+Overall:  [████████████████░░░░░░░░] ~69% (9/~13 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
-- Average duration: 5.1 min
-- Total execution time: 0.69 hours
+- Total plans completed: 9
+- Average duration: 5.3 min
+- Total execution time: 0.81 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-event-stream-foundation | 5 | 29 min | 5.8 min |
-| 02-episode-population-storage | 3 | 12 min | 4.0 min |
+| 02-episode-population-storage | 4 | 19 min | 4.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 6 min, 5 min, 4 min, 4 min, 4 min
-- Trend: stable/improving
+- Last 5 plans: 5 min, 4 min, 4 min, 4 min, 7 min
+- Trend: stable
 
 *Updated after each plan completion*
 
@@ -72,6 +72,9 @@ Recent decisions affecting current work:
 - Plan 02-02: Observation derived from context events only (preceding episode), never from segment body events
 - Plan 02-03: Refined ^NO block pattern to standalone-only (^NO[!.\s]*$) to prevent false-blocking corrections
 - Plan 02-03: Why-question pattern broadened to \bwhy\b.*\? for natural language coverage
+- Plan 02-04: Staging table + struct_pack() for STRUCT column insertion (avoids DuckDB binding issues)
+- Plan 02-04: _find_next_human_message builds tag list from tag_by_event_id for ReactionLabeler compatibility
+- Plan 02-04: Episode validation gates storage: invalid episodes logged but never written to episodes table
 
 ### Pending Todos
 
@@ -91,28 +94,20 @@ Phase 1 delivered a working end-to-end extraction pipeline:
 - **Idempotent**: Re-running produces no duplicates
 - **Components**: config models, JSONL/git adapters, normalizer, tagger, segmenter, writer, runner, CLI
 
-## Phase 2 Progress
+## Phase 2 Completion Summary
 
-Plan 02-01 (Episode Model + Schema + Validator) complete:
-- **104 tests** passing (90 existing + 14 new episode validator tests)
+Phase 2 extended the pipeline with episode population and storage:
+- **198 tests** passing across 6 test suites (tagger: 47, segmenter: 35, validator: 14, populator: 30, reaction: 48, storage: 12, integration: 12)
 - **Episode model**: 24 frozen Pydantic v2 models mirroring orchestrator-episode.schema.json
-- **DuckDB episodes table**: hybrid flat + STRUCT + JSON columns with 5 indexes
-- **EpisodeValidator**: jsonschema Draft 2020-12 + business rule checks
-
-Plan 02-02 (EpisodePopulator) complete:
-- **134 tests** passing (104 existing + 30 new populator tests)
+- **DuckDB episodes table**: hybrid flat + STRUCT + JSON columns with 5 indexes, MERGE upsert
 - **EpisodePopulator**: populate(segment, events, context_events) -> schema-valid episode dict
-- **Mode inference**: all 7 modes with priority ordering and position tie-breaking
-- **Field derivation**: observation from context, action from start trigger, outcome from body events
-
-Plan 02-03 (ReactionLabeler) complete:
-- **152 tests** passing (104 existing + 48 new reaction labeler tests)
-- **ReactionLabeler**: 5 reaction labels + unknown with two-tier confidence (strong 0.85, weak 0.55)
-- **Priority ordering**: block > correct > redirect > question > approve
-- **Special cases**: O_CORR override (0.9), O_DIR implicit approval (0.5)
+- **ReactionLabeler**: 5 reaction labels + unknown with two-tier confidence
+- **EpisodeValidator**: jsonschema Draft 2020-12 + business rule checks
+- **Full pipeline**: JSONL -> events -> segments -> episodes (populated, labeled, validated, stored)
+- **CLI**: episode stats (populated/valid/invalid) + reaction label distribution
 
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Plan 02-03 complete. Ready for 02-04 (Episode Storage + Integration).
-Resume file: .planning/phases/02-episode-population-storage/02-03-SUMMARY.md
+Stopped at: Phase 2 complete (all 4 plans). Ready for Phase 3.
+Resume file: .planning/phases/02-episode-population-storage/02-04-SUMMARY.md

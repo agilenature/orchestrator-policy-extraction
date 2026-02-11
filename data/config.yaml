@@ -1,49 +1,142 @@
-# Episode Builder Configuration
-# Based on "WHY_TURN_LEVEL - Improved.md" specification
+# Orchestrator Policy Extraction - Pipeline Configuration
+# All values derived from 21 locked decisions in CLARIFICATIONS-ANSWERED.md
+# Single config file for Phase 1 (no overlays per Q21)
 
-episode_builder:
-  # Episode boundaries
-  idle_timeout_minutes: 30  # Close episode if no events for this long
-  commit_link_window_minutes: 10  # Match episodes to commits within this window
+# Episode Segmentation (Q4: 30 seconds default, configurable)
+episode_timeout_seconds: 30
 
-# Risk Model Configuration
-risk:
-  # Protected paths (touching these paths → high risk)
+# Event Classification
+classification:
+  # Q5: X_PROPOSE and X_ASK operational definitions (stakeholder-provided)
+  labels:
+    X_PROPOSE:
+      definition: "Executor presents candidate next steps as recommended course of action"
+      properties:
+        - action_content_exists
+        - normative_stance_exists
+        - orchestrator_degrees_of_freedom
+      canonical_examples:
+        - "I propose we fix this by editing config.yaml and adding a regression test."
+        - "Options: (A) reuse existing adapter (recommended), (B) add new dependency, (C) rewrite module. I recommend A."
+        - "Given the failing tests, I propose switching to Triage mode and reproducing with pytest -k ...."
+      non_examples:
+        - "I found 3 references in src/."  # X_REPORT
+        - "Which framework should I use?"  # X_ASK
+
+    X_ASK:
+      definition: "Executor requests missing information/clarification necessary to proceed"
+      properties:
+        - information_missing
+        - proceeding_would_be_speculation
+        - explicitly_soliciting_input
+      canonical_examples:
+        - "Should I use React or Vue?"
+        - "Do you want backward compatibility with v1 clients?"
+        - "This touches db/migrations/. May I proceed, or should we require approval?"
+        - "Which of these two behaviors is correct per spec?"
+      non_examples:
+        - "Want me to add tests?"  # If test policy exists, this is X_REPORT
+
+  # Q6: O_CORR keyword matching (start with core list, expand based on false negatives)
+  reaction_keywords:
+    O_CORR:
+      - "No"
+      - "Wrong"
+      - "Stop"
+      - "Fix"
+      - "Error"
+      - "Don't"
+      - "That's not"
+      - "do not"
+      - "never"
+      - "absolutely not"
+      - "instead"
+      - "that's wrong"
+      - "change it to"
+
+  # Q9: Confidence threshold (minimum 0.5 to assign any primary label)
+  min_confidence: 0.5
+
+  # Q9: Tied confidence precedence order
+  precedence:
+    - O_CORR
+    - O_DIR
+    - O_GATE
+
+# Risk Model (Q10, Q11, Q12)
+risk_model:
+  threshold: 0.7  # Q12: 0.7 threshold for T_RISKY classification
+  combination_mode:
+    classification: max  # Q11: max(risk_factors) >= 0.7 -> T_RISKY
+    scoring: weighted_average  # Q11: weighted_average for continuous risk_score
+
+  # Q10: Tolerate false positives for Phase 1
+  false_positive_tolerance: true
+  acceptable_false_positive_rate: 0.20
+
+  # Dual-layer detection: risky tools + protected paths
+  risky_tools:
+    - "delete_file"
+    - "drop_table"
+    - "rm -rf"
+    - "sudo"
+    - "curl * | bash"
+    - "wget * | sh"
+    - "git push --force"
+    - "git reset --hard"
+
   protected_paths:
+    - "**/secrets.yaml"
+    - "**/credentials.json"
+    - "**/.env"
+    - "**/db/migrations/**"
     - "infra/"
-    - "db/migrations/"
     - "auth/"
     - ".github/workflows/"
     - "secrets/"
     - "credentials/"
 
-  # Diff size risk thresholds
-  diff_thresholds:
-    low:
-      lines: 50
-      files: 3
-      risk: 0.2
-    medium:
-      lines: 300
-      files: 10
-      risk: 0.5
-    high:
-      risk: 0.8
+# Payload Structure (Q7: minimal common, tool-specific in details)
+payload:
+  common_fields:
+    required:
+      - text
+    optional:
+      - reasoning
+      - tool_name
+      - duration_ms
+      - error_message
+      - files_touched
 
-  # Risky commands (trigger risk boundary + episode end)
-  risky_commands:
-    - "rm -rf"
-    - "sudo"
-    - "curl * | bash"
-    - "wget * | sh"
-    - "git push origin main"
-    - "git push origin master"
-    - "git push --force"
-    - "git reset --hard"
+# Temporal Alignment (Q1: hybrid link-based + windowing fallback)
+temporal:
+  causal_window_seconds: 2
+  link_confidence:
+    explicit: 1.0
+    windowing: 0.8
+    none: 0.0
 
-# Event Tagging Patterns
+# Deduplication (Q13: track metadata, Q14: turn_id in hash, Q15: log duplicates)
+deduplication:
+  track_metadata: true
+  log_duplicates: true
+  duplicate_alert_threshold: 0.05  # WARNING if >5% duplicates
+
+# Error Handling / Validation (Q16: abort at 10%, Q17: configurable strictness)
+validation:
+  mode: strict  # strict | permissive (Q17)
+  invalid_event_abort_threshold: 0.10  # Q16: abort session if >10% invalid
+  abort_scope: per_session  # Continue to next session after abort
+
+# Temporal Anomaly Handling (Q18: tolerate + flag + deterministic noise)
+temporal_anomalies:
+  tolerate: true
+  flag: true
+  log_level: warning
+  microsecond_noise: deterministic  # hash(event_id) % 1000 microseconds
+
+# Event Tagging Patterns (preserved from existing config, used by tool tagger)
 tags:
-  # Test commands (trigger T_TEST tag)
   test_commands:
     - "pytest"
     - "go test"
@@ -55,7 +148,6 @@ tags:
     - "dotnet test"
     - "ctest"
 
-  # Lint/format commands (trigger T_LINT tag)
   lint_commands:
     - "ruff"
     - "flake8"
@@ -67,7 +159,6 @@ tags:
     - "cargo fmt"
     - "cargo clippy"
 
-  # Build commands (trigger T_BUILD tag)
   build_commands:
     - "make"
     - "gradle build"
@@ -77,68 +168,36 @@ tags:
     - "pnpm build"
     - "go build"
 
-  # Git commands (trigger T_GIT_* tags)
   git_commands:
-    commit: ["git commit"]
-    push: ["git push"]
-    merge: ["git merge"]
-    rebase: ["git rebase"]
-    checkout: ["git checkout", "git switch"]
-    branch: ["git branch"]
-    status: ["git status"]
-    diff: ["git diff"]
+    commit:
+      - "git commit"
+    push:
+      - "git push"
+    merge:
+      - "git merge"
+    rebase:
+      - "git rebase"
+    checkout:
+      - "git checkout"
+      - "git switch"
+    branch:
+      - "git branch"
+    status:
+      - "git status"
+    diff:
+      - "git diff"
 
-# Reaction Classification Keywords
-reaction_keywords:
-  # Block (high confidence)
-  block:
-    - "NO"
-    - "don't"
-    - "stop"
-    - "never"
-    - "absolutely not"
-    - "do not"
+  risky_commands:
+    - "rm -rf"
+    - "sudo"
+    - "curl * | bash"
+    - "wget * | sh"
+    - "git push origin main"
+    - "git push origin master"
+    - "git push --force"
+    - "git reset --hard"
 
-  # Correct (medium-high confidence)
-  correct:
-    - "no, do"
-    - "instead"
-    - "use"
-    - "replace"
-    - "avoid"
-    - "don't use"
-    - "change it to"
-    - "that's wrong"
-
-  # Approve (high confidence)
-  approve:
-    - "yes"
-    - "ok"
-    - "okay"
-    - "looks good"
-    - "go ahead"
-    - "commit"
-    - "ship it"
-    - "continue"
-    - "proceed"
-
-  # Redirect (medium confidence)
-  redirect:
-    - "instead focus"
-    - "let's do"
-    - "different direction"
-    - "switch to"
-    - "ignore that"
-
-  # Question (high confidence)
-  question:
-    - "why"
-    - "how"
-    - "what about"
-    - "can you clarify"
-    - "explain"
-
-# Orchestrator Mode Inference Rules
+# Orchestrator Mode Inference Rules (preserved from existing config)
 mode_inference:
   Explore:
     keywords:
@@ -206,7 +265,7 @@ mode_inference:
       - "push"
     priority: 5
 
-# Gate Detection Patterns
+# Gate Detection Patterns (preserved from existing config)
 gate_patterns:
   run_tests:
     - "run tests"
@@ -224,10 +283,9 @@ gate_patterns:
     - "plan first"
     - "no code until"
 
-  protected_paths:
-    # Implicit - triggered by risk model
+  protected_paths: []  # Implicit - triggered by risk model
 
-# Constraint Extraction Patterns
+# Constraint Extraction Patterns (preserved from existing config)
 constraint_patterns:
   forbidden:
     - "don't"

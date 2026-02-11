@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import hashlib
 from collections import defaultdict
+from datetime import datetime
 
 from src.pipeline.models.config import PipelineConfig
 from src.pipeline.models.events import TaggedEvent
@@ -44,6 +45,9 @@ class EpisodeSegmenter:
         self._timeout_seconds = config.episode_timeout_seconds
         self._segments: list[EpisodeSegment] = []
         self._orphan_count: int = 0
+        # Track the last event timestamp for timeout detection without
+        # attaching dynamic attributes to the Pydantic EpisodeSegment model.
+        self._last_event_ts: datetime | None = None
 
     def segment(self, tagged_events: list[TaggedEvent]) -> list[EpisodeSegment]:
         """Segment a stream of tagged events into episodes.
@@ -65,6 +69,7 @@ class EpisodeSegmenter:
         """
         self._segments = []
         self._orphan_count = 0
+        self._last_event_ts = None
         current: EpisodeSegment | None = None
         last_actor: str | None = None
         # Track whether we've seen the first body event after start trigger.
@@ -149,16 +154,8 @@ class EpisodeSegmenter:
         return tag in END_TRIGGERS
 
     def _timed_out(self, current: EpisodeSegment, event: TaggedEvent) -> bool:
-        """Check if the gap between the current episode's last event and this event exceeds timeout.
-
-        Uses the last event timestamp in the episode (approximated by end_ts
-        tracking or start_ts if no events added yet).
-        """
-        # Get the latest timestamp in the current episode
-        # We track this via the most recent event's timestamp
-        # Since we don't store full events, use a simple approach:
-        # Compare current event's ts to the episode's tracked last_ts
-        last_ts = getattr(current, "_last_event_ts", current.start_ts)
+        """Check if the gap between the last event and this event exceeds timeout."""
+        last_ts = self._last_event_ts if self._last_event_ts is not None else current.start_ts
         gap = (event.event.ts_utc - last_ts).total_seconds()
         return gap > self._timeout_seconds
 
@@ -173,8 +170,7 @@ class EpisodeSegmenter:
             start_trigger=tag or "unknown",
         )
         episode.add_event(event.event.event_id)
-        # Track last event timestamp for timeout detection
-        episode._last_event_ts = event.event.ts_utc  # type: ignore[attr-defined]
+        self._last_event_ts = event.event.ts_utc
         return episode
 
     def _close_episode(
@@ -197,7 +193,7 @@ class EpisodeSegmenter:
         if trigger == "timeout":
             # For timeout, end timestamp is the last event's timestamp,
             # not the new event that triggered timeout detection
-            last_ts = getattr(episode, "_last_event_ts", episode.start_ts)
+            last_ts = self._last_event_ts if self._last_event_ts is not None else episode.start_ts
             episode.close(
                 end_ts=last_ts,
                 end_event_id=None,
@@ -206,7 +202,7 @@ class EpisodeSegmenter:
             )
         elif trigger == "superseded":
             # For superseded, the superseding event is NOT part of this episode
-            last_ts = getattr(episode, "_last_event_ts", episode.start_ts)
+            last_ts = self._last_event_ts if self._last_event_ts is not None else episode.start_ts
             episode.close(
                 end_ts=last_ts,
                 end_event_id=None,
@@ -255,7 +251,7 @@ class EpisodeSegmenter:
             episode.complexity = "complex"
 
         # Track last event timestamp for timeout detection
-        episode._last_event_ts = event.event.ts_utc  # type: ignore[attr-defined]
+        self._last_event_ts = event.event.ts_utc
 
     def _determine_outcome(self, event: TaggedEvent) -> str:
         """Determine the episode outcome based on the end trigger event.

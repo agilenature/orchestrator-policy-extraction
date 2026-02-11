@@ -30,11 +30,14 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Every event in the stream carries a classification tag (O_DIR, O_GATE, O_CORR, X_PROPOSE, X_ASK, T_TEST, T_LINT, T_GIT_COMMIT, T_RISKY) assigned by rule-based tagger
   3. Event stream is segmented into decision-point episode boundaries using start triggers (O_DIR, O_GATE) and end triggers (X_PROPOSE, X_ASK, T_TEST result, T_RISKY, T_GIT_COMMIT, 30min timeout)
   4. Configuration (risk model, event tag patterns, reaction keywords, mode inference rules) loads from YAML file and drives tagger and segmenter behavior
-**Plans**: TBD
+**Plans:** 5 plans in 4 waves
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md — Config system + data models + DuckDB schema (Wave 1)
+- [ ] 01-02-PLAN.md — DuckDB JSONL ingestion + git history + normalization (Wave 2)
+- [ ] 01-03-PLAN.md — Multi-pass event tagger [TDD] (Wave 3)
+- [ ] 01-04-PLAN.md — Episode segmenter [TDD] (Wave 3)
+- [ ] 01-05-PLAN.md — Pipeline runner + CLI + integration (Wave 4)
 
 ### Phase 2: Episode Population & Storage
 **Goal**: Episode segments are populated with structured fields (observation, action, outcome), reactions are labeled, and complete episodes are stored in DuckDB with full provenance
@@ -118,7 +121,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Event Stream Foundation | 0/TBD | Not started | - |
+| 1. Event Stream Foundation | 0/5 | Planning complete | - |
 | 2. Episode Population & Storage | 0/TBD | Not started | - |
 | 3. Constraint Management | 0/TBD | Not started | - |
 | 4. Validation & Quality | 0/TBD | Not started | - |

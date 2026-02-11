@@ -396,19 +396,11 @@ class ExecutorTagger:
         return any(p.search(text) for p in self._ASK_PATTERNS)
 
     def _is_pure_question(self, text: str) -> bool:
-        """Check if text is primarily a question without a recommendation."""
-        # If it contains propose/recommend patterns, it's not a pure question
-        has_recommendation = any(
-            p.search(text)
-            for p in [
-                re.compile(r"\bI propose\b", re.IGNORECASE),
-                re.compile(r"\bI recommend\b", re.IGNORECASE),
-                re.compile(r"\brecommended\b", re.IGNORECASE),
-                re.compile(r"\bOptions:\b", re.IGNORECASE),
-                re.compile(r"\bpropose switching\b", re.IGNORECASE),
-                re.compile(r"\bwe should\b", re.IGNORECASE),
-            ]
-        )
+        """Check if text is primarily a question without a recommendation.
+
+        Reuses the class-level _PROPOSE_PATTERNS to avoid redundant regex compilation.
+        """
+        has_recommendation = any(p.search(text) for p in self._PROPOSE_PATTERNS)
         return not has_recommendation
 
     def _compute_propose_confidence(self, text: str) -> float:
@@ -446,14 +438,27 @@ class OrchestratorTagger:
 
     def __init__(self, config: PipelineConfig) -> None:
         self.config = config
-        # O_CORR keywords from config (Q6)
+        # O_CORR keywords from config (Q6) -- pre-compile regex patterns
         self._corr_keywords = config.classification.reaction_keywords.get(
             "O_CORR", []
         )
+        self._corr_patterns = [
+            re.compile(r"\b" + re.escape(kw) + r"\b", re.IGNORECASE)
+            for kw in self._corr_keywords
+        ]
         # Gate patterns from config
         self._gate_patterns = config.gate_patterns
-        # Mode inference keywords from config
+        # Mode inference keywords from config -- pre-compile regex patterns
         self._mode_keywords = config.mode_inference
+        self._dir_patterns: list[re.Pattern[str]] = []
+        for _mode_name, mode_config in self._mode_keywords.items():
+            if isinstance(mode_config, dict):
+                for keyword in mode_config.get("keywords", []):
+                    self._dir_patterns.append(
+                        re.compile(
+                            r"\b" + re.escape(keyword) + r"\b", re.IGNORECASE
+                        )
+                    )
 
     def classify(
         self,
@@ -515,21 +520,11 @@ class OrchestratorTagger:
         return common.get("text", "")
 
     def _has_correction_keyword(self, text: str) -> bool:
-        """Check if text starts with or contains reaction keywords (Q6)."""
-        text_lower = text.lower().strip()
-        for keyword in self._corr_keywords:
-            kw_lower = keyword.lower()
-            # Check if text starts with keyword (word boundary)
-            if text_lower.startswith(kw_lower):
-                # Verify word boundary (next char is space, comma, period, or end)
-                next_pos = len(kw_lower)
-                if next_pos >= len(text_lower) or not text_lower[next_pos].isalpha():
-                    return True
-            # Also check if keyword appears as a separate word/phrase in the text
-            pattern = re.compile(r"\b" + re.escape(kw_lower) + r"\b", re.IGNORECASE)
-            if pattern.search(text):
-                return True
-        return False
+        """Check if text starts with or contains reaction keywords (Q6).
+
+        Uses pre-compiled word-boundary regex patterns for efficient matching.
+        """
+        return any(p.search(text) for p in self._corr_patterns)
 
     def _has_gate_pattern(self, text: str) -> bool:
         """Check if text matches gate patterns from config."""
@@ -547,20 +542,10 @@ class OrchestratorTagger:
     def _has_direction_keyword(self, text: str) -> bool:
         """Check if text matches mode inference keywords (O_DIR).
 
-        Uses word-boundary matching to prevent false positives from short
-        keywords (e.g., 'PR' matching 'production').
+        Uses pre-compiled word-boundary regex patterns to prevent false
+        positives from short keywords (e.g., 'PR' matching 'production').
         """
-        for _mode_name, mode_config in self._mode_keywords.items():
-            if isinstance(mode_config, dict):
-                keywords = mode_config.get("keywords", [])
-                for keyword in keywords:
-                    # Use word boundary regex to prevent substring false positives
-                    pattern = re.compile(
-                        r"\b" + re.escape(keyword) + r"\b", re.IGNORECASE
-                    )
-                    if pattern.search(text):
-                        return True
-        return False
+        return any(p.search(text) for p in self._dir_patterns)
 
     def _preceding_is_test_or_risky(
         self, context: list[CanonicalEvent | TaggedEvent]

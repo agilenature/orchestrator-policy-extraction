@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 1 of 6 (Event Stream Foundation)
-Plan: 1 of TBD in current phase
+Plan: 2 of 5 in current phase
 Status: In progress
-Last activity: 2026-02-11 -- Completed 01-01-PLAN.md (Foundation Layer)
+Last activity: 2026-02-11 -- Completed 01-02-PLAN.md (JSONL/Git Ingestion)
 
-Progress: [..........] ~5%
+Progress: [====......] 40%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 5 min
-- Total execution time: 0.08 hours
+- Total plans completed: 2
+- Average duration: 6.5 min
+- Total execution time: 0.22 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-event-stream-foundation | 1 | 5 min | 5 min |
+| 01-event-stream-foundation | 2 | 13 min | 6.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min
-- Trend: --
+- Last 5 plans: 5 min, 8 min
+- Trend: stable
 
 *Updated after each plan completion*
 
@@ -50,6 +50,10 @@ Recent decisions affecting current work:
 - Plan 01-01: LabelDefinition sub-model for classification labels (not bare dict)
 - Plan 01-01: CombinationModeConfig sub-model for risk_model.combination_mode
 - Plan 01-01: episode_segments table has 16 columns (plan said 15, research SQL spec defines 16)
+- Plan 01-02: DuckDB read_json_auto with union_by_name=true; message.content comes back as JSON string requiring re-parsing
+- Plan 01-02: Resilient column detection via information_schema.columns for varying JSONL schemas
+- Plan 01-02: Staging table upsert pattern for DuckDB (CREATE TEMP -> UPDATE -> INSERT -> DROP)
+- Plan 01-02: Git log parser uses separator-detection rather than blank-line splitting
 
 ### Pending Todos
 
@@ -63,5 +67,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Completed Plan 01-01 (Foundation Layer) -- ready for Plan 01-02
-Resume file: .planning/phases/01-event-stream-foundation/01-01-SUMMARY.md
+Stopped at: Completed Plan 01-02 (JSONL/Git Ingestion) -- ready for Plan 01-03
+Resume file: .planning/phases/01-event-stream-foundation/01-02-SUMMARY.md

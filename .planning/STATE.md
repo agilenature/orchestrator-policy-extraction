@@ -5,33 +5,35 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 1 COMPLETE - Event Stream Foundation
+**Current focus:** Phase 2 IN PROGRESS - Episode Population & Storage
 
 ## Current Position
 
-Phase: 1 of 6 (Event Stream Foundation)
-Plan: 5 of 5 in current phase (ALL COMPLETE)
-Status: Phase complete
-Last activity: 2026-02-11 -- Completed 01-05-PLAN.md (Pipeline Runner + CLI)
+Phase: 2 of 6 (Episode Population & Storage)
+Plan: 1 of 4 in current phase
+Status: In progress
+Last activity: 2026-02-11 -- Completed 02-01-PLAN.md (Episode Model + Schema + Validator)
 
-Progress: [##########] 100% (Phase 1)
+Progress: [######░░░░░░░░░░░░░░░░░░] 25% (Phase 2)
+Overall:  [████████████░░░░░░░░░░░░] ~50% (6/~12 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: 6 min
-- Total execution time: 0.48 hours
+- Total plans completed: 6
+- Average duration: 5.5 min
+- Total execution time: 0.55 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-event-stream-foundation | 5 | 29 min | 5.8 min |
+| 02-episode-population-storage | 1 | 4 min | 4.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min, 8 min, 5 min, 6 min, 5 min
-- Trend: stable
+- Last 5 plans: 8 min, 5 min, 6 min, 5 min, 4 min
+- Trend: stable/improving
 
 *Updated after each plan completion*
 
@@ -64,6 +66,8 @@ Recent decisions affecting current work:
 - Plan 01-05: Resilient isSidechain column detection in validation query for small JSONL files
 - Plan 01-05: Fresh EpisodeSegmenter per session for clean state isolation
 - Plan 01-05: Config hash from Pydantic model_dump_json() for deterministic provenance
+- Plan 02-01: ConstraintScope separate from Scope (JSON Schema Constraint.scope has only paths, no avoid)
+- Plan 02-01: EpisodePopulationConfig wired into PipelineConfig with defaults: 20 events, 300 seconds
 
 ### Pending Todos
 
@@ -83,8 +87,16 @@ Phase 1 delivered a working end-to-end extraction pipeline:
 - **Idempotent**: Re-running produces no duplicates
 - **Components**: config models, JSONL/git adapters, normalizer, tagger, segmenter, writer, runner, CLI
 
+## Phase 2 Progress
+
+Plan 02-01 (Episode Model + Schema + Validator) complete:
+- **104 tests** passing (90 existing + 14 new episode validator tests)
+- **Episode model**: 24 frozen Pydantic v2 models mirroring orchestrator-episode.schema.json
+- **DuckDB episodes table**: hybrid flat + STRUCT + JSON columns with 5 indexes
+- **EpisodeValidator**: jsonschema Draft 2020-12 + business rule checks
+
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Phase 1 complete -- all 5 plans executed. Ready for Phase 2 planning.
-Resume file: .planning/phases/01-event-stream-foundation/01-05-SUMMARY.md
+Stopped at: Plan 02-01 complete. Ready for 02-02 (Episode Populator).
+Resume file: .planning/phases/02-episode-population-storage/02-01-SUMMARY.md

@@ -354,3 +354,83 @@ class TestImportLabels:
         assert len(valid) == 0
         assert len(errors) == 1
         assert "schema validation failed" in errors[0]
+
+
+class TestParquetExport:
+    """Tests for Parquet export via DuckDB native COPY."""
+
+    def test_export_parquet_creates_readable_file(self, conn_with_episodes, tmp_path):
+        """Parquet export should produce a file readable by DuckDB."""
+        from src.pipeline.validation.exporter import export_parquet
+
+        parquet_path = tmp_path / "episodes.parquet"
+        count = export_parquet(conn_with_episodes, parquet_path)
+
+        assert count == 10
+        assert parquet_path.exists()
+
+        # Verify readable via DuckDB read_parquet
+        verify_conn = duckdb.connect(":memory:")
+        rows = verify_conn.execute(
+            f"SELECT count(*) FROM read_parquet('{parquet_path}')"
+        ).fetchone()
+        assert rows[0] == 10
+        verify_conn.close()
+
+    def test_export_parquet_empty_table(self, tmp_path):
+        """Export with no matching episodes returns 0."""
+        from src.pipeline.validation.exporter import export_parquet
+
+        conn = duckdb.connect(":memory:")
+        create_schema(conn)
+
+        parquet_path = tmp_path / "empty.parquet"
+        count = export_parquet(conn, parquet_path)
+
+        assert count == 0
+        conn.close()
+
+    def test_export_parquet_custom_query(self, conn_with_episodes, tmp_path):
+        """Custom query should filter exported rows."""
+        from src.pipeline.validation.exporter import export_parquet
+
+        parquet_path = tmp_path / "filtered.parquet"
+        count = export_parquet(
+            conn_with_episodes,
+            parquet_path,
+            query="SELECT * FROM episodes WHERE mode = 'Implement'",
+        )
+
+        # 3 Implement episodes in test data
+        assert count == 3
+
+    def test_export_parquet_creates_parent_dirs(self, conn_with_episodes, tmp_path):
+        """Export should create parent directories if needed."""
+        from src.pipeline.validation.exporter import export_parquet
+
+        parquet_path = tmp_path / "deep" / "nested" / "dir" / "episodes.parquet"
+        count = export_parquet(conn_with_episodes, parquet_path)
+
+        assert count == 10
+        assert parquet_path.exists()
+
+
+class TestCLIValidateGroup:
+    """Tests for CLI validate command group registration."""
+
+    def test_validate_group_has_subcommands(self):
+        """Validate group should have export, metrics, export-parquet subcommands."""
+        from src.pipeline.cli.validate import validate_group
+
+        command_names = list(validate_group.commands.keys())
+        assert "export" in command_names
+        assert "metrics" in command_names
+        assert "export-parquet" in command_names
+
+    def test_cli_main_has_validate_and_extract(self):
+        """Main CLI should have both extract and validate commands."""
+        from src.pipeline.cli.__main__ import cli
+
+        command_names = list(cli.commands.keys())
+        assert "extract" in command_names
+        assert "validate" in command_names

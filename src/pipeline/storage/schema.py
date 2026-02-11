@@ -1,13 +1,14 @@
 """DuckDB schema creation and connection management.
 
-Creates the events and episode_segments tables with correct column types
-matching the Pydantic data models. Supports both in-memory (for testing)
-and on-disk databases.
+Creates the events, episode_segments, and episodes tables with correct
+column types matching the Pydantic data models. Supports both in-memory
+(for testing) and on-disk databases.
 
 Schema follows the research spec with:
 - 17-column events table with deterministic event_id primary key
 - 15-column episode_segments table
-- Indexes for session, tag, and timestamp queries
+- episodes table with flat + STRUCT + JSON hybrid columns
+- Indexes for session, tag, timestamp, mode, risk, and reaction queries
 - Ingestion metadata columns (first_seen, last_seen, ingestion_count) per Q13
 
 Exports:
@@ -43,10 +44,11 @@ def get_connection(db_path: str = "data/ope.db") -> duckdb.DuckDBPyConnection:
 
 
 def create_schema(conn: duckdb.DuckDBPyConnection) -> None:
-    """Create the events and episode_segments tables with indexes.
+    """Create the events, episode_segments, and episodes tables with indexes.
 
     Uses CREATE TABLE IF NOT EXISTS so this is safe to call multiple times.
-    Schema columns match the Pydantic models in events.py and segments.py.
+    Schema columns match the Pydantic models in events.py, segments.py,
+    and episodes.py.
 
     Args:
         conn: DuckDB connection to create tables in.
@@ -110,6 +112,76 @@ def create_schema(conn: duckdb.DuckDBPyConnection) -> None:
         "CREATE INDEX IF NOT EXISTS idx_segments_session ON episode_segments(session_id)"
     )
 
+    # Episodes table: hybrid flat + STRUCT + JSON storage
+    # Flat columns for fast filtering, STRUCT for typed nested queries,
+    # JSON for flexible nested data
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS episodes (
+            -- Identity (flat, queryable)
+            episode_id VARCHAR PRIMARY KEY,
+            session_id VARCHAR NOT NULL,
+            segment_id VARCHAR NOT NULL,
+            timestamp TIMESTAMPTZ NOT NULL,
+
+            -- Flat queryable columns (duplicated from nested for fast filtering)
+            mode VARCHAR,
+            risk VARCHAR,
+            reaction_label VARCHAR,
+            reaction_confidence FLOAT,
+            outcome_type VARCHAR,
+
+            -- STRUCT for typed nested data (queryable via dot notation)
+            observation STRUCT(
+                repo_state STRUCT(
+                    changed_files VARCHAR[],
+                    diff_stat STRUCT(files INTEGER, insertions INTEGER, deletions INTEGER)
+                ),
+                quality_state STRUCT(
+                    tests_status VARCHAR,
+                    lint_status VARCHAR,
+                    build_status VARCHAR
+                ),
+                context STRUCT(
+                    recent_summary VARCHAR,
+                    open_questions VARCHAR[],
+                    constraints_in_force VARCHAR[]
+                )
+            ),
+
+            -- JSON for flexible nested data
+            orchestrator_action JSON,
+            outcome JSON,
+            provenance JSON,
+            labels JSON,
+
+            -- Provenance flat columns
+            source_files VARCHAR[],
+            config_hash VARCHAR,
+
+            -- Metadata
+            schema_version INTEGER DEFAULT 1,
+            created_at TIMESTAMPTZ DEFAULT current_timestamp,
+            updated_at TIMESTAMPTZ DEFAULT current_timestamp
+        )
+    """)
+
+    # Episodes indexes
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_episodes_session ON episodes(session_id)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_episodes_mode ON episodes(mode)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_episodes_risk ON episodes(risk)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_episodes_reaction ON episodes(reaction_label)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_episodes_ts ON episodes(timestamp)"
+    )
+
 
 def drop_schema(conn: duckdb.DuckDBPyConnection) -> None:
     """Drop all pipeline tables (for testing).
@@ -119,5 +191,6 @@ def drop_schema(conn: duckdb.DuckDBPyConnection) -> None:
     Args:
         conn: DuckDB connection to drop tables from.
     """
+    conn.execute("DROP TABLE IF EXISTS episodes")
     conn.execute("DROP TABLE IF EXISTS episode_segments")
     conn.execute("DROP TABLE IF EXISTS events")

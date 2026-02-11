@@ -99,6 +99,12 @@ Plan 02-01 (Episode Model + Schema + Validator) complete:
 - **DuckDB episodes table**: hybrid flat + STRUCT + JSON columns with 5 indexes
 - **EpisodeValidator**: jsonschema Draft 2020-12 + business rule checks
 
+Plan 02-02 (EpisodePopulator) complete:
+- **134 tests** passing (104 existing + 30 new populator tests)
+- **EpisodePopulator**: populate(segment, events, context_events) -> schema-valid episode dict
+- **Mode inference**: all 7 modes with priority ordering and position tie-breaking
+- **Field derivation**: observation from context, action from start trigger, outcome from body events
+
 Plan 02-03 (ReactionLabeler) complete:
 - **152 tests** passing (104 existing + 48 new reaction labeler tests)
 - **ReactionLabeler**: 5 reaction labels + unknown with two-tier confidence (strong 0.85, weak 0.55)

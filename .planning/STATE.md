@@ -5,32 +5,32 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 1 - Event Stream Foundation
+**Current focus:** Phase 1 COMPLETE - Event Stream Foundation
 
 ## Current Position
 
 Phase: 1 of 6 (Event Stream Foundation)
-Plan: 4 of 5 in current phase
-Status: In progress
-Last activity: 2026-02-11 -- Completed 01-03-PLAN.md (Multi-Pass Event Tagger) and 01-04-PLAN.md (Episode Segmenter)
+Plan: 5 of 5 in current phase (ALL COMPLETE)
+Status: Phase complete
+Last activity: 2026-02-11 -- Completed 01-05-PLAN.md (Pipeline Runner + CLI)
 
-Progress: [========..] 80%
+Progress: [##########] 100% (Phase 1)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
+- Total plans completed: 5
 - Average duration: 6 min
-- Total execution time: 0.40 hours
+- Total execution time: 0.48 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-event-stream-foundation | 4 | 24 min | 6 min |
+| 01-event-stream-foundation | 5 | 29 min | 5.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min, 8 min, 5 min, 6 min
+- Last 5 plans: 5 min, 8 min, 5 min, 6 min, 5 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -60,6 +60,10 @@ Recent decisions affecting current work:
 - Plan 01-04: O_CORR added as start trigger alongside O_DIR/O_GATE (corrections open new episodes)
 - Plan 01-04: Context switches only counted after first body event (start trigger transition is normal flow)
 - Plan 01-04: Last event timestamp tracked on segmenter instance, not as dynamic Pydantic attribute
+- Plan 01-05: Validation measures invalid rate against filtered records, not raw count (excludes legitimately skipped types)
+- Plan 01-05: Resilient isSidechain column detection in validation query for small JSONL files
+- Plan 01-05: Fresh EpisodeSegmenter per session for clean state isolation
+- Plan 01-05: Config hash from Pydantic model_dump_json() for deterministic provenance
 
 ### Pending Todos
 
@@ -70,8 +74,17 @@ None.
 - Phase 6 (Mission Control Integration) requires access to Mission Control repository (external blocker noted in PROJECT.md constraints)
 - Phases 1-5 are independent of this blocker and can proceed
 
+## Phase 1 Completion Summary
+
+Phase 1 delivered a working end-to-end extraction pipeline:
+- **90 tests** passing across 3 test suites (tagger: 47, segmenter: 35, integration: 8)
+- **10 real sessions** processed: 1264 events, 22 episodes, 9 tag types, 5 outcome types
+- **CLI**: `python -m src.pipeline.cli.extract <path> [--db] [--config] [--repo] [-v]`
+- **Idempotent**: Re-running produces no duplicates
+- **Components**: config models, JSONL/git adapters, normalizer, tagger, segmenter, writer, runner, CLI
+
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Completed Plans 01-03 (Event Tagger) and 01-04 (Episode Segmenter) -- Plan 01-05 (Pipeline Runner) is next
-Resume file: .planning/phases/01-event-stream-foundation/01-03-SUMMARY.md
+Stopped at: Phase 1 complete -- all 5 plans executed. Ready for Phase 2 planning.
+Resume file: .planning/phases/01-event-stream-foundation/01-05-SUMMARY.md

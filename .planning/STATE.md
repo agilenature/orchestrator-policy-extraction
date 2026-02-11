@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 1 of 6 (Event Stream Foundation)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-02-10 -- Roadmap created from 23 v1 requirements across 6 phases
+Plan: 1 of TBD in current phase
+Status: In progress
+Last activity: 2026-02-11 -- Completed 01-01-PLAN.md (Foundation Layer)
 
-Progress: [..........] 0%
+Progress: [..........] ~5%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: --
-- Total execution time: 0 hours
+- Total plans completed: 1
+- Average duration: 5 min
+- Total execution time: 0.08 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01-event-stream-foundation | 1 | 5 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: --
+- Last 5 plans: 5 min
 - Trend: --
 
 *Updated after each plan completion*
@@ -46,10 +46,14 @@ Recent decisions affecting current work:
 - Phase 0: Session backup via copy + commit to git (data loss prevention)
 - Phase 0: Decision-point episodes (not turn-level) as correct unit
 - Roadmap: 6-phase structure derived from 23 requirements across 6 categories
+- Plan 01-01: Merged existing config patterns (tags, mode_inference, gates) into locked-decision config structure
+- Plan 01-01: LabelDefinition sub-model for classification labels (not bare dict)
+- Plan 01-01: CombinationModeConfig sub-model for risk_model.combination_mode
+- Plan 01-01: episode_segments table has 16 columns (plan said 15, research SQL spec defines 16)
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
@@ -58,6 +62,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-10
-Stopped at: Roadmap and state initialized -- ready for Phase 1 planning
-Resume file: None
+Last session: 2026-02-11
+Stopped at: Completed Plan 01-01 (Foundation Layer) -- ready for Plan 01-02
+Resume file: .planning/phases/01-event-stream-foundation/01-01-SUMMARY.md

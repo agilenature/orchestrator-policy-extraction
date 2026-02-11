@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 2 COMPLETE - Episode Population & Storage
+**Current focus:** Phase 3 IN PROGRESS - Constraint Management
 
 ## Current Position
 
-Phase: 2 of 6 (Episode Population & Storage)
-Plan: 4 of 4 in current phase
-Status: Phase complete
-Last activity: 2026-02-11 -- Completed 02-04-PLAN.md (Episode Storage + Integration)
+Phase: 3 of 6 (Constraint Management)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-11 -- Completed 03-01-PLAN.md (ConstraintExtractor)
 
-Progress: [########################] 100% (Phase 2)
-Overall:  [████████████████░░░░░░░░] ~69% (9/~13 plans)
+Progress: [############............] 50% (Phase 3)
+Overall:  [██████████████████░░░░░░] ~77% (10/~13 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
-- Average duration: 5.3 min
-- Total execution time: 0.81 hours
+- Total plans completed: 10
+- Average duration: 5.1 min
+- Total execution time: 0.85 hours
 
 **By Phase:**
 
@@ -30,9 +30,10 @@ Overall:  [████████████████░░░░░░░
 |-------|-------|-------|----------|
 | 01-event-stream-foundation | 5 | 29 min | 5.8 min |
 | 02-episode-population-storage | 4 | 19 min | 4.8 min |
+| 03-constraint-management | 1 | 3 min | 3.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min, 4 min, 4 min, 4 min, 7 min
+- Last 5 plans: 4 min, 4 min, 4 min, 7 min, 3 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -75,6 +76,9 @@ Recent decisions affecting current work:
 - Plan 02-04: Staging table + struct_pack() for STRUCT column insertion (avoids DuckDB binding issues)
 - Plan 02-04: _find_next_human_message builds tag list from tag_by_event_id for ReactionLabeler compatibility
 - Plan 02-04: Episode validation gates storage: invalid episodes logged but never written to episodes table
+- Plan 03-01: Text normalization strips conversational prefixes via compiled regex (no NLP)
+- Plan 03-01: Forbidden keywords take precedence over preferred when both present (hard correction not downgraded)
+- Plan 03-01: Examples array populated with source episode as first entry during extraction
 
 ### Pending Todos
 
@@ -109,5 +113,5 @@ Phase 2 extended the pipeline with episode population and storage:
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Phase 2 complete (all 4 plans). Ready for Phase 3.
-Resume file: .planning/phases/02-episode-population-storage/02-04-SUMMARY.md
+Stopped at: Phase 3 plan 1 complete. Ready for plan 03-02.
+Resume file: .planning/phases/03-constraint-management/03-01-SUMMARY.md

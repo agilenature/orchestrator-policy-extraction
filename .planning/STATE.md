@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 3 IN PROGRESS - Constraint Management
+**Current focus:** Phase 3 COMPLETE - Constraint Management
 
 ## Current Position
 
 Phase: 3 of 6 (Constraint Management)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-02-11 -- Completed 03-01-PLAN.md (ConstraintExtractor)
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-02-11 -- Completed 03-02-PLAN.md (ConstraintStore + Pipeline Integration)
 
-Progress: [############............] 50% (Phase 3)
-Overall:  [██████████████████░░░░░░] ~77% (10/~13 plans)
+Progress: [########################] 100% (Phase 3)
+Overall:  [████████████████████░░░░] ~85% (11/~13 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
-- Average duration: 5.1 min
-- Total execution time: 0.85 hours
+- Total plans completed: 11
+- Average duration: 5.0 min
+- Total execution time: 0.92 hours
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Overall:  [██████████████████░░░░░
 |-------|-------|-------|----------|
 | 01-event-stream-foundation | 5 | 29 min | 5.8 min |
 | 02-episode-population-storage | 4 | 19 min | 4.8 min |
-| 03-constraint-management | 1 | 3 min | 3.0 min |
+| 03-constraint-management | 2 | 7 min | 3.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min, 4 min, 4 min, 7 min, 3 min
+- Last 5 plans: 4 min, 4 min, 7 min, 3 min, 4 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -79,6 +79,9 @@ Recent decisions affecting current work:
 - Plan 03-01: Text normalization strips conversational prefixes via compiled regex (no NLP)
 - Plan 03-01: Forbidden keywords take precedence over preferred when both present (hard correction not downgraded)
 - Plan 03-01: Examples array populated with source episode as first entry during extraction
+- Plan 03-02: ConstraintStore path configurable via constraints_path param for test isolation
+- Plan 03-02: Duplicate constraints enrich existing examples array (new episode references appended)
+- Plan 03-02: Constraint store saved only when extraction produced results (avoids unnecessary writes)
 
 ### Pending Todos
 
@@ -110,8 +113,18 @@ Phase 2 extended the pipeline with episode population and storage:
 - **Full pipeline**: JSONL -> events -> segments -> episodes (populated, labeled, validated, stored)
 - **CLI**: episode stats (populated/valid/invalid) + reaction label distribution
 
+## Phase 3 Completion Summary
+
+Phase 3 added constraint extraction and management:
+- **270 tests** passing across 8 test suites (tagger: 47, segmenter: 35, validator: 14, populator: 30, reaction: 48, storage: 12, constraint extractor: 50, constraint store: 18, integration: 16)
+- **ConstraintExtractor**: correct/block reactions -> structured constraints with 3-tier severity, narrowest-scope inference, deterministic IDs
+- **ConstraintStore**: JSON file manager with dedup, schema validation, examples enrichment
+- **Pipeline Step 12**: constraint extraction wired after episode storage
+- **CLI**: constraint stats (extracted, duplicate, total in store)
+- **Idempotent**: re-running produces no duplicate constraints in data/constraints.json
+
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Phase 3 plan 1 complete. Ready for plan 03-02.
-Resume file: .planning/phases/03-constraint-management/03-01-SUMMARY.md
+Stopped at: Phase 3 complete. Ready for Phase 4.
+Resume file: .planning/phases/03-constraint-management/03-02-SUMMARY.md

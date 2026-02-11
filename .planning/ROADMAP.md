@@ -12,8 +12,8 @@ This roadmap delivers a system that extracts decision-point episodes from histor
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Event Stream Foundation** - Normalize raw logs into tagged canonical events and segment into decision-point boundaries
-- [ ] **Phase 2: Episode Population & Storage** - Populate episode fields, label reactions, and store complete episodes in DuckDB
+- [x] **Phase 1: Event Stream Foundation** - Normalize raw logs into tagged canonical events and segment into decision-point boundaries
+- [x] **Phase 2: Episode Population & Storage** - Populate episode fields, label reactions, and store complete episodes in DuckDB
 - [ ] **Phase 3: Constraint Management** - Extract durable orchestration constraints from corrections and manage them with severity and scope
 - [ ] **Phase 4: Validation & Quality** - Validate episode quality through multi-layer checks and build gold-standard labeled dataset
 - [ ] **Phase 5: Training Infrastructure** - Deploy RAG baseline orchestrator and validate via shadow mode testing
@@ -123,8 +123,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Event Stream Foundation | 0/5 | Planning complete | - |
-| 2. Episode Population & Storage | 0/TBD | Not started | - |
+| 1. Event Stream Foundation | 5/5 | ✓ Complete | 2026-02-11 |
+| 2. Episode Population & Storage | 4/4 | ✓ Complete | 2026-02-11 |
 | 3. Constraint Management | 0/TBD | Not started | - |
 | 4. Validation & Quality | 0/TBD | Not started | - |
 | 5. Training Infrastructure | 0/TBD | Not started | - |

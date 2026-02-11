@@ -81,11 +81,11 @@ Plans:
   2. A manual validation workflow produces a gold-standard set of 100+ episodes with verified mode labels, reaction labels, and constraint extractions
   3. Quality metrics are calculated and tracked: mode inference accuracy >=85%, reaction label confidence >=80%, constraint extraction rate >=90% of corrections
   4. Episodes that pass validation can be exported to Parquet format for ML training pipelines
-**Plans**: TBD
+**Plans:** 2 plans in 2 waves
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
+- [ ] 04-01-PLAN.md — GenusValidator with five validation layers [TDD] (Wave 1)
+- [ ] 04-02-PLAN.md — Gold-standard workflow + metrics + Parquet export + CLI (Wave 2)
 
 ### Phase 5: Training Infrastructure
 **Goal**: A RAG baseline orchestrator recommends actions from similar past episodes, and shadow mode testing validates recommendations against human decisions before any autonomous operation
@@ -126,6 +126,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 1. Event Stream Foundation | 5/5 | ✓ Complete | 2026-02-11 |
 | 2. Episode Population & Storage | 4/4 | ✓ Complete | 2026-02-11 |
 | 3. Constraint Management | 2/2 | ✓ Complete | 2026-02-11 |
-| 4. Validation & Quality | 0/TBD | Not started | - |
+| 4. Validation & Quality | 0/2 | Not started | - |
 | 5. Training Infrastructure | 0/TBD | Not started | - |
 | 6. Mission Control Integration | 0/TBD | Not started | - |

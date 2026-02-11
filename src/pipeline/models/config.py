@@ -144,6 +144,17 @@ class TemporalAnomalyConfig(BaseModel):
     microsecond_noise: str = "deterministic"
 
 
+class EpisodePopulationConfig(BaseModel):
+    """Episode population settings (Phase 2).
+
+    Controls the observation context window used when constructing
+    episodes from episode segments.
+    """
+
+    observation_context_events: int = 20
+    observation_context_seconds: int = 300
+
+
 class GitCommands(BaseModel):
     """Git command patterns for tagging."""
 
@@ -192,6 +203,9 @@ class PipelineConfig(BaseModel):
         default_factory=TemporalAnomalyConfig
     )
     tags: TagPatterns = Field(default_factory=TagPatterns)
+    episode_population: EpisodePopulationConfig = Field(
+        default_factory=EpisodePopulationConfig
+    )
 
     # Preserved from existing config (used by downstream components)
     mode_inference: dict[str, Any] = Field(default_factory=dict)

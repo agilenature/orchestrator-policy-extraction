@@ -197,6 +197,11 @@ tags:
     - "git push --force"
     - "git reset --hard"
 
+# Episode Population (Phase 2: context window for observation construction)
+episode_population:
+  observation_context_events: 20
+  observation_context_seconds: 300
+
 # Orchestrator Mode Inference Rules (preserved from existing config)
 mode_inference:
   Explore:

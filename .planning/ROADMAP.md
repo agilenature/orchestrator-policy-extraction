@@ -66,11 +66,11 @@ Plans:
   2. Constraints are stored in a version-controlled JSON file (data/constraints.json) with unique IDs and metadata
   3. Severity levels (warning / requires_approval / forbidden) are assigned based on reaction type and keyword analysis -- "correct" reactions produce warning/requires_approval, "block" reactions produce forbidden
   4. Constraint scope (file-level, module-level, or repo-wide) is inferred from mentioned paths, defaulting to narrowest applicable scope rather than repo-wide
-**Plans**: TBD
+**Plans:** 2 plans in 2 waves
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
+- [ ] 03-01-PLAN.md — ConstraintExtractor with severity, scope, hints [TDD] (Wave 1)
+- [ ] 03-02-PLAN.md — ConstraintStore + pipeline integration + CLI stats (Wave 2)
 
 ### Phase 4: Validation & Quality
 **Goal**: Episode quality is verified through multi-layer validation, a gold-standard labeled dataset exists for accuracy measurement, and quality metrics meet thresholds for training readiness

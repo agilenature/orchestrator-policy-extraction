@@ -147,13 +147,26 @@ class PipelineRunner:
         # We query the filtered count to compute the true invalid rate.
         if raw_count > 0:
             try:
+                # Check if isSidechain column exists in raw_records
+                raw_cols = {
+                    row[0]
+                    for row in self._conn.execute(
+                        "SELECT column_name FROM information_schema.columns "
+                        "WHERE table_name = 'raw_records'"
+                    ).fetchall()
+                }
+                sidechain_clause = (
+                    "AND (isSidechain IS NULL OR isSidechain = false)"
+                    if "isSidechain" in raw_cols
+                    else ""
+                )
                 filtered_count = self._conn.execute(
                     "SELECT count(*) FROM raw_records "
                     "WHERE type NOT IN ('progress', 'file-history-snapshot', 'queue-operation') "
-                    "AND (isSidechain IS NULL OR isSidechain = false)"
+                    + sidechain_clause
                 ).fetchone()[0]
             except Exception:
-                # Fallback: if the query fails (column missing), use raw count
+                # Fallback: if the query fails entirely, use raw count
                 filtered_count = raw_count
 
             invalid_count = max(0, filtered_count - len(jsonl_events))

@@ -1,0 +1,169 @@
+"""CLI entry point for the extraction pipeline.
+
+Processes Claude Code JSONL session files through the full pipeline:
+load -> normalize -> tag -> segment -> store in DuckDB.
+
+Usage:
+    python -m src.pipeline.cli.extract <path> [options]
+
+    <path> can be a single .jsonl file or a directory of .jsonl files.
+
+Examples:
+    # Process a single session file
+    python -m src.pipeline.cli.extract session.jsonl --db data/ope.db
+
+    # Process all sessions in a directory
+    python -m src.pipeline.cli.extract ~/.claude/projects/myproject/ -v
+
+    # Process with git history for temporal alignment
+    python -m src.pipeline.cli.extract session.jsonl --repo /path/to/repo
+
+Exports:
+    main: Click CLI entry point
+"""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+import click
+from loguru import logger
+
+from src.pipeline.models.config import load_config
+from src.pipeline.runner import PipelineRunner
+
+
+@click.command()
+@click.argument("input_path", type=click.Path(exists=True))
+@click.option("--db", default="data/ope.db", help="DuckDB output path (use :memory: for no persistence).")
+@click.option("--config", "config_path", default="data/config.yaml", help="Config YAML path.")
+@click.option("--repo", default=None, help="Git repo path for temporal alignment.")
+@click.option("--verbose", "-v", is_flag=True, help="Verbose logging (DEBUG level).")
+def main(
+    input_path: str,
+    db: str,
+    config_path: str,
+    repo: str | None,
+    verbose: bool,
+) -> None:
+    """Process Claude Code JSONL sessions into tagged, segmented events in DuckDB.
+
+    INPUT_PATH can be a single .jsonl file or a directory containing .jsonl files.
+
+    Run with: python -m src.pipeline.cli.extract
+    """
+    # Configure logging
+    logger.remove()  # Remove default handler
+    log_level = "DEBUG" if verbose else "INFO"
+    logger.add(sys.stderr, level=log_level, format="{time:HH:mm:ss} | {level:<7} | {message}")
+
+    # Load config
+    try:
+        config = load_config(config_path)
+    except FileNotFoundError:
+        click.echo(f"Error: Config file not found: {config_path}", err=True)
+        sys.exit(1)
+    except Exception as e:
+        click.echo(f"Error loading config: {e}", err=True)
+        sys.exit(1)
+
+    # Initialize runner
+    runner = PipelineRunner(config, db_path=db)
+
+    try:
+        input_p = Path(input_path)
+
+        if input_p.is_file() and input_p.suffix == ".jsonl":
+            # Single file mode
+            click.echo(f"Processing single session: {input_p.name}")
+            result = runner.run_session(input_p, repo_path=repo)
+            _print_session_summary(result)
+            has_errors = bool(result.get("errors"))
+        elif input_p.is_dir():
+            # Batch mode
+            click.echo(f"Batch processing directory: {input_p}")
+            batch_result = runner.run_batch(input_p, repo_path=repo)
+            _print_batch_summary(batch_result)
+            has_errors = bool(batch_result.get("errors"))
+        else:
+            click.echo(f"Error: {input_path} is not a .jsonl file or directory", err=True)
+            sys.exit(1)
+
+    finally:
+        runner.close()
+
+    sys.exit(1 if has_errors else 0)
+
+
+def _print_session_summary(result: dict) -> None:
+    """Print a summary table for a single session result."""
+    click.echo("\n--- Session Summary ---")
+    click.echo(f"  Session ID:  {result['session_id']}")
+    click.echo(f"  Events:      {result['event_count']}")
+    click.echo(f"  Episodes:    {result['episode_count']}")
+    click.echo(f"  Orphans:     {result.get('orphan_count', 0)}")
+    click.echo(f"  Duplicates:  {result.get('duplicate_count', 0)}")
+    click.echo(f"  Invalid:     {result.get('invalid_count', 0)}")
+    click.echo(f"  Duration:    {result.get('duration_seconds', 0):.2f}s")
+
+    if result.get("tag_distribution"):
+        click.echo("\n  Tag Distribution:")
+        for tag, count in sorted(result["tag_distribution"].items(), key=lambda x: -x[1]):
+            click.echo(f"    {tag:16s} {count:>5d}")
+
+    if result.get("outcome_distribution"):
+        click.echo("\n  Outcome Distribution:")
+        for outcome, count in sorted(result["outcome_distribution"].items(), key=lambda x: -x[1]):
+            click.echo(f"    {outcome:20s} {count:>5d}")
+
+    if result.get("errors"):
+        click.echo("\n  Errors:")
+        for err in result["errors"]:
+            click.echo(f"    - {err}")
+
+    if result.get("warnings"):
+        click.echo("\n  Warnings:")
+        for warn in result["warnings"]:
+            click.echo(f"    - {warn}")
+
+    click.echo()
+
+
+def _print_batch_summary(result: dict) -> None:
+    """Print a summary table for batch processing results."""
+    click.echo("\n=== Batch Processing Summary ===")
+    click.echo(f"  Sessions processed: {result['sessions_processed']}")
+    click.echo(f"  Total events:       {result['total_events']}")
+    click.echo(f"  Total episodes:     {result['total_episodes']}")
+
+    if result.get("tag_distribution"):
+        click.echo("\n  Aggregate Tag Distribution:")
+        for tag, count in sorted(result["tag_distribution"].items(), key=lambda x: -x[1]):
+            click.echo(f"    {tag:16s} {count:>5d}")
+
+    if result.get("outcome_distribution"):
+        click.echo("\n  Aggregate Outcome Distribution:")
+        for outcome, count in sorted(result["outcome_distribution"].items(), key=lambda x: -x[1]):
+            click.echo(f"    {outcome:20s} {count:>5d}")
+
+    if result.get("errors"):
+        click.echo(f"\n  Errors ({len(result['errors'])}):")
+        for err in result["errors"]:
+            click.echo(f"    - {err}")
+
+    # Per-session summaries
+    if result.get("results"):
+        click.echo("\n  Per-Session Results:")
+        for r in result["results"]:
+            status = "OK" if not r.get("errors") else "ERROR"
+            click.echo(
+                f"    [{status:5s}] {r['session_id']}: "
+                f"{r['event_count']} events, {r['episode_count']} episodes"
+            )
+
+    click.echo()
+
+
+if __name__ == "__main__":
+    main()

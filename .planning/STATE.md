@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 1 of 6 (Event Stream Foundation)
-Plan: 2 of 5 in current phase
+Plan: 4 of 5 in current phase
 Status: In progress
-Last activity: 2026-02-11 -- Completed 01-02-PLAN.md (JSONL/Git Ingestion)
+Last activity: 2026-02-11 -- Completed 01-04-PLAN.md (Episode Segmenter)
 
-Progress: [====......] 40%
+Progress: [======....] 60%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 6.5 min
-- Total execution time: 0.22 hours
+- Total plans completed: 3
+- Average duration: 6 min
+- Total execution time: 0.30 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-event-stream-foundation | 2 | 13 min | 6.5 min |
+| 01-event-stream-foundation | 3 | 18 min | 6 min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min, 8 min
+- Last 5 plans: 5 min, 8 min, 5 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -54,6 +54,9 @@ Recent decisions affecting current work:
 - Plan 01-02: Resilient column detection via information_schema.columns for varying JSONL schemas
 - Plan 01-02: Staging table upsert pattern for DuckDB (CREATE TEMP -> UPDATE -> INSERT -> DROP)
 - Plan 01-02: Git log parser uses separator-detection rather than blank-line splitting
+- Plan 01-04: O_CORR added as start trigger alongside O_DIR/O_GATE (corrections open new episodes)
+- Plan 01-04: Context switches only counted after first body event (start trigger transition is normal flow)
+- Plan 01-04: Last event timestamp tracked on segmenter instance, not as dynamic Pydantic attribute
 
 ### Pending Todos
 
@@ -67,5 +70,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Completed Plan 01-02 (JSONL/Git Ingestion) -- ready for Plan 01-03
-Resume file: .planning/phases/01-event-stream-foundation/01-02-SUMMARY.md
+Stopped at: Completed Plan 01-04 (Episode Segmenter) -- Plan 01-03 (Event Tagger) running in parallel, Plan 01-05 next
+Resume file: .planning/phases/01-event-stream-foundation/01-04-SUMMARY.md

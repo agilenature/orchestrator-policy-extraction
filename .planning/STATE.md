@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 4 COMPLETE - Validation & Quality
+**Current focus:** Phase 5 IN PROGRESS - Training Infrastructure
 
 ## Current Position
 
-Phase: 4 of 6 (Validation & Quality)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-11 -- Completed 04-02-PLAN.md (Gold-standard workflow, metrics, Parquet export)
+Phase: 5 of 6 (Training Infrastructure)
+Plan: 1 of 1 in current phase
+Status: In progress
+Last activity: 2026-02-11 -- Completed 05-01-PLAN.md (Episode embedding infrastructure)
 
-Progress: [########################] 100% (Phase 4)
-Overall:  [██████████████████████░░] ~93% (13/14 plans)
+Progress: [########################] 100% (Phase 5 Plan 1)
+Overall:  [███████████████████████░] ~100% (14/14 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
+- Total plans completed: 14
 - Average duration: 5.1 min
-- Total execution time: 1.10 hours
+- Total execution time: 1.18 hours
 
 **By Phase:**
 
@@ -32,9 +32,10 @@ Overall:  [██████████████████████░
 | 02-episode-population-storage | 4 | 19 min | 4.8 min |
 | 03-constraint-management | 2 | 7 min | 3.5 min |
 | 04-validation-quality | 2 | 11 min | 5.5 min |
+| 05-training-infrastructure | 1 | 5 min | 5.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 7 min, 3 min, 4 min, 4 min, 7 min
+- Last 5 plans: 3 min, 4 min, 4 min, 7 min, 5 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -92,6 +93,10 @@ Recent decisions affecting current work:
 - Plan 04-02: Constraint extraction rate links via examples array episode_ids (not constraint text)
 - Plan 04-02: CLI refactored from direct-invoke to click.group with extract+validate subcommands
 - Plan 04-02: Parquet export uses DuckDB native COPY TO (no pyarrow dependency)
+- Plan 05-01: FTS index install/load in rebuild_fts_index() rather than create_schema() to avoid extension dependency
+- Plan 05-01: VSS extension loaded in create_schema() with try/except for already-installed scenarios
+- Plan 05-01: HNSW index deferred to Plan 02 (requires data to be present first)
+- Plan 05-01: observation_to_text maps to DuckDB STRUCT field names (tests_status) not Pydantic names (tests.status)
 
 ### Pending Todos
 
@@ -144,8 +149,16 @@ Phase 4 added validation layers and gold-standard quality workflow:
 - **CLI**: `python -m src.pipeline.cli validate export|metrics|export-parquet`
 - **CLI refactored**: click.group() with extract + validate subcommands
 
+## Phase 5 Progress
+
+Phase 5 builds training infrastructure for RAG retrieval and shadow mode testing:
+- **Plan 01 COMPLETE**: Episode embedding infrastructure (EpisodeEmbedder, observation_to_text, DuckDB schema extensions)
+- **370 tests** passing across 13 test suites (+18 new in plan 05-01)
+- **New module**: src/pipeline/rag/ with embedder.py
+- **Dependencies added**: sentence-transformers 5.2.2
+
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Phase 4 complete. Ready for Phase 5 (Pipeline Polish).
-Resume file: .planning/phases/04-validation-quality/04-02-SUMMARY.md
+Stopped at: Phase 5 Plan 01 complete. Ready for next plan if present.
+Resume file: .planning/phases/05-training-infrastructure-training-infrastructure/05-01-SUMMARY.md

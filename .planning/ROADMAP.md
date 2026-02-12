@@ -15,9 +15,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Event Stream Foundation** - Normalize raw logs into tagged canonical events and segment into decision-point boundaries
 - [x] **Phase 2: Episode Population & Storage** - Populate episode fields, label reactions, and store complete episodes in DuckDB
 - [x] **Phase 3: Constraint Management** - Extract durable orchestration constraints from corrections and manage them with severity and scope
-- [ ] **Phase 4: Validation & Quality** - Validate episode quality through multi-layer checks and build gold-standard labeled dataset
-- [ ] **Phase 5: Training Infrastructure** - Deploy RAG baseline orchestrator and validate via shadow mode testing
-- [ ] **Phase 6: Mission Control Integration** - Capture episodes in real-time from structured tasks with review UI and tool provenance
+- [x] **Phase 4: Validation & Quality** - Validate episode quality through multi-layer checks and build gold-standard labeled dataset
+- [x] **Phase 5: Training Infrastructure** - Deploy RAG baseline orchestrator and validate via shadow mode testing
+- [x] **Phase 6: Mission Control Integration** - Capture episodes in real-time from structured tasks with review UI and tool provenance
 
 ## Phase Details
 
@@ -33,11 +33,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 5 plans in 4 waves
 
 Plans:
-- [ ] 01-01-PLAN.md — Config system + data models + DuckDB schema (Wave 1)
-- [ ] 01-02-PLAN.md — DuckDB JSONL ingestion + git history + normalization (Wave 2)
-- [ ] 01-03-PLAN.md — Multi-pass event tagger [TDD] (Wave 3)
-- [ ] 01-04-PLAN.md — Episode segmenter [TDD] (Wave 3)
-- [ ] 01-05-PLAN.md — Pipeline runner + CLI + integration (Wave 4)
+- [x] 01-01-PLAN.md — Config system + data models + DuckDB schema (Wave 1)
+- [x] 01-02-PLAN.md — DuckDB JSONL ingestion + git history + normalization (Wave 2)
+- [x] 01-03-PLAN.md — Multi-pass event tagger [TDD] (Wave 3)
+- [x] 01-04-PLAN.md — Episode segmenter [TDD] (Wave 3)
+- [x] 01-05-PLAN.md — Pipeline runner + CLI + integration (Wave 4)
 
 ### Phase 2: Episode Population & Storage
 **Goal**: Episode segments are populated with structured fields (observation, action, outcome), reactions are labeled, and complete episodes are stored in DuckDB with full provenance
@@ -52,10 +52,10 @@ Plans:
 **Plans:** 4 plans in 3 waves
 
 Plans:
-- [ ] 02-01-PLAN.md — Episode Pydantic model + DuckDB hybrid schema + EpisodeValidator (Wave 1)
-- [ ] 02-02-PLAN.md — EpisodePopulator [TDD] (Wave 2)
-- [ ] 02-03-PLAN.md — ReactionLabeler [TDD] (Wave 2)
-- [ ] 02-04-PLAN.md — Pipeline integration + episode writer + end-to-end tests (Wave 3)
+- [x] 02-01-PLAN.md — Episode Pydantic model + DuckDB hybrid schema + EpisodeValidator (Wave 1)
+- [x] 02-02-PLAN.md — EpisodePopulator [TDD] (Wave 2)
+- [x] 02-03-PLAN.md — ReactionLabeler [TDD] (Wave 2)
+- [x] 02-04-PLAN.md — Pipeline integration + episode writer + end-to-end tests (Wave 3)
 
 ### Phase 3: Constraint Management
 **Goal**: Corrections and blocks in episode reactions are converted into durable, enforceable orchestration constraints with severity levels and explicit scope
@@ -98,9 +98,9 @@ Plans:
 **Plans:** 3 plans in 3 waves
 
 Plans:
-- [ ] 05-01-PLAN.md — Embedder + search text + DuckDB schema extensions [TDD] (Wave 1)
-- [ ] 05-02-PLAN.md — HybridRetriever + Recommender + danger detection [TDD] (Wave 2)
-- [ ] 05-03-PLAN.md — Shadow mode runner + evaluator + reporter + CLI (Wave 3)
+- [x] 05-01-PLAN.md — Embedder + search text + DuckDB schema extensions [TDD] (Wave 1)
+- [x] 05-02-PLAN.md — HybridRetriever + Recommender + danger detection [TDD] (Wave 2)
+- [x] 05-03-PLAN.md — Shadow mode runner + evaluator + reporter + CLI (Wave 3)
 
 ### Phase 6: Mission Control Integration
 **Goal**: Episodes are captured in real-time from Mission Control structured tasks, eliminating post-hoc log parsing for ongoing sessions
@@ -114,10 +114,10 @@ Plans:
 **Plans:** 4 plans in 3 waves
 
 Plans:
-- [ ] 06-01-PLAN.md — SQLite episode schema + DuckDB bridge + TypeScript CRUD (Wave 1)
-- [ ] 06-02-PLAN.md — Episode builder + task lifecycle mapper + API routes (Wave 2)
-- [ ] 06-03-PLAN.md — Tool provenance capture from OpenClaw Gateway (Wave 2)
-- [ ] 06-04-PLAN.md — Review widget + constraint extraction + SSE + timeline (Wave 3)
+- [x] 06-01-PLAN.md — SQLite episode schema + DuckDB bridge + TypeScript CRUD (Wave 1)
+- [x] 06-02-PLAN.md — Episode builder + task lifecycle mapper + API routes (Wave 2)
+- [x] 06-03-PLAN.md — Tool provenance capture from OpenClaw Gateway (Wave 2)
+- [x] 06-04-PLAN.md — Review widget + constraint extraction + SSE + timeline (Wave 3)
 
 ## Progress
 
@@ -131,4 +131,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 3. Constraint Management | 2/2 | ✓ Complete | 2026-02-11 |
 | 4. Validation & Quality | 2/2 | ✓ Complete | 2026-02-11 |
 | 5. Training Infrastructure | 3/3 | ✓ Complete | 2026-02-11 |
-| 6. Mission Control Integration | 0/4 | Not started | - |
+| 6. Mission Control Integration | 4/4 | ✓ Complete | 2026-02-12 |

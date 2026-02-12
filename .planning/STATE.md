@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 6 IN PROGRESS - Mission Control Integration
+**Current focus:** PROJECT COMPLETE - All 6 phases delivered
 
 ## Current Position
 
 Phase: 6 of 6 (Mission Control Integration)
-Plan: 3 of 4 in current phase (Plans 01, 02, 03 complete)
-Status: In progress
-Last activity: 2026-02-12 -- Completed 06-02-PLAN.md (Episode capture from task lifecycle)
+Plan: 4 of 4 in current phase (ALL COMPLETE)
+Status: Complete
+Last activity: 2026-02-12 -- Completed 06-04-PLAN.md (Dashboard components + SSE integration)
 
-Progress: [################........] 75% (Phase 6 Plans 1-3)
-Overall:  [████████████████████████████░] ~95% (19/20 plans)
+Progress: [########################] 100% (Phase 6 Plans 1-4)
+Overall:  [██████████████████████████████] 100% (20/20 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 19
-- Average duration: 5.2 min
-- Total execution time: 1.65 hours
+- Total plans completed: 20
+- Average duration: 5.1 min
+- Total execution time: 1.7 hours
 
 **By Phase:**
 
@@ -33,10 +33,10 @@ Overall:  [███████████████████████
 | 03-constraint-management | 2 | 7 min | 3.5 min |
 | 04-validation-quality | 2 | 11 min | 5.5 min |
 | 05-training-infrastructure | 3 | 21 min | 7.0 min |
-| 06-mission-control-integration | 3 | 12 min | 4.0 min |
+| 06-mission-control-integration | 4 | 15 min | 3.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 9 min, 7 min, 5 min, 3 min, 4 min
+- Last 5 plans: 7 min, 5 min, 3 min, 4 min, 3 min
 - Trend: stable to decreasing
 
 *Updated after each plan completion*
@@ -122,6 +122,12 @@ Recent decisions affecting current work:
 - Plan 06-03: tool_result events not counted as separate tool_calls in aggregation (they are responses)
 - Plan 06-03: Failed flush re-adds events to buffer for retry rather than dropping them
 - Plan 06-03: AggregationResult uses snake_case field names (executor_effects) matching Pydantic model
+- Plan 06-04: ConstraintForm rendered inline (not modal) per Pitfall 4 guidance for high constraint capture rate
+- Plan 06-04: Default severity mapping: correct -> requires_approval, block -> forbidden
+- Plan 06-04: SSE event bus uses in-memory Set of writers with write-catch for cleanup
+- Plan 06-04: Constraint API generates SHA-256(text + JSON.stringify(scope_paths)) matching Python ConstraintStore
+- Plan 06-04: EpisodeTimeline backfills existing events on mount, then receives live updates via SSE
+- Plan 06-04: Keep-alive comments every 30s to prevent proxy/browser timeout
 
 ### Pending Todos
 
@@ -129,8 +135,7 @@ None.
 
 ### Blockers/Concerns
 
-- Phase 6 (Mission Control Integration) requires access to Mission Control repository (external blocker noted in PROJECT.md constraints)
-- Phases 1-5 are independent of this blocker and can proceed
+- External blocker: Mission Control repository access needed for integration of mission-control/ code into actual MC codebase
 
 ## Phase 1 Completion Summary
 
@@ -186,17 +191,21 @@ Phase 5 delivered training infrastructure for RAG retrieval and shadow mode test
 - **CLI train**: embed, recommend, shadow-run, shadow-report subcommands
 - **Dependencies added**: sentence-transformers 5.2.2
 
-## Phase 6 Completion Summary (In Progress)
+## Phase 6 Completion Summary
 
-Phase 6 is adding Mission Control integration:
+Phase 6 delivered Mission Control integration (all 4 MC requirements):
 - **Plan 01 COMPLETE**: SQLite episode schema (5 tables) + TypeScript CRUD + Python MCBridgeReader + 13 tests
 - **Plan 02 COMPLETE**: EpisodeBuilder (6 lifecycle methods) + mapper (hybrid JSON/prose) + API routes (CRUD + events)
 - **Plan 03 COMPLETE**: ProvenanceCapture adapter (Gateway WS) + ProvenanceAggregator (episode outcome)
-- **Plan 04**: Dashboard integration with DuckDB bridge (pending)
-- **439 tests** passing across 17 test suites (+13 new in plan 06-01)
+- **Plan 04 COMPLETE**: ReviewWidget (5 reactions + inline constraint form) + EpisodeTimeline (SSE + backfill) + Constraint API + SSE endpoint
+- **MC-01**: Episode schema with SQLite storage and DuckDB bridge
+- **MC-02**: Real-time episode capture from task lifecycle with provenance
+- **MC-03**: Review widget with reaction labeling and constraint extraction
+- **MC-04**: Live event streaming via SSE with 30s keep-alive
+- **Mission Control files**: 14 TypeScript files across lib/db, lib/episodes, lib/openclaw, app/api, app/components
 
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Phase 6 Plans 01-03 complete. Plan 04 remaining.
-Resume file: .planning/phases/06-mission-control-integration/06-02-SUMMARY.md
+Stopped at: PROJECT COMPLETE -- All 20 plans across 6 phases delivered.
+Resume file: .planning/phases/06-mission-control-integration/06-04-SUMMARY.md

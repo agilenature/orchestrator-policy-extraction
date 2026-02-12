@@ -1,13 +1,15 @@
 """DuckDB schema creation and connection management.
 
-Creates the events, episode_segments, and episodes tables with correct
-column types matching the Pydantic data models. Supports both in-memory
-(for testing) and on-disk databases.
+Creates the events, episode_segments, episodes, episode_search_text, and
+episode_embeddings tables with correct column types matching the Pydantic
+data models. Supports both in-memory (for testing) and on-disk databases.
 
 Schema follows the research spec with:
 - 17-column events table with deterministic event_id primary key
 - 15-column episode_segments table
 - episodes table with flat + STRUCT + JSON hybrid columns
+- episode_search_text table for BM25 FTS retrieval
+- episode_embeddings table for cosine similarity search (384-dim)
 - Indexes for session, tag, timestamp, mode, risk, and reaction queries
 - Ingestion metadata columns (first_seen, last_seen, ingestion_count) per Q13
 
@@ -182,15 +184,46 @@ def create_schema(conn: duckdb.DuckDBPyConnection) -> None:
         "CREATE INDEX IF NOT EXISTS idx_episodes_ts ON episodes(timestamp)"
     )
 
+    # Episode search text table for BM25 FTS retrieval
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS episode_search_text (
+            episode_id VARCHAR PRIMARY KEY,
+            search_text VARCHAR
+        )
+    """)
+
+    # Episode embeddings table for cosine similarity search
+    # VSS extension needed for FLOAT[384] array operations
+    try:
+        conn.execute("INSTALL vss; LOAD vss;")
+    except Exception:
+        # Extension may already be installed/loaded
+        try:
+            conn.execute("LOAD vss;")
+        except Exception:
+            pass
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS episode_embeddings (
+            episode_id VARCHAR PRIMARY KEY,
+            embedding FLOAT[384],
+            model_name VARCHAR DEFAULT 'all-MiniLM-L6-v2',
+            created_at TIMESTAMPTZ DEFAULT current_timestamp
+        )
+    """)
+
 
 def drop_schema(conn: duckdb.DuckDBPyConnection) -> None:
     """Drop all pipeline tables (for testing).
 
-    Drops tables in reverse dependency order.
+    Drops tables in reverse dependency order. RAG tables first,
+    then episodes, segments, events.
 
     Args:
         conn: DuckDB connection to drop tables from.
     """
+    conn.execute("DROP TABLE IF EXISTS episode_embeddings")
+    conn.execute("DROP TABLE IF EXISTS episode_search_text")
     conn.execute("DROP TABLE IF EXISTS episodes")
     conn.execute("DROP TABLE IF EXISTS episode_segments")
     conn.execute("DROP TABLE IF EXISTS events")

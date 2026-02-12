@@ -111,11 +111,13 @@ Plans:
   2. Tool provenance (tool calls, files touched, commands run, test results, commits) streams from OpenClaw Gateway during task execution and attaches to episodes
   3. A review widget in Mission Control allows labeling reactions (approve/correct/redirect/block/question) with optional inline constraint extraction workflow
   4. Episodes are stored in Mission Control's SQLite database (episodes, episode_events, constraints, approvals, commit_links tables) enabling dashboard integration
-**Plans**: TBD
+**Plans:** 4 plans in 3 waves
 
 Plans:
-- [ ] 06-01: TBD
-- [ ] 06-02: TBD
+- [ ] 06-01-PLAN.md — SQLite episode schema + DuckDB bridge + TypeScript CRUD (Wave 1)
+- [ ] 06-02-PLAN.md — Episode builder + task lifecycle mapper + API routes (Wave 2)
+- [ ] 06-03-PLAN.md — Tool provenance capture from OpenClaw Gateway (Wave 2)
+- [ ] 06-04-PLAN.md — Review widget + constraint extraction + SSE + timeline (Wave 3)
 
 ## Progress
 
@@ -129,4 +131,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 3. Constraint Management | 2/2 | ✓ Complete | 2026-02-11 |
 | 4. Validation & Quality | 2/2 | ✓ Complete | 2026-02-11 |
 | 5. Training Infrastructure | 3/3 | ✓ Complete | 2026-02-11 |
-| 6. Mission Control Integration | 0/TBD | Not started | - |
+| 6. Mission Control Integration | 0/4 | Not started | - |

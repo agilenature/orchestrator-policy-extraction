@@ -10,19 +10,19 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 6 of 6 (Mission Control Integration)
-Plan: 1 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-12 -- Completed 06-01-PLAN.md (SQLite episode schema + DuckDB bridge)
+Last activity: 2026-02-12 -- Completed 06-03-PLAN.md (Tool provenance capture + aggregator)
 
-Progress: [######..................] 25% (Phase 6 Plan 1)
-Overall:  [█████████████████████████░░░] ~85% (17/20 plans)
+Progress: [################........] 75% (Phase 6 Plan 3)
+Overall:  [██████████████████████████░░] ~90% (18/20 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
-- Average duration: 5.4 min
-- Total execution time: 1.53 hours
+- Total plans completed: 18
+- Average duration: 5.3 min
+- Total execution time: 1.58 hours
 
 **By Phase:**
 
@@ -33,11 +33,11 @@ Overall:  [███████████████████████
 | 03-constraint-management | 2 | 7 min | 3.5 min |
 | 04-validation-quality | 2 | 11 min | 5.5 min |
 | 05-training-infrastructure | 3 | 21 min | 7.0 min |
-| 06-mission-control-integration | 1 | 5 min | 5.0 min |
+| 06-mission-control-integration | 2 | 8 min | 4.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 7 min, 5 min, 9 min, 7 min, 5 min
-- Trend: stable
+- Last 5 plans: 5 min, 9 min, 7 min, 5 min, 3 min
+- Trend: stable to decreasing
 
 *Updated after each plan completion*
 
@@ -112,6 +112,10 @@ Recent decisions affecting current work:
 - Plan 06-01: MCBridgeReader uses short-lived attach/query/detach to avoid holding SQLite locks
 - Plan 06-01: Constraint dedup uses same SHA-256(text + scope_paths) pattern as Python ConstraintStore
 - Plan 06-01: .gitignore negation added for mission-control/src/lib/ (Rule 3 auto-fix)
+- Plan 06-03: classifyTool inspects Bash command content for git/test/lint/build sub-classification
+- Plan 06-03: tool_result events not counted as separate tool_calls in aggregation (they are responses)
+- Plan 06-03: Failed flush re-adds events to buffer for retry rather than dropping them
+- Plan 06-03: AggregationResult uses snake_case field names (executor_effects) matching Pydantic model
 
 ### Pending Todos
 
@@ -181,12 +185,12 @@ Phase 5 delivered training infrastructure for RAG retrieval and shadow mode test
 Phase 6 is adding Mission Control integration:
 - **Plan 01 COMPLETE**: SQLite episode schema (5 tables) + TypeScript CRUD + Python MCBridgeReader + 13 tests
 - **Plan 02**: Real-time episode capture from task lifecycle (pending)
-- **Plan 03**: Review widget with reaction labeling + constraint extraction (pending)
+- **Plan 03 COMPLETE**: ProvenanceCapture adapter (Gateway WS) + ProvenanceAggregator (episode outcome)
 - **Plan 04**: Dashboard integration with DuckDB bridge (pending)
 - **439 tests** passing across 17 test suites (+13 new in plan 06-01)
 
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Phase 6 Plan 01 complete. Plans 02-04 remaining.
-Resume file: .planning/phases/06-mission-control-integration/06-01-SUMMARY.md
+Stopped at: Phase 6 Plan 03 complete. Plans 02, 04 remaining.
+Resume file: .planning/phases/06-mission-control-integration/06-03-SUMMARY.md

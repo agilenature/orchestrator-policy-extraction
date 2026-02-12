@@ -95,11 +95,12 @@ Plans:
   1. RAG baseline retrieves top-k similar episodes by observation context and recommends orchestrator actions with explainable provenance (citing source episodes)
   2. Shadow mode framework runs recommendations alongside actual human decisions across >=50 sessions, measuring agreement rate
   3. Shadow mode achieves >=70% agreement threshold with zero dangerous recommendations before any autonomous operation is permitted
-**Plans**: TBD
+**Plans:** 3 plans in 3 waves
 
 Plans:
-- [ ] 05-01: TBD
-- [ ] 05-02: TBD
+- [ ] 05-01-PLAN.md — Embedder + search text + DuckDB schema extensions [TDD] (Wave 1)
+- [ ] 05-02-PLAN.md — HybridRetriever + Recommender + danger detection [TDD] (Wave 2)
+- [ ] 05-03-PLAN.md — Shadow mode runner + evaluator + reporter + CLI (Wave 3)
 
 ### Phase 6: Mission Control Integration
 **Goal**: Episodes are captured in real-time from Mission Control structured tasks, eliminating post-hoc log parsing for ongoing sessions
@@ -127,5 +128,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 2. Episode Population & Storage | 4/4 | ✓ Complete | 2026-02-11 |
 | 3. Constraint Management | 2/2 | ✓ Complete | 2026-02-11 |
 | 4. Validation & Quality | 2/2 | ✓ Complete | 2026-02-11 |
-| 5. Training Infrastructure | 0/TBD | Not started | - |
+| 5. Training Infrastructure | 0/3 | Not started | - |
 | 6. Mission Control Integration | 0/TBD | Not started | - |

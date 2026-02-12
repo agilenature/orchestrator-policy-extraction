@@ -10,19 +10,19 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 5 of 6 (Training Infrastructure)
-Plan: 1 of 1 in current phase
+Plan: 2 of 2 in current phase
 Status: In progress
-Last activity: 2026-02-11 -- Completed 05-01-PLAN.md (Episode embedding infrastructure)
+Last activity: 2026-02-11 -- Completed 05-02-PLAN.md (Hybrid retriever and recommender)
 
-Progress: [########################] 100% (Phase 5 Plan 1)
-Overall:  [███████████████████████░] ~100% (14/14 plans)
+Progress: [########################] 100% (Phase 5 Plan 2)
+Overall:  [████████████████████████] ~100% (15/15 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
-- Average duration: 5.1 min
-- Total execution time: 1.18 hours
+- Total plans completed: 15
+- Average duration: 5.4 min
+- Total execution time: 1.33 hours
 
 **By Phase:**
 
@@ -32,10 +32,10 @@ Overall:  [███████████████████████
 | 02-episode-population-storage | 4 | 19 min | 4.8 min |
 | 03-constraint-management | 2 | 7 min | 3.5 min |
 | 04-validation-quality | 2 | 11 min | 5.5 min |
-| 05-training-infrastructure | 1 | 5 min | 5.0 min |
+| 05-training-infrastructure | 2 | 14 min | 7.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 3 min, 4 min, 4 min, 7 min, 5 min
+- Last 5 plans: 4 min, 4 min, 7 min, 5 min, 9 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -97,6 +97,10 @@ Recent decisions affecting current work:
 - Plan 05-01: VSS extension loaded in create_schema() with try/except for already-installed scenarios
 - Plan 05-01: HNSW index deferred to Plan 02 (requires data to be present first)
 - Plan 05-01: observation_to_text maps to DuckDB STRUCT field names (tests_status) not Pydantic names (tests.status)
+- Plan 05-02: Bidirectional prefix matching for scope violation detection (rec path under constraint dir OR constraint dir under rec path)
+- Plan 05-02: Parameterized SQL with IS NULL OR != pattern for exclude_episode_id (avoids SQL injection)
+- Plan 05-02: Over-fetch top_k*2 from each search strategy before RRF fusion for better recall
+- Plan 05-02: Pydantic frozen models for Recommendation and SourceEpisodeRef (immutable, serializable)
 
 ### Pending Todos
 
@@ -153,12 +157,13 @@ Phase 4 added validation layers and gold-standard quality workflow:
 
 Phase 5 builds training infrastructure for RAG retrieval and shadow mode testing:
 - **Plan 01 COMPLETE**: Episode embedding infrastructure (EpisodeEmbedder, observation_to_text, DuckDB schema extensions)
-- **370 tests** passing across 13 test suites (+18 new in plan 05-01)
-- **New module**: src/pipeline/rag/ with embedder.py
+- **Plan 02 COMPLETE**: Hybrid retriever and recommender (HybridRetriever, Recommender, danger detection)
+- **394 tests** passing across 15 test suites (+24 new in plan 05-02)
+- **RAG module**: src/pipeline/rag/ with embedder.py, retriever.py, recommender.py
 - **Dependencies added**: sentence-transformers 5.2.2
 
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Phase 5 Plan 01 complete. Ready for next plan if present.
-Resume file: .planning/phases/05-training-infrastructure-training-infrastructure/05-01-SUMMARY.md
+Stopped at: Phase 5 Plan 02 complete. Ready for next plan if present.
+Resume file: .planning/phases/05-training-infrastructure-training-infrastructure/05-02-SUMMARY.md

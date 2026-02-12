@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 5 IN PROGRESS - Training Infrastructure
+**Current focus:** Phase 5 COMPLETE - Training Infrastructure
 
 ## Current Position
 
 Phase: 5 of 6 (Training Infrastructure)
-Plan: 2 of 2 in current phase
-Status: In progress
-Last activity: 2026-02-11 -- Completed 05-02-PLAN.md (Hybrid retriever and recommender)
+Plan: 3 of 3 in current phase
+Status: Phase complete
+Last activity: 2026-02-11 -- Completed 05-03-PLAN.md (Shadow mode testing framework)
 
-Progress: [########################] 100% (Phase 5 Plan 2)
-Overall:  [████████████████████████] ~100% (15/15 plans)
+Progress: [########################] 100% (Phase 5 Plan 3)
+Overall:  [████████████████████████] ~100% (16/16 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
-- Average duration: 5.4 min
-- Total execution time: 1.33 hours
+- Total plans completed: 16
+- Average duration: 5.5 min
+- Total execution time: 1.45 hours
 
 **By Phase:**
 
@@ -32,10 +32,10 @@ Overall:  [███████████████████████
 | 02-episode-population-storage | 4 | 19 min | 4.8 min |
 | 03-constraint-management | 2 | 7 min | 3.5 min |
 | 04-validation-quality | 2 | 11 min | 5.5 min |
-| 05-training-infrastructure | 2 | 14 min | 7.0 min |
+| 05-training-infrastructure | 3 | 21 min | 7.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min, 4 min, 7 min, 5 min, 9 min
+- Last 5 plans: 4 min, 7 min, 5 min, 9 min, 7 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -101,6 +101,10 @@ Recent decisions affecting current work:
 - Plan 05-02: Parameterized SQL with IS NULL OR != pattern for exclude_episode_id (avoids SQL injection)
 - Plan 05-02: Over-fetch top_k*2 from each search strategy before RRF fusion for better recall
 - Plan 05-02: Pydantic frozen models for Recommendation and SourceEpisodeRef (immutable, serializable)
+- Plan 05-03: Jaccard similarity for scope overlap: |intersection|/|union|, 1.0 when both empty, 0.0 when one empty
+- Plan 05-03: shadow_run_id as UUID primary key (not episode_id) to allow multiple runs per episode across batches
+- Plan 05-03: Gate agreement uses exact set match (both sets must be equal) not subset
+- Plan 05-03: Reporter threshold: 70% mode agreement rate and 50 session minimum as PASS/FAIL gates
 
 ### Pending Todos
 
@@ -153,17 +157,20 @@ Phase 4 added validation layers and gold-standard quality workflow:
 - **CLI**: `python -m src.pipeline.cli validate export|metrics|export-parquet`
 - **CLI refactored**: click.group() with extract + validate subcommands
 
-## Phase 5 Progress
+## Phase 5 Completion Summary
 
-Phase 5 builds training infrastructure for RAG retrieval and shadow mode testing:
+Phase 5 delivered training infrastructure for RAG retrieval and shadow mode testing:
 - **Plan 01 COMPLETE**: Episode embedding infrastructure (EpisodeEmbedder, observation_to_text, DuckDB schema extensions)
 - **Plan 02 COMPLETE**: Hybrid retriever and recommender (HybridRetriever, Recommender, danger detection)
-- **394 tests** passing across 15 test suites (+24 new in plan 05-02)
+- **Plan 03 COMPLETE**: Shadow mode testing framework (ShadowModeRunner, ShadowEvaluator, ShadowReporter, CLI train subcommand)
+- **426 tests** passing across 16 test suites (+32 new in plan 05-03)
 - **RAG module**: src/pipeline/rag/ with embedder.py, retriever.py, recommender.py
+- **Shadow module**: src/pipeline/shadow/ with evaluator.py, runner.py, reporter.py
+- **CLI train**: embed, recommend, shadow-run, shadow-report subcommands
 - **Dependencies added**: sentence-transformers 5.2.2
 
 ## Session Continuity
 
 Last session: 2026-02-11
-Stopped at: Phase 5 Plan 02 complete. Ready for next plan if present.
-Resume file: .planning/phases/05-training-infrastructure-training-infrastructure/05-02-SUMMARY.md
+Stopped at: Phase 5 Plan 03 complete. Phase 5 fully delivered.
+Resume file: .planning/phases/05-training-infrastructure-training-infrastructure/05-03-SUMMARY.md

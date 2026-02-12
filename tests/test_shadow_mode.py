@@ -1,7 +1,7 @@
 """Tests for shadow mode testing framework.
 
-Tests ShadowEvaluator, ShadowModeRunner, schema extensions,
-and integration with leave-one-out protocol.
+Tests ShadowEvaluator, ShadowModeRunner, ShadowReporter, CLI train
+subcommand, schema extensions, and integration with leave-one-out protocol.
 """
 
 from __future__ import annotations
@@ -427,3 +427,258 @@ class TestShadowIntegration:
             "SELECT COUNT(*) FROM shadow_mode_results WHERE run_batch_id = 'batch-1'"
         ).fetchone()[0]
         assert batch_count == 2
+
+
+# ---------------------------------------------------------------------------
+# Reporter tests
+# ---------------------------------------------------------------------------
+
+
+class TestShadowReporter:
+    """Tests for ShadowReporter."""
+
+    def _populate_shadow_results(self, conn, results):
+        """Insert shadow results directly for reporter testing."""
+        for r in results:
+            conn.execute(
+                """
+                INSERT INTO shadow_mode_results (
+                    shadow_run_id, episode_id, session_id,
+                    human_mode, human_risk, human_reaction_label,
+                    shadow_mode, shadow_risk, shadow_confidence,
+                    mode_agrees, risk_agrees, scope_overlap, gate_agrees,
+                    is_dangerous, danger_reasons,
+                    source_episode_ids, retrieval_scores,
+                    run_batch_id
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                [
+                    r.get("shadow_run_id", str(hash(r.get("episode_id", "")))),
+                    r["episode_id"],
+                    r["session_id"],
+                    r["human_mode"],
+                    r["human_risk"],
+                    r.get("human_reaction_label"),
+                    r["shadow_mode"],
+                    r["shadow_risk"],
+                    r.get("shadow_confidence", 0.8),
+                    r["mode_agrees"],
+                    r["risk_agrees"],
+                    r.get("scope_overlap", 1.0),
+                    r.get("gate_agrees", True),
+                    r.get("is_dangerous", False),
+                    json.dumps(r.get("danger_reasons", [])),
+                    json.dumps(r.get("source_episode_ids", [])),
+                    json.dumps(r.get("retrieval_scores", [])),
+                    r.get("run_batch_id"),
+                ],
+            )
+
+    def test_compute_report_mode_agreement_rate(self, conn):
+        from src.pipeline.shadow.reporter import ShadowReporter
+
+        # 3 results, 2 agree on mode
+        results = [
+            {"shadow_run_id": "sr-1", "episode_id": "ep-1", "session_id": "s1",
+             "human_mode": "Implement", "human_risk": "low",
+             "shadow_mode": "Implement", "shadow_risk": "low",
+             "mode_agrees": True, "risk_agrees": True},
+            {"shadow_run_id": "sr-2", "episode_id": "ep-2", "session_id": "s1",
+             "human_mode": "Explore", "human_risk": "medium",
+             "shadow_mode": "Implement", "shadow_risk": "medium",
+             "mode_agrees": False, "risk_agrees": True},
+            {"shadow_run_id": "sr-3", "episode_id": "ep-3", "session_id": "s1",
+             "human_mode": "Implement", "human_risk": "high",
+             "shadow_mode": "Implement", "shadow_risk": "high",
+             "mode_agrees": True, "risk_agrees": True},
+        ]
+        self._populate_shadow_results(conn, results)
+
+        reporter = ShadowReporter(conn)
+        report = reporter.compute_report()
+
+        assert report["total_episodes"] == 3
+        assert report["mode_agreement_rate"] == pytest.approx(2.0 / 3.0)
+
+    def test_compute_report_meets_threshold_true(self, conn):
+        from src.pipeline.shadow.reporter import ShadowReporter
+
+        # All agree -> 100% > 70%
+        results = [
+            {"shadow_run_id": f"sr-{i}", "episode_id": f"ep-{i}", "session_id": "s1",
+             "human_mode": "Implement", "human_risk": "low",
+             "shadow_mode": "Implement", "shadow_risk": "low",
+             "mode_agrees": True, "risk_agrees": True}
+            for i in range(5)
+        ]
+        self._populate_shadow_results(conn, results)
+
+        reporter = ShadowReporter(conn)
+        report = reporter.compute_report()
+
+        assert report["meets_threshold"] is True
+
+    def test_compute_report_meets_threshold_false(self, conn):
+        from src.pipeline.shadow.reporter import ShadowReporter
+
+        # Only 1/5 agree -> 20% < 70%
+        results = []
+        for i in range(5):
+            agrees = i == 0
+            results.append({
+                "shadow_run_id": f"sr-{i}", "episode_id": f"ep-{i}",
+                "session_id": "s1", "human_mode": "Implement", "human_risk": "low",
+                "shadow_mode": "Implement" if agrees else "Explore",
+                "shadow_risk": "low",
+                "mode_agrees": agrees, "risk_agrees": True,
+            })
+        self._populate_shadow_results(conn, results)
+
+        reporter = ShadowReporter(conn)
+        report = reporter.compute_report()
+
+        assert report["meets_threshold"] is False
+
+    def test_compute_report_per_session_breakdown(self, conn):
+        from src.pipeline.shadow.reporter import ShadowReporter
+
+        results = [
+            {"shadow_run_id": "sr-1", "episode_id": "ep-1", "session_id": "s1",
+             "human_mode": "Implement", "human_risk": "low",
+             "shadow_mode": "Implement", "shadow_risk": "low",
+             "mode_agrees": True, "risk_agrees": True},
+            {"shadow_run_id": "sr-2", "episode_id": "ep-2", "session_id": "s2",
+             "human_mode": "Explore", "human_risk": "low",
+             "shadow_mode": "Implement", "shadow_risk": "low",
+             "mode_agrees": False, "risk_agrees": True},
+        ]
+        self._populate_shadow_results(conn, results)
+
+        reporter = ShadowReporter(conn)
+        report = reporter.compute_report()
+
+        assert len(report["per_session"]) == 2
+        s1 = next(s for s in report["per_session"] if s["session_id"] == "s1")
+        s2 = next(s for s in report["per_session"] if s["session_id"] == "s2")
+        assert s1["episode_count"] == 1
+        assert s1["mode_agreement_rate"] == 1.0
+        assert s2["episode_count"] == 1
+        assert s2["mode_agreement_rate"] == 0.0
+
+    def test_format_report_produces_pass_fail(self, conn):
+        from src.pipeline.shadow.reporter import ShadowReporter
+
+        results = [
+            {"shadow_run_id": "sr-1", "episode_id": "ep-1", "session_id": "s1",
+             "human_mode": "Implement", "human_risk": "low",
+             "shadow_mode": "Implement", "shadow_risk": "low",
+             "mode_agrees": True, "risk_agrees": True},
+        ]
+        self._populate_shadow_results(conn, results)
+
+        reporter = ShadowReporter(conn)
+        report = reporter.compute_report()
+        text = reporter.format_report(report)
+
+        assert "Shadow Mode Report" in text
+        assert "PASS" in text or "FAIL" in text
+        assert "Mode:" in text
+        assert "Risk:" in text
+        assert "Scope:" in text
+
+    def test_format_report_shows_dangerous_count(self, conn):
+        from src.pipeline.shadow.reporter import ShadowReporter
+
+        results = [
+            {"shadow_run_id": "sr-1", "episode_id": "ep-1", "session_id": "s1",
+             "human_mode": "Implement", "human_risk": "low",
+             "shadow_mode": "Implement", "shadow_risk": "low",
+             "mode_agrees": True, "risk_agrees": True,
+             "is_dangerous": True, "danger_reasons": ["scope_violation"]},
+        ]
+        self._populate_shadow_results(conn, results)
+
+        reporter = ShadowReporter(conn)
+        report = reporter.compute_report()
+        text = reporter.format_report(report)
+
+        assert "Dangerous recommendations: 1" in text
+        assert "scope_violation" in text
+
+    def test_compute_report_filters_by_batch_id(self, conn):
+        from src.pipeline.shadow.reporter import ShadowReporter
+
+        results = [
+            {"shadow_run_id": "sr-1", "episode_id": "ep-1", "session_id": "s1",
+             "human_mode": "Implement", "human_risk": "low",
+             "shadow_mode": "Implement", "shadow_risk": "low",
+             "mode_agrees": True, "risk_agrees": True,
+             "run_batch_id": "batch-A"},
+            {"shadow_run_id": "sr-2", "episode_id": "ep-2", "session_id": "s1",
+             "human_mode": "Explore", "human_risk": "low",
+             "shadow_mode": "Implement", "shadow_risk": "low",
+             "mode_agrees": False, "risk_agrees": True,
+             "run_batch_id": "batch-B"},
+        ]
+        self._populate_shadow_results(conn, results)
+
+        reporter = ShadowReporter(conn)
+        report_a = reporter.compute_report(batch_id="batch-A")
+        report_b = reporter.compute_report(batch_id="batch-B")
+
+        assert report_a["total_episodes"] == 1
+        assert report_a["mode_agreement_rate"] == 1.0
+        assert report_b["total_episodes"] == 1
+        assert report_b["mode_agreement_rate"] == 0.0
+
+
+# ---------------------------------------------------------------------------
+# CLI tests
+# ---------------------------------------------------------------------------
+
+
+class TestTrainCLI:
+    """Tests for CLI train subcommand."""
+
+    def test_train_help_shows_subcommands(self):
+        from click.testing import CliRunner
+        from src.pipeline.cli.__main__ import cli
+
+        runner = CliRunner()
+        result = runner.invoke(cli, ["train", "--help"])
+        assert result.exit_code == 0
+        assert "embed" in result.output
+        assert "recommend" in result.output
+        assert "shadow-run" in result.output
+        assert "shadow-report" in result.output
+
+    def test_train_group_registered_in_main_cli(self):
+        from click.testing import CliRunner
+        from src.pipeline.cli.__main__ import cli
+
+        runner = CliRunner()
+        result = runner.invoke(cli, ["--help"])
+        assert result.exit_code == 0
+        assert "train" in result.output
+
+    def test_shadow_report_produces_output(self, conn, tmp_path):
+        """shadow-report produces formatted output with pre-populated results."""
+        from src.pipeline.shadow.reporter import ShadowReporter
+
+        # Insert some shadow results
+        conn.execute("""
+            INSERT INTO shadow_mode_results (
+                shadow_run_id, episode_id, session_id,
+                human_mode, human_risk, shadow_mode, shadow_risk,
+                shadow_confidence, mode_agrees, risk_agrees,
+                scope_overlap, gate_agrees, is_dangerous
+            ) VALUES ('sr-1', 'ep-1', 's1', 'Implement', 'low',
+                      'Implement', 'low', 0.8, true, true, 1.0, true, false)
+        """)
+
+        reporter = ShadowReporter(conn)
+        report = reporter.compute_report()
+        text = reporter.format_report(report)
+
+        assert "Shadow Mode Report" in text
+        assert "1" in text  # at least 1 episode

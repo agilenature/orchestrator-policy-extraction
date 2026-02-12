@@ -10,19 +10,19 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 6 of 6 (Mission Control Integration)
-Plan: 3 of 4 in current phase
+Plan: 3 of 4 in current phase (Plans 01, 02, 03 complete)
 Status: In progress
-Last activity: 2026-02-12 -- Completed 06-03-PLAN.md (Tool provenance capture + aggregator)
+Last activity: 2026-02-12 -- Completed 06-02-PLAN.md (Episode capture from task lifecycle)
 
-Progress: [################........] 75% (Phase 6 Plan 3)
-Overall:  [██████████████████████████░░] ~90% (18/20 plans)
+Progress: [################........] 75% (Phase 6 Plans 1-3)
+Overall:  [████████████████████████████░] ~95% (19/20 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18
-- Average duration: 5.3 min
-- Total execution time: 1.58 hours
+- Total plans completed: 19
+- Average duration: 5.2 min
+- Total execution time: 1.65 hours
 
 **By Phase:**
 
@@ -33,10 +33,10 @@ Overall:  [███████████████████████
 | 03-constraint-management | 2 | 7 min | 3.5 min |
 | 04-validation-quality | 2 | 11 min | 5.5 min |
 | 05-training-infrastructure | 3 | 21 min | 7.0 min |
-| 06-mission-control-integration | 2 | 8 min | 4.0 min |
+| 06-mission-control-integration | 3 | 12 min | 4.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min, 9 min, 7 min, 5 min, 3 min
+- Last 5 plans: 9 min, 7 min, 5 min, 3 min, 4 min
 - Trend: stable to decreasing
 
 *Updated after each plan completion*
@@ -112,6 +112,12 @@ Recent decisions affecting current work:
 - Plan 06-01: MCBridgeReader uses short-lived attach/query/detach to avoid holding SQLite locks
 - Plan 06-01: Constraint dedup uses same SHA-256(text + scope_paths) pattern as Python ConstraintStore
 - Plan 06-01: .gitignore negation added for mission-control/src/lib/ (Rule 3 auto-fix)
+- Plan 06-02: Hybrid planningOutputToAction: JSON.parse first, prose keyword heuristic fallback
+- Plan 06-02: Status progression guards for idempotent lifecycle methods (skip if past expected state)
+- Plan 06-02: Next.js 15 async params pattern: { params: Promise<{ id: string }> }
+- Plan 06-02: getDb() singleton with MC_DB_PATH env var override for database access
+- Plan 06-02: Input validation via allowlists matching schema CHECK constraints (not zod)
+- Plan 06-02: db/index.ts connection module created (Rule 3 auto-fix, routes needed it)
 - Plan 06-03: classifyTool inspects Bash command content for git/test/lint/build sub-classification
 - Plan 06-03: tool_result events not counted as separate tool_calls in aggregation (they are responses)
 - Plan 06-03: Failed flush re-adds events to buffer for retry rather than dropping them
@@ -184,7 +190,7 @@ Phase 5 delivered training infrastructure for RAG retrieval and shadow mode test
 
 Phase 6 is adding Mission Control integration:
 - **Plan 01 COMPLETE**: SQLite episode schema (5 tables) + TypeScript CRUD + Python MCBridgeReader + 13 tests
-- **Plan 02**: Real-time episode capture from task lifecycle (pending)
+- **Plan 02 COMPLETE**: EpisodeBuilder (6 lifecycle methods) + mapper (hybrid JSON/prose) + API routes (CRUD + events)
 - **Plan 03 COMPLETE**: ProvenanceCapture adapter (Gateway WS) + ProvenanceAggregator (episode outcome)
 - **Plan 04**: Dashboard integration with DuckDB bridge (pending)
 - **439 tests** passing across 17 test suites (+13 new in plan 06-01)
@@ -192,5 +198,5 @@ Phase 6 is adding Mission Control integration:
 ## Session Continuity
 
 Last session: 2026-02-12
-Stopped at: Phase 6 Plan 03 complete. Plans 02, 04 remaining.
-Resume file: .planning/phases/06-mission-control-integration/06-03-SUMMARY.md
+Stopped at: Phase 6 Plans 01-03 complete. Plan 04 remaining.
+Resume file: .planning/phases/06-mission-control-integration/06-02-SUMMARY.md

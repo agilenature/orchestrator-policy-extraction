@@ -1,8 +1,9 @@
 """DuckDB schema creation and connection management.
 
-Creates the events, episode_segments, episodes, episode_search_text, and
-episode_embeddings tables with correct column types matching the Pydantic
-data models. Supports both in-memory (for testing) and on-disk databases.
+Creates the events, episode_segments, episodes, episode_search_text,
+episode_embeddings, and shadow_mode_results tables with correct column
+types matching the Pydantic data models. Supports both in-memory (for
+testing) and on-disk databases.
 
 Schema follows the research spec with:
 - 17-column events table with deterministic event_id primary key
@@ -10,6 +11,7 @@ Schema follows the research spec with:
 - episodes table with flat + STRUCT + JSON hybrid columns
 - episode_search_text table for BM25 FTS retrieval
 - episode_embeddings table for cosine similarity search (384-dim)
+- shadow_mode_results table for shadow mode evaluation data
 - Indexes for session, tag, timestamp, mode, risk, and reaction queries
 - Ingestion metadata columns (first_seen, last_seen, ingestion_count) per Q13
 
@@ -212,6 +214,39 @@ def create_schema(conn: duckdb.DuckDBPyConnection) -> None:
         )
     """)
 
+    # Shadow mode results table for leave-one-out evaluation
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS shadow_mode_results (
+            shadow_run_id VARCHAR PRIMARY KEY,
+            episode_id VARCHAR NOT NULL,
+            session_id VARCHAR NOT NULL,
+            human_mode VARCHAR NOT NULL,
+            human_risk VARCHAR NOT NULL,
+            human_reaction_label VARCHAR,
+            shadow_mode VARCHAR NOT NULL,
+            shadow_risk VARCHAR NOT NULL,
+            shadow_confidence FLOAT,
+            mode_agrees BOOLEAN NOT NULL,
+            risk_agrees BOOLEAN NOT NULL,
+            scope_overlap FLOAT,
+            gate_agrees BOOLEAN,
+            is_dangerous BOOLEAN NOT NULL DEFAULT FALSE,
+            danger_reasons JSON,
+            source_episode_ids JSON,
+            retrieval_scores JSON,
+            run_batch_id VARCHAR,
+            created_at TIMESTAMPTZ DEFAULT current_timestamp
+        )
+    """)
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_shadow_session "
+        "ON shadow_mode_results(session_id)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_shadow_batch "
+        "ON shadow_mode_results(run_batch_id)"
+    )
+
 
 def drop_schema(conn: duckdb.DuckDBPyConnection) -> None:
     """Drop all pipeline tables (for testing).
@@ -222,6 +257,7 @@ def drop_schema(conn: duckdb.DuckDBPyConnection) -> None:
     Args:
         conn: DuckDB connection to drop tables from.
     """
+    conn.execute("DROP TABLE IF EXISTS shadow_mode_results")
     conn.execute("DROP TABLE IF EXISTS episode_embeddings")
     conn.execute("DROP TABLE IF EXISTS episode_search_text")
     conn.execute("DROP TABLE IF EXISTS episodes")

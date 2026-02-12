@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 5 COMPLETE - Training Infrastructure
+**Current focus:** Phase 6 IN PROGRESS - Mission Control Integration
 
 ## Current Position
 
-Phase: 5 of 6 (Training Infrastructure)
-Plan: 3 of 3 in current phase
-Status: Phase complete
-Last activity: 2026-02-11 -- Completed 05-03-PLAN.md (Shadow mode testing framework)
+Phase: 6 of 6 (Mission Control Integration)
+Plan: 1 of 4 in current phase
+Status: In progress
+Last activity: 2026-02-12 -- Completed 06-01-PLAN.md (SQLite episode schema + DuckDB bridge)
 
-Progress: [########################] 100% (Phase 5 Plan 3)
-Overall:  [████████████████████████] ~100% (16/16 plans)
+Progress: [######..................] 25% (Phase 6 Plan 1)
+Overall:  [█████████████████████████░░░] ~85% (17/20 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
-- Average duration: 5.5 min
-- Total execution time: 1.45 hours
+- Total plans completed: 17
+- Average duration: 5.4 min
+- Total execution time: 1.53 hours
 
 **By Phase:**
 
@@ -33,9 +33,10 @@ Overall:  [███████████████████████
 | 03-constraint-management | 2 | 7 min | 3.5 min |
 | 04-validation-quality | 2 | 11 min | 5.5 min |
 | 05-training-infrastructure | 3 | 21 min | 7.0 min |
+| 06-mission-control-integration | 1 | 5 min | 5.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min, 7 min, 5 min, 9 min, 7 min
+- Last 5 plans: 7 min, 5 min, 9 min, 7 min, 5 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -105,6 +106,12 @@ Recent decisions affecting current work:
 - Plan 05-03: shadow_run_id as UUID primary key (not episode_id) to allow multiple runs per episode across batches
 - Plan 05-03: Gate agreement uses exact set match (both sets must be equal) not subset
 - Plan 05-03: Reporter threshold: 70% mode agreement rate and 50 session minimum as PASS/FAIL gates
+- Plan 06-01: SQLite column names use snake_case matching Pydantic Episode model exactly (no camelCase in DB)
+- Plan 06-01: JSON columns stored as TEXT in SQLite; parsed via json.loads on Python side
+- Plan 06-01: WAL mode + busy_timeout=5000 for concurrent read/write access
+- Plan 06-01: MCBridgeReader uses short-lived attach/query/detach to avoid holding SQLite locks
+- Plan 06-01: Constraint dedup uses same SHA-256(text + scope_paths) pattern as Python ConstraintStore
+- Plan 06-01: .gitignore negation added for mission-control/src/lib/ (Rule 3 auto-fix)
 
 ### Pending Todos
 
@@ -169,8 +176,17 @@ Phase 5 delivered training infrastructure for RAG retrieval and shadow mode test
 - **CLI train**: embed, recommend, shadow-run, shadow-report subcommands
 - **Dependencies added**: sentence-transformers 5.2.2
 
+## Phase 6 Completion Summary (In Progress)
+
+Phase 6 is adding Mission Control integration:
+- **Plan 01 COMPLETE**: SQLite episode schema (5 tables) + TypeScript CRUD + Python MCBridgeReader + 13 tests
+- **Plan 02**: Real-time episode capture from task lifecycle (pending)
+- **Plan 03**: Review widget with reaction labeling + constraint extraction (pending)
+- **Plan 04**: Dashboard integration with DuckDB bridge (pending)
+- **439 tests** passing across 17 test suites (+13 new in plan 06-01)
+
 ## Session Continuity
 
-Last session: 2026-02-11
-Stopped at: Phase 5 Plan 03 complete. Phase 5 fully delivered.
-Resume file: .planning/phases/05-training-infrastructure-training-infrastructure/05-03-SUMMARY.md
+Last session: 2026-02-12
+Stopped at: Phase 6 Plan 01 complete. Plans 02-04 remaining.
+Resume file: .planning/phases/06-mission-control-integration/06-01-SUMMARY.md

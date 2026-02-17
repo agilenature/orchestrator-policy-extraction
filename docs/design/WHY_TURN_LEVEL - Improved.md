@@ -1946,3 +1946,522 @@ So `ep-003.provenance.sources` includes `{type:"git", ref:"abc1234"}` and the co
   * from **executor tool calls** (how Claude executed)
 * We captured your key advantage: **mistakes + corrections become learnable constraints**, not lost history. 
 
+
+Below is a concrete spec you can drop into your design docs: a **MUST/SHOULD/MAY requirements table** and **explicit interface contracts** for the **OpenClaw “orchestrator skill pack”** (implemented as OpenClaw *plugin agent tools* with typed params + JSON outputs).
+
+A quick terminology anchor so we don’t mix levels:
+
+* **OpenClaw “Skills”** (SKILL.md folders) are instruction sets loaded from bundled / user / workspace directories. ([OpenClaw][1])
+* **OpenClaw “Agent tools”** are JSON‑schema functions registered by plugins (TypeBox or JSON schema), exposed to the model for tool calling. ([OpenClaw][2])
+* Your whole approach depends on producing **decision-point episodes (observation → action → reaction/outcome)** rather than only commit correlation.
+
+The **interface contracts below are for the agent tools**, becats/outputs/errors are enforceable and machine-checkable.
+
+---
+
+## Requirements table (MUST / SHOULD / MAY)
+
+|  ID | Requirement                                                                                                                                                                                        |  Level | Verification                                                                                            |
+| --: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----: | ------------------------------------------------------------------------------------------------------- |
+|  R1 | The orchestrator skill pack MUST be implemented as **OpenClaw plugin agent tools** with explicit parameter schemas and deterministic execution. ([OpenClaw][2])                                    |  MUST  | Tools appear in `openclaw tools` schema; tool calls validate params; integration test calls each tool.  |
+|  R2 | Every tool MUST use a **top-level `object` schema with simple `properties` and enums**; avoid unsupported JSON Schema features (e.g., anyOf/oneOf/allOf, patternProperties, etc.). ([OpenClaw][3]) |  MUST  | Schema lints + OpenClaw load passes; tool calls succeed against target model provider.                  |
+|  R3 | Side-effecting tools MUST be **opt‑in/allowlisted** per agent (do not ship enabled by default). ([OpenClaw][2])                                                                                    |  MUST  | Default agent config cannot call side-effecting tools; allowlist enables them explicitly.               |
+|  R4 | Tool outputs MUST be **JSON-only** (no prose, no code fences) to support episode extraction and downstream learning signals (turn/decision-point granularity).  ([OpenClaw][4])                    |  MUST  | Parser test: tool output text parses as JSON; schema checks for required envelope fields.               |
+|  R5 | Every tool response MUST include a standardized **envelope**: `ok`, `tool`, `request_id`, ` (commands/files/refs).                                                                                 |  MUST  | Golden-file tests for each tool; provenance present and non-empty for tool actions.                     |
+|  R6 | Tools MUST be designed so they can be correlated into “decision-point episodes” (i.e., return enough provenance to reconstruct Observation/Outcome without guessing).                              |  MUST  | Episode builder can reconstruct episode fields for a sample run with no manual joins.                   |
+|  R7 | Tools MUST enforce **least privilege**: no network access unless explicitly requested and allowed by gate/config; no generic “exec anything” interface. ([OpenClaw][5])1                          |  MUST  | Attempted disallowed ops return `E_POLICY_DENIED`; no raw command passthrough exists.                   |
+|  R8 | Tool names MUST be stable and versioned (e.g., `oc.repo_snapshot@1` internally or via `schema_version` field) to avoid training drift.                                                             |  MUST  | Contract tests fail on breaking changes; semantic version is emitted in output.                         |
+|  R9 | Tools SHOULD support `timeout_ms` and return a structured timeout error (`E_TIMEOUT`) rather than hanging.                                                                                         | SHOULD | Inject sleep; verify tool returns within timeout with `E_TIMEOUT`.                                      |
+| R10 | Tools SHOULD support `dry_run` for operations that could change state (git commit, patch apply) and default to safe behavior when ambiguous.                                                       | SHOULD | Dry-run tests: no repo changes; output includes planned actions.                                        |
+| R11 | Tools MUST NOT rely on mutable workspace Skills overrides for security-sensitive behavior; privileged logic should live in the plugin/tool code, not in SKILL.md text. ([OpenClaw][1])             |  MUST  | Changing SKILL.md cannot bypass tool checks; tool denies disallowed actions regardless of instructions. |
+| R12 | Tools SHOULD emit bounded outputs (size caps) to avoid token blowups and keep the agent from over-consuming context.                                                                               | SHOULD | Large repo/diff tests; output respects `max_*` caps and returns `truncated=true`.                       |
+| R13 | Tools MUST be idempotent where possible (`repo_snapshot`, `constraints_check`) and MUST clearly declare side effects otherwise (`git_commit`, `episode_emit`).                                     |  MUST  | Re-run tools twice; verify same results for idempotent tools; side-effect tools declare changes.        |
+| R14 | Tools SHOULD provide machine-friendly summaries (counts, file lists) even when full logs are truncated.                                                                                            | SHOULD | Snapshot with huge diffs still returns diffstat + top files.                                            |
+| R15 | Tools MAY provide “streaming” progress events, but MUST still terminate with a valid JSON envelope. ([OpenClaw][6])                                                                                |   MAY  | Optional: observe event stream; final result is still parseable JSON.                                   |
+| R16 | The skill pack SHOULD include explicit “quality gates” tools (tests/lint) because learning and governance depend on observable outcomes.                                                           | SHOULD | Run tests tool is available and returns structured pass/fail + failing cases.                           |
+| R17 | The skill pack SHOULD include a constraint/guardrails checker that converts “human corrections” into enforceable checks over diffs.                                                                | SHOULD | Add a constraint; create violating diff; tool detects violation.                                        |
+| R18 | The skill pack MUST be compatible with OpenClaw’s tool exposure model (tool /system prompt or it cannot be called). ([OpenClaw][7])                                                                |  MUST  | Disable tool → agent cannot call it; enable tool → agent can.                                           |
+
+---
+
+## Common interface conventions
+
+### A) Tool envelope (all tools)
+
+All tools return a single **Jool result `content[].text` (plugin tools return content blocks). ([OpenClaw][2])
+
+**Success envelope**
+
+```json
+{
+  "ok": true,
+  "tool": "oc.repo_snapshot",
+  "request_id": "toolcall_123",
+  "ts": "2026-02-06T12:34:56Z",
+  "schema_version": 1,
+  "result": {},
+  "warnings": [],
+  "provenance": {
+    "repo_path": "/repo",
+    "commands": [],
+    "files_read": [],
+    "files_written": [],
+    "git_refs": []
+  }
+}
+```
+
+**Failure envelope (non-exceptional / expected failure)**
+
+```json
+{
+  "ok": false,
+  "tool": "oc.repo_snapshot",
+  "request_id": "toolcall_123",
+  "ts": "2026-02-06T12:34:56Z",
+  "schema_version": 1,
+  "error": {
+    "code": "E_NOT_GIT_REPO",
+    "message": "Path is not a git repository",
+    "retryable": false,
+    "details": { "repo_path": "/repo" }
+  },
+  "warnings": [],
+  "provenance": { "repo_path": "/repo", "commands": [], "files_read": [], "files_written": [], "git_refs": [] }
+}
+```
+
+### B) Shared error codes (recommended baseline)
+
+* `E_INVALID_PARAMS` (schema-valid but semantically invalid)
+* `E_POLICY_DENIED` (blocked by allowlist/gate/constraint)
+* `E_TIMEOUT`
+* `E_IO` (filesystem)
+* `E_NOT_FOUND`
+* `E_NOT_GIT_REPO`
+* `E_GIT_ERROR`
+* `E_NOTHING_TO_DO`
+* `E_EXECUTOR_ERROR` (Claude runner)
+* `E_TEST_FAIL`
+
+---
+
+## Interface contracts for each OpenClaw orchestrator skill
+
+These are defined as **plugin agent tools** with TypeBox/JSON schema parameters. ([OpenClaw][2])
+Keep parameter schemas “simple object with properties” to avoid schema incompatibilities. ([OpenClaw][3])
+
+---
+
+# 1) `oc.repo_snapshot`
+
+### Purpose
+
+Produce the **Observation** snapshot needed for decision-point episodes: branch, HEAD, status, diffstat, changed files, and a bounded summary.
+
+### Inputs
+
+```json
+{
+  "repo_path": "/repo",
+  "include_changed_files": true,
+  "include_diff_stat": true,
+  "max_paths": 200,
+  "timeout_ms": 15000
+}
+```
+
+**Parameter meanings**
+
+* `repo_path` (string, required)
+* `include_changed_files` (boolean, optional; default true)
+* `include_diff_stat` (boolean, optional; default true)
+* `max_paths` (integer, optional; default 200)
+* `timeout_ms` (integer, optional; default 15000)
+
+### Outputs (`result`)
+
+```json
+{
+  "branch": "feature/x",
+  "head": { "hash": "abc1234", "subject": "feat: ..." },
+  "status": {
+    "is_clean": false,
+    "stag:contentReference[oaicite:24]{index=24}  "unstaged": ["src/b.py"],
+    "untracked": ["notes.txt"]
+  },
+  "diff_stat": { "files": 2, "insertions": 120, "deletions": 10 },
+  "changed_files": ["src/a.py", "src/b.py"],
+  "truncated": false
+}
+```
+
+### Errors
+
+* `E_NOT_FOUND` (repo_path missing)
+* `E_NOT_GIT_REPO`
+* `E_TIMEOUT`
+* `E_IO`
+
+### Side effects
+
+None (read-only). MUST be idempotent.
+
+---
+
+# 2) `oc.quality_run_tests`
+
+### Purpose
+
+Run tests as an **objective outcome signal** (reward proxy) for orchestration learning and governance.
+
+### Inputs
+
+Use a **profile-based** approach (safer than arbitrary shell):
+
+```json
+{
+  "repo_path": "/repo",
+  "profile": "pytest_full",
+  "extra_args": ["-q"],
+  "timeout_ms": 120000
+}
+```
+
+* `profile` (string enum in your config, e.g., `pytest_k`, `pytest_full`, `go_test`, etc.)
+* `extra_args` (array of strings, optional)
+* `timeout_ms` (integer, optional)
+
+### Outputs (`result`)
+
+```json
+{
+  "profile": "pytest_full",
+  "command": "pytest -q",
+  "status": "pass",
+  "exit_code": 0,
+  "duration_ms": 38210,
+  "failing": [],
+  "summary": "120 passed"
+}
+```
+
+### Errors
+
+* `E_INVALID_PAR)
+* `E_TIMEOUT`
+* `E_TEST_FAIL` (tests ran and failed; include failing list when possible)
+* `E_POLICY_DENIED` (profile not allowlisted)
+* `E_IO`
+
+### Side effects
+
+Creates test artifacts/cache potentially (declare in warnings). No code changes.
+
+---
+
+# 3) `oc.quality_run_lint` (optional tool)
+
+### Purpose
+
+Run lint/static checks as an additional objective quality signal.
+
+### Inputs
+
+```json
+{
+  "repo_path": "/repo",
+  "profile": "ruff",
+  "timeout_ms": 60000
+}
+```
+
+### Outputs (`result`)
+
+```json
+{
+  "profile": "ruff",
+  "command": "ruff check .",
+  "status": "fail",
+  "exit_code": 1,
+  "issues_count": 7,
+  "top_issues": [
+    { "path": "src/a.py", "code": "F401", "message": "Imported but unused" }
+  ]
+}
+```
+
+### Errors
+
+* `E_INVALID_PARAMS` (unknown profile)
+* `E_TIMEOUT`
+* `E_POLICY_DENIED`
+
+### Side effects
+
+None (read-only).
+
+---
+
+# 4) `oc.executor_run_claude_code`
+
+### Purpose
+
+Delegate implementation/exploration to Claude Code as the **executor**ins the **orchestrator**. This preserves your separation of orchestration policy vs execution policy.
+
+### Inputs
+
+```json
+{
+  "repo_path": "/repo",
+  "instruction": "Scan for existing XML parsing patterns and propose 2 options with tradeoffs.",
+  "write_allowed": false,
+  "max_minutes": 10,
+  "session_label": "phase03.1-01-xml-explore"
+}
+```
+
+* `instruction` (string, required)
+* `write_allowed` (boolean, optional; default false)
+* `max_minutes` (integer, optional; default 10)
+* `session_label` (string, optional)
+
+### Outputs (`result`)
+
+```json
+{
+  "executor": "claude-code",
+  "executor_session_id": "claude_sess_789",
+  "write_allowed": false,
+  "summary": "Found legacy_xml_adapter;:contentReference[oaicite:30]{index=30}irect libxml2.",
+  "tool_calls_count": 17,
+  "files_touched": ["src/legacy_xml_adapter.cpp"],
+  "diff_stat": { "files": 0, "insertions": 0, "deletions": 0 },
+  "proposed_next_steps": [
+    "Implement parser via legacy_xml_adapter",
+    "Add targeted tests (pytest -k xml) then full suite"
+  ]
+}
+```
+
+### Errors
+
+* `E_EXECUTOR_ERROR` (Claude Code invocation failed)
+* `E_TIMEOUT`
+* `E_POLICY_DENIED` (write attempted while `write_allowed=false`, or executor not permitted)
+* `E_IO`
+
+### Side effects
+
+* If `write_allowed=false`, MUST enforce read-only behavior (fail with `E_POLICY_DENIED` on write attempts).
+* If `write_allowed=true`, tool MUST record `files_written` in provenance.
+
+---
+
+# 5) `oc.git_create_branch`
+
+### Purpose
+
+Create/switch to a feature branch under controlled naming rules (keeps orchestration safe and reviewable).
+
+### Inputs
+
+```json
+{
+  "repo_path": "/repo",
+  "branch_name": "feature/03.1-01-xml",
+  "from_ref": "main",
+  "checkout": true
+}
+```
+
+### Outputs (`result`)
+
+```json
+{
+  "created": true,
+  "checked_out": true,
+  "branch": "feature/03.1-01-xml",
+  "from_ref": "main",
+  "head": "def5678"
+}
+```
+
+### Errors
+
+* `E_INVALID_PARAMS` (invalid branch name)
+* `E_GIT_ERROR`
+* `E_POLICY_DENIED` (branch naming policy violation)
+* `E_TIMEOUT`
+
+### Side effects
+
+Changes HEAD/working branch.
+
+---
+
+# 6) `oc.git_commit`
+
+### Purpose
+
+Create a commit under explicit gates (tests, constraint checks, diff caps) so orchestration is enforceable, not vibes-based.
+
+### Inputs
+
+```json
+{
+  "repo_path": "/repo",
+  "message": "feat(parser): implement XML parsing via legacy adapter",
+  "add_all": false,
+  "paths": ["src/parser.cpp", "tests/test_parser_xml.cpp"],
+  "require_clean_tests": true,
+  "dry_run": false
+}
+```
+
+* `paths` optional; if omitted, commit staged changes only (policy choice)
+* `require_clean_tests` boolean gate
+* `dry_run` boolean
+
+### Outputs (`result`)
+
+```json
+{
+  "committed": true,
+  "hash": "abc1234",
+  "message": "feat(parser): implement XML parsing via legacy adapter",
+  "diff_stat": { "files": 2, "insertions": 180, "deletions": 20 }
+}
+```
+
+### Errors
+
+* `E_NOTHING_TO_DO` (nothing to commit)
+* `E_POLICY_DENIED` (tests not clean but required; commit message policy; forbidden paths)
+* `E_GIT_ERROR`
+* `E_TIMEOUT`
+
+### Side effects
+
+Creates a commit (unless `dry_run=true`).
+
+---
+
+# 7) `oc.constraints_check`
+
+### Purpose
+
+Convert “human corrections/blocks” into enforceable, checkable rules over the current changes—so the agent can eventually operate without you.
+
+### Inputs
+
+```json
+{
+  "repo_path": "/repo",
+  "severity_threshold": "warning",
+  "constraint_ids": [],
+  "max_findings": 200,
+  "timeout_ms": 15000
+}
+```
+
+* `severity_threshold` enum: `warning | requires_approval | forbidden`
+* `constraint_ids` empty ⇒ all active constraints
+
+### Outputs (`result`)
+
+```json
+{
+  "ok_to_proceed": false,
+  "violations": [
+    {
+      "constraint_id": "c-avoid-regex-xml",
+      "severity": "requires_approval",
+      "paths": ["src/parser.cpp"],
+      "message": "Detected regex-based XML parsing pattern (std::regex) in parser.cpp",
+      "evidence": [":contentReference[oaicite:32]{index=32}earch"]
+    }
+  ],
+  "checked_paths": ["src/parser.cpp", "tests/test_parser_xml.cpp"],
+  "truncated": false
+}
+```
+
+### Errors
+
+* `E_NOT_FOUND` (constraint store missing)
+* `E_TIMEOUT`
+* `E_IO`
+* `E_INVALID_PARAMS`
+
+### Side effects
+
+None.
+
+---
+
+# 8) `oc.episode_emit`
+
+### Purpose
+
+Append a **decision-point episode record** (JSONL) for learning and later policy training—this is the mechanical bridge from runtime orchestration to your dataset D.
+
+### Inputs
+
+To keep schemas simple and robust, pass the episode as a string:
+
+```json
+{
+  "repo_path": "/repo",
+  "dataset_path": ".openclaw/orchestrator_episodes.jsonl",
+  "episode_json": "{\"episode_id\":\"...\",\"observation\":{...}}",
+  "append": true
+}
+```
+
+### Outputs (`result`)
+
+```json
+{
+  "written": true,
+  "dataset_path": ".openclaw/orchestrator_episodes.jsonl",
+  "bytes_appended": 1842,
+  "line_count_increment": 1
+}
+```
+
+### Errors
+
+* `E_INVALID_PARAMS` (dataset path not allowed, append=false unsupported, etc.)
+* `E_IO` (write failed)
+* `E_POLICY_DENIED` (attempt to write ot paths)
+* `E_TIMEOUT`
+
+### Side effects
+
+Writes to disk (bounded to an allowlisted path).
+
+---
+
+## Optional: one “SKILL.md” wrapper you should also create
+
+While the contracts above are for tools, you will usually also create **one** OpenClaw Skill folder (SKILL.md) that teaches the agent:
+
+* when to call `oc.repo_snapshot` vs `oc.executor_run_claude_code`
+* to always call `oc.constraints_check` + `oc.quality_run_tests` before `oc.git_commit`
+* to emit episodes via `oc.episode_emit`
+
+That wrapper Skill is loaded via the OpenClaw Skills system and subject to precedence rules (workspace overrides user overrides bundled). ([OpenClaw][1])
+But the *enforcement* must remain in the tools (R11), not only in text.
+
+---
+
+If you tell me your actual test/lint commands and your protected path set (e.g., `infra/`, `db/migrations/`, `secrets/`), I can tighten `profile` enums and produce concrete TypeBox parameter definitions for each tool (ready to paste into `api.registerTool(...)`). ([OpenClaw][2])
+
+[1]: https://docs.openclaw.ai/tools/skills?utm_source=chatgpt.com "Skills - OpenClaw"
+[2]: https://docs.openclaw.ai/plugins/agent-tools "Plugin Agent Tools - OpenClaw"
+[3]: https://docs.openclaw.ai/gateway/troubleshooting "Troubleshooting - OpenClaw"
+[4]: https://docs.openclaw.ai/tools/llm-task "LLM Task - OpenClaw"
+[5]: https://docs.openclaw.ai/gateway/security "Security - OpenClaw"
+[6]: https://docs.openclaw.ai/concepts/typebox?utm_source=chatgpt.com "TypeBox - OpenClaw"
+[7]: https://docs.openclaw.ai/tools "Tools - OpenClaw"

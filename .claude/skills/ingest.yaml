@@ -1,0 +1,105 @@
+name: ingest
+description: Incrementally ingest new Claude Code sessions and generate embeddings for training
+version: 1.0.0
+
+# This skill discovers and ingests new JSONL sessions from ~/.claude/projects/
+# and automatically generates embeddings for the RAG system.
+#
+# Usage:
+#   /ingest                    # Discover and ingest all new sessions + embed
+#   /ingest --dry-run          # Show what would be ingested without executing
+#   /ingest --no-embed         # Ingest without generating embeddings
+#   /ingest --project <name>   # Only ingest specific project
+
+command: |
+  #!/bin/bash
+  set -e
+
+  cd "{{project_root}}"
+
+  # Parse arguments
+  DRY_RUN=""
+  EMBED="--embed"
+  PROJECT=""
+  VERBOSE="-v"
+
+  for arg in "$@"; do
+    case $arg in
+      --dry-run)
+        DRY_RUN="--dry-run"
+        ;;
+      --no-embed)
+        EMBED=""
+        ;;
+      --project=*)
+        PROJECT="--project ${arg#*=}"
+        ;;
+      --quiet)
+        VERBOSE=""
+        ;;
+    esac
+  done
+
+  echo "🔄 Running incremental ingestion..."
+  echo ""
+
+  python scripts/ingest_incremental.py $DRY_RUN $EMBED $PROJECT $VERBOSE
+
+  if [ -z "$DRY_RUN" ]; then
+    echo ""
+    echo "✅ Ingestion complete! RAG system updated with new data."
+    echo ""
+    echo "📊 Quick stats:"
+    python -c "
+  import duckdb
+  conn = duckdb.connect('data/ope.db')
+  sessions = conn.execute('SELECT COUNT(DISTINCT session_id) FROM events').fetchone()[0]
+  episodes = conn.execute('SELECT COUNT(*) FROM episodes').fetchone()[0]
+  embeddings = conn.execute('SELECT COUNT(*) FROM episode_embeddings').fetchone()[0]
+  print(f'  Sessions: {sessions}')
+  print(f'  Episodes: {episodes}')
+  print(f'  Embeddings: {embeddings}')
+  conn.close()
+  "
+  fi
+
+parameters:
+  - name: dry_run
+    description: Show what would be ingested without executing
+    type: boolean
+    default: false
+    flag: --dry-run
+
+  - name: no_embed
+    description: Skip embedding generation after ingestion
+    type: boolean
+    default: false
+    flag: --no-embed
+
+  - name: project
+    description: Only ingest specific project (e.g., orchestrator-policy-extraction)
+    type: string
+    required: false
+    flag: --project
+
+examples:
+  - command: /ingest
+    description: Ingest all new sessions and generate embeddings
+
+  - command: /ingest --dry-run
+    description: Preview what would be ingested without making changes
+
+  - command: /ingest --no-embed
+    description: Ingest sessions but skip embedding generation
+
+  - command: /ingest --project=orchestrator-policy-extraction
+    description: Only ingest sessions from specific project
+
+tags:
+  - data
+  - ingestion
+  - training
+  - rag
+
+# Skill is project-local (only visible in this project)
+scope: project

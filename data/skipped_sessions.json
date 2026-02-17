@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0",
+  "description": "Sessions permanently excluded from ingestion and training. Tracked for auditability but never processed.",
+  "sessions": [
+    {
+      "session_id": "732d367d-b04c-47ad-bd5a-1f749661185f",
+      "project": "modernizing-tool",
+      "reason": "invalid_event_threshold",
+      "detail": "14.3% invalid events (1/7) exceeds 10% abort threshold — session too small to survive any normalization failure",
+      "skipped_date": "2026-02-17"
+    },
+    {
+      "session_id": "7bbf3188-5625-49fb-8b1a-be6c3a668249",
+      "project": "modernizing-tool",
+      "reason": "invalid_event_threshold",
+      "detail": "14.3% invalid events (1/7) exceeds 10% abort threshold — session too small to survive any normalization failure",
+      "skipped_date": "2026-02-17"
+    },
+    {
+      "session_id": "7bf9d69e-993f-4de1-862c-ad52fecfadff",
+      "project": "modernizing-tool",
+      "reason": "invalid_event_threshold",
+      "detail": "14.3% invalid events (1/7) exceeds 10% abort threshold — session too small to survive any normalization failure",
+      "skipped_date": "2026-02-17"
+    },
+    {
+      "session_id": "d53ed6f5-a1b2-41c2-b148-8fee9b6ba0e0",
+      "project": "modernizing-tool",
+      "reason": "invalid_event_threshold",
+      "detail": "14.3% invalid events (1/7) exceeds 10% abort threshold — session too small to survive any normalization failure",
+      "skipped_date": "2026-02-17"
+    },
+    {
+      "session_id": "e6777b08-b3df-4ba1-b5b3-9fccee9de195",
+      "project": "modernizing-tool",
+      "reason": "invalid_event_threshold",
+      "detail": "14.3% invalid events (1/7) exceeds 10% abort threshold — session too small to survive any normalization failure",
+      "skipped_date": "2026-02-17"
+    },
+    {
+      "session_id": "fbcb3be1-527c-4e08-bf75-196c70774571",
+      "project": "modernizing-tool",
+      "reason": "invalid_event_threshold",
+      "detail": "14.3% invalid events (1/7) exceeds 10% abort threshold — session too small to survive any normalization failure",
+      "skipped_date": "2026-02-17"
+    },
+    {
+      "session_id": "c9a3a41b-d116-4ca5-b360-e6d07ea30d98",
+      "project": "personal-website",
+      "reason": "invalid_event_threshold",
+      "detail": "14.3% invalid events (1/7) exceeds 10% abort threshold — session too small to survive any normalization failure",
+      "skipped_date": "2026-02-17"
+    },
+    {
+      "session_id": "a400829a-fb26-489d-b8be-cac0a89ab143",
+      "project": "objectivism-library-semantic-search",
+      "reason": "invalid_event_threshold",
+      "detail": "14.3% invalid events (1/7) exceeds 10% abort threshold — session too small to survive any normalization failure",
+      "skipped_date": "2026-02-17"
+    }
+  ]
+}

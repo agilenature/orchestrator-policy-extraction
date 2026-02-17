@@ -54,6 +54,7 @@ dmypy.json
 # Git repos: EXCLUDED (can re-clone, metadata extracted to JSON)
 # DuckDB: INCLUDED (primary extracted data)
 data/raw/*/git/               # Git clones (large, can re-clone)
+data/*.db                     # DuckDB database files (too large for GitHub)
 
 # Keep these for tracking
 !data/raw/*/metadata.json

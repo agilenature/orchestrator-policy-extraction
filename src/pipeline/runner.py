@@ -307,12 +307,6 @@ class PipelineRunner:
                     # Populate episode
                     episode = self._populator.populate(seg, segment_events, context_events)
 
-                    # Add storage metadata
-                    episode["session_id"] = session_id
-                    episode["segment_id"] = seg.segment_id
-                    episode["outcome_type"] = seg.outcome
-                    episode["config_hash"] = self._config_hash
-
                     # Find next human message after segment end for reaction labeling
                     next_human_msg = self._find_next_human_message(
                         all_session_events, seg.end_ts, tag_by_event_id
@@ -326,7 +320,15 @@ class PipelineRunner:
                         episode.setdefault("outcome", {})["reaction"] = reaction
                         reaction_distribution[reaction["label"]] += 1
 
-                    populated_episodes.append(episode)
+                    # Store episode for validation
+                    # Metadata will be added AFTER validation
+                    populated_episodes.append({
+                        "episode": episode,
+                        "session_id": session_id,
+                        "segment_id": seg.segment_id,
+                        "outcome_type": seg.outcome,
+                        "config_hash": self._config_hash,
+                    })
 
                 except Exception as e:
                     logger.warning(
@@ -348,11 +350,23 @@ class PipelineRunner:
         valid_episodes: list[dict] = []
         episode_invalid_count = 0
 
-        for episode in populated_episodes:
+        for ep_wrapper in populated_episodes:
+            # Extract episode and metadata
+            episode = ep_wrapper["episode"]
+            metadata = {
+                "session_id": ep_wrapper["session_id"],
+                "segment_id": ep_wrapper["segment_id"],
+                "outcome_type": ep_wrapper["outcome_type"],
+                "config_hash": ep_wrapper["config_hash"],
+            }
+
             try:
+                # Validate the episode WITHOUT metadata fields
                 is_valid, validation_errors = self._validator.validate(episode)
                 if is_valid:
-                    valid_episodes.append(episode)
+                    # Add metadata AFTER successful validation
+                    episode_with_metadata = {**episode, **metadata}
+                    valid_episodes.append(episode_with_metadata)
                 else:
                     episode_invalid_count += 1
                     logger.warning(

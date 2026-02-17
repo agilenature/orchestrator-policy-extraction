@@ -1,18 +1,21 @@
 {
   "schema_version": "1.0",
-  "last_updated": "2026-02-05T17:45:00Z",
+  "last_updated": "2026-02-17T22:08:26Z",
   "projects": [
     {
       "id": "modernizing-tool",
-      "name": "C++ Modernization Tool",
+      "name": "Modernizing Tool",
       "metadata_path": "data/raw/modernizing-tool/metadata.json",
-      "status": "pending_processing",
+      "status": "ready",
       "added_date": "2026-02-05",
       "notes": "Initial dataset - rich phase-based workflow with GSD framework",
       "data_status": {
-        "sessions_available": false,
-        "git_clone_needed": true,
-        "metadata_complete": false
+        "sessions_available": true,
+        "sessions_location": "~/.claude/projects/-Users-david-projects-modernizing-tool/",
+        "git_clone_needed": false,
+        "git_location": "https://github.com/agilenature/modernizing-tool.git",
+        "metadata_complete": false,
+        "session_count": 120
       }
     },
     {
@@ -52,13 +55,29 @@
         "commits_with_claude_attribution": 7,
         "correlation_strategy": "hash_based_heuristic"
       }
+    },
+    {
+      "id": "objectivism-library-semantic-search",
+      "name": "Objectivism Library Semantic Search",
+      "metadata_path": "data/raw/objectivism-library-semantic-search/metadata.json",
+      "status": "ready",
+      "added_date": "2026-02-17",
+      "notes": "",
+      "data_status": {
+        "sessions_available": true,
+        "sessions_location": "~/.claude/projects/-Users-david-projects-objectivism-library-semantic-search/",
+        "git_clone_needed": false,
+        "metadata_complete": false,
+        "git_location": "https://github.com/agilenature/objectivism-library-semantic-search.git",
+        "session_count": 12
+      }
     }
   ],
   "statistics": {
-    "total_projects": 3,
-    "ready_projects": 2,
-    "pending_projects": 1,
-    "total_sessions": 9,
+    "total_projects": 4,
+    "ready_projects": 4,
+    "pending_projects": 0,
+    "total_sessions": 141,
     "total_commits": 37,
     "commits_with_session_ids": 4,
     "commits_with_claude_attribution": 14

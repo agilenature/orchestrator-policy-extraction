@@ -189,10 +189,23 @@ Plans:
   5. The objectivism pre-mortem is fully ingested: 11 stories → 11 dead-end entries, 15 assumptions → 15 constraints
 **Plans:** TBD — to be planned via /gsd:plan-phase
 
+### Phase 13: Policy-to-Constraint Feedback Loop
+
+**Goal**: Close the feedback loop: when the trained policy recommends an action that a human subsequently blocks or corrects, that correction automatically propagates back into the constraint store and guardrail system. The policy becomes a source of new constraints, not just a consumer of them.
+**Depends on**: Phase 12 (governance layer in place); Phase 5 shadow mode (policy recommendations exist)
+**Requirements**: FEEDBACK-01, FEEDBACK-02, FEEDBACK-03
+**Success Criteria** (what must be TRUE):
+  1. Every policy recommendation that receives a block/correct human reaction is automatically fed back into the constraint extraction pipeline — producing a new constraint entry attributed to the policy recommendation, not the human episode
+  2. Constraint entries sourced from policy feedback are distinguishable from human-sourced constraints (`source: policy_feedback` vs `source: human_correction`)
+  3. The constraint store accumulates policy-feedback constraints over time; durability tracking (Phase 10) applies to these constraints identically to human-sourced ones
+  4. The system detects when a policy recommendation would violate an existing constraint before surfacing it — policy recommendations that conflict with active constraints are suppressed and logged as policy errors, not surfaced to the human
+  5. A `policy error rate` metric is tracked: fraction of policy recommendations that conflict with active constraints. Target: < 5% after 100 sessions of feedback integration
+**Plans:** TBD — to be planned via /gsd:plan-phase
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
+Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 12 -> 13
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -208,3 +221,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 10. Cross-Session Decision Durability | 0/TBD | ⬜ Pending | — |
 | 11. Project-Level Wisdom Layer | 0/TBD | ⬜ Pending | — |
 | 12. Governance Protocol Integration | 0/TBD | ⬜ Pending | — |
+| 13. Policy-to-Constraint Feedback Loop | 0/TBD | ⬜ Pending | — |

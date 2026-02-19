@@ -128,7 +128,7 @@ Plans:
   2. Each document addresses its full analysis as specified in the Knowledge Extraction Prompt
   3. Documents are grounded in specific evidence from session files and git commits (not generic)
   4. The spiral pattern (initial grasp → dead end → breakthrough) is traceable through the analysis
-**Plans:** TBD — to be planned via /gsd:plan-phase
+**Plans:** Completed via parallel agent analysis (no formal plan files)
 
 ### Phase 8: Knowledge Architecture Conciliation
 **Goal**: Take the learnings from Phase 7 and establish a concrete roadmap for reconciling the Knowledge Extraction approach (project-level wisdom: breakthroughs, dead ends, validation gates, decision amnesia) with the current episode-based orchestrator policy system. Define what new capabilities are needed and how they extend the existing architecture.
@@ -139,7 +139,55 @@ Plans:
   2. New requirements identified: richer episode structure, project-level wisdom capture, anti-amnesia encoding, extended constraint store
   3. A concrete roadmap of new phases added to this project to implement the reconciled approach
   4. The question "what should a future agent be able to start with?" is answered at both the micro (decision) and macro (project wisdom) levels
-**Plans:** TBD — emerges from conversation after Phase 7 outputs are reviewed
+**Plans:** Completed via synthesis document: `docs/analysis/knowledge-architecture-conciliation/PHASE_8_SYNTHESIS.md`
+
+### Phase 9: Obstacle Escalation Detection
+**Goal**: The event tagger recognizes obstacle escalation sequences (blocked path → alternative path bypassing authorization) and creates O_ESC episodes. Escalation episodes without authorization automatically generate forbidden constraints.
+**Depends on**: Phase 8 (gap analysis and requirements defined)
+**Requirements**: ESCALATE-01, ESCALATE-02, ESCALATE-03
+**Success Criteria** (what must be TRUE):
+  1. Tagger produces O_ESC tag when it detects the blocked-path → alternative-path-bypass sequence
+  2. O_ESC episodes are created with `orchestrator_action.mode = ESCALATE` and links to the bypassed constraint
+  3. Escalation episodes without APPROVE reaction generate `forbidden` constraints automatically
+  4. Shadow mode reports escalation rate per session (target: 0 unauthorized escalations)
+  5. 30 test cases cover escalation detection (confirmed positive examples from objectivism sessions)
+**Plans:** TBD — to be planned via /gsd:plan-phase
+
+### Phase 10: Cross-Session Decision Durability
+**Goal**: The system tracks which constraints were read, honored, and violated in each session. A decision durability index gives each constraint a survival score across sessions. Sessions that violate active constraints are flagged as amnesia events.
+**Depends on**: Phase 9 (escalation as a distinct episode type)
+**Requirements**: AMNESIA-01, AMNESIA-02, AMNESIA-03
+**Success Criteria** (what must be TRUE):
+  1. Session start audit surfaces all constraints relevant to current task scope within 3 minutes
+  2. Decision durability index: each constraint has `durability_score` = sessions_honored / sessions_active
+  3. Cross-session amnesia detection: sessions violating pre-existing constraints produce amnesia events
+  4. `data/decisions.json` stores ACTIVE/SUPERSEDED scope, method, and architecture decisions
+  5. `python -m src.pipeline.cli audit session` reports amnesia events for any session
+**Plans:** TBD — to be planned via /gsd:plan-phase
+
+### Phase 11: Project-Level Wisdom Layer
+**Goal**: The pipeline captures and retrieves project-level knowledge (breakthroughs, dead ends, scope decisions) as structured entities in a `project_wisdom` DuckDB table. The RAG retriever uses these alongside episode context.
+**Depends on**: Phase 10 (cross-session tracking in place)
+**Requirements**: WISDOM-01, WISDOM-02, WISDOM-03
+**Success Criteria** (what must be TRUE):
+  1. `project_wisdom` table stores Breakthrough, DeadEnd, ScopeDecision, MethodDecision entities
+  2. RAG retriever returns relevant wisdom entities alongside top-k episodes
+  3. Scope decision enforcement: `python -m src.pipeline.cli wisdom check-scope` validates completion state
+  4. Dead end detection: recommendations include dead-end warnings when context matches known failures
+  5. The four objectivism analysis documents are converted into 15+ wisdom entries
+**Plans:** TBD — to be planned via /gsd:plan-phase
+
+### Phase 12: Governance Protocol Integration
+**Goal**: The pipeline ingests governance documents (pre-mortem files, DECISIONS.md) as structured constraint and wisdom sources. Stability check scripts run as episode outcome validators. Sessions performing bulk operations without a stability check are flagged.
+**Depends on**: Phase 11 (project wisdom layer in place)
+**Requirements**: GOVERN-01, GOVERN-02
+**Success Criteria** (what must be TRUE):
+  1. `python -m src.pipeline.cli govern ingest <file>` ingests pre-mortem/DECISIONS.md into constraints and wisdom
+  2. Pre-mortem failure stories become `dead_end` wisdom entities with associated constraints
+  3. Stability scripts run via `python -m src.pipeline.cli govern check-stability` and produce episode outcome records
+  4. Sessions with bulk operations and no subsequent stability check are flagged as missing required validation
+  5. The objectivism pre-mortem is fully ingested: 11 stories → 11 dead-end entries, 15 assumptions → 15 constraints
+**Plans:** TBD — to be planned via /gsd:plan-phase
 
 ## Progress
 
@@ -154,5 +202,9 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 4. Validation & Quality | 2/2 | ✓ Complete | 2026-02-11 |
 | 5. Training Infrastructure | 3/3 | ✓ Complete | 2026-02-11 |
 | 6. Mission Control Integration | 4/4 | ✓ Complete | 2026-02-12 |
-| 7. Objectivism Project Knowledge Extraction | 0/TBD | ⬜ Pending | — |
-| 8. Knowledge Architecture Conciliation | 0/TBD | ⬜ Pending | — |
+| 7. Objectivism Project Knowledge Extraction | —/— | ✓ Complete | 2026-02-17 |
+| 8. Knowledge Architecture Conciliation | —/— | ✓ Complete | 2026-02-19 |
+| 9. Obstacle Escalation Detection | 0/TBD | ⬜ Pending | — |
+| 10. Cross-Session Decision Durability | 0/TBD | ⬜ Pending | — |
+| 11. Project-Level Wisdom Layer | 0/TBD | ⬜ Pending | — |
+| 12. Governance Protocol Integration | 0/TBD | ⬜ Pending | — |

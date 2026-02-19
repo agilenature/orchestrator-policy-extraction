@@ -119,10 +119,32 @@ Plans:
 - [x] 06-03-PLAN.md — Tool provenance capture from OpenClaw Gateway (Wave 2)
 - [x] 06-04-PLAN.md — Review widget + constraint extraction + SSE + timeline (Wave 3)
 
+### Phase 7: Objectivism Project Knowledge Extraction
+**Goal**: Run a parallel agent analysis of the Objectivism Library Semantic Search project — its session files and git history — to produce four structured documents answering the Knowledge Extraction Prompt: (1) Reusable Knowledge Guide, (2) Problem Formulation Retrospective, (3) Validation Gate Audit, (4) Decision Amnesia Report.
+**Depends on**: Phase 6 (pipeline proven), objectivism repo cloned locally, sessions ingested
+**Requirements**: Parallel agents reading raw JSONL sessions + git history; synthesis into 4 output documents
+**Success Criteria** (what must be TRUE):
+  1. All four analysis documents exist in `docs/analysis/objectivism-knowledge-extraction/`
+  2. Each document addresses its full analysis as specified in the Knowledge Extraction Prompt
+  3. Documents are grounded in specific evidence from session files and git commits (not generic)
+  4. The spiral pattern (initial grasp → dead end → breakthrough) is traceable through the analysis
+**Plans:** TBD — to be planned via /gsd:plan-phase
+
+### Phase 8: Knowledge Architecture Conciliation
+**Goal**: Take the learnings from Phase 7 and establish a concrete roadmap for reconciling the Knowledge Extraction approach (project-level wisdom: breakthroughs, dead ends, validation gates, decision amnesia) with the current episode-based orchestrator policy system. Define what new capabilities are needed and how they extend the existing architecture.
+**Depends on**: Phase 7 (four analysis documents complete)
+**Requirements**: Conversation-driven synthesis; review of Phase 7 outputs; roadmap design
+**Success Criteria** (what must be TRUE):
+  1. A clear mapping between the Knowledge Extraction framework and the current episode model — what each captures, what each misses
+  2. New requirements identified: richer episode structure, project-level wisdom capture, anti-amnesia encoding, extended constraint store
+  3. A concrete roadmap of new phases added to this project to implement the reconciled approach
+  4. The question "what should a future agent be able to start with?" is answered at both the micro (decision) and macro (project wisdom) levels
+**Plans:** TBD — emerges from conversation after Phase 7 outputs are reviewed
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -132,3 +154,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 4. Validation & Quality | 2/2 | ✓ Complete | 2026-02-11 |
 | 5. Training Infrastructure | 3/3 | ✓ Complete | 2026-02-11 |
 | 6. Mission Control Integration | 4/4 | ✓ Complete | 2026-02-12 |
+| 7. Objectivism Project Knowledge Extraction | 0/TBD | ⬜ Pending | — |
+| 8. Knowledge Architecture Conciliation | 0/TBD | ⬜ Pending | — |

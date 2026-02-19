@@ -54,6 +54,8 @@ dmypy.json
 # Git repos: EXCLUDED (can re-clone, metadata extracted to JSON)
 # DuckDB: INCLUDED (primary extracted data)
 data/raw/*/git/               # Git clones (large, can re-clone)
+# Cloned repos (large, excluded from version control)
+data/raw/objectivism-library-semantic-search/
 data/*.db                     # DuckDB database files (too large for GitHub)
 
 # Keep these for tracking

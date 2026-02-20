@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 7 — Objectivism Project Knowledge Extraction
+**Current focus:** Phase 9 — Obstacle Escalation Detection
 
 ## Current Position
 
 Phase: 9 of 12 (Obstacle Escalation Detection)
-Plan: 0 of TBD in current phase (NOT STARTED)
+Plan: 1 of 4 in current phase
 Status: In Progress
-Last activity: 2026-02-19 -- Completed Phase 7 (4 analysis docs) and Phase 8 (synthesis + 4 new phases added to roadmap)
+Last activity: 2026-02-19 -- Completed 09-01-PLAN.md (data model foundation)
 
-Progress: [████████████████████████████] 100% (Phases 7-8 complete)
-Overall:  [████████████████████████████████████] 100% (20/20 plans, +phases 7-8 delivered)
+Progress: [█░░░░░░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans in phase 9)
+Overall:  [████████████████████████████████████░░░] 88% (21/24 plans, +phases 7-8 delivered)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
-- Average duration: 5.1 min
-- Total execution time: 1.7 hours
+- Total plans completed: 21
+- Average duration: 5.0 min
+- Total execution time: 1.8 hours
 
 **By Phase:**
 
@@ -34,10 +34,11 @@ Overall:  [███████████████████████
 | 04-validation-quality | 2 | 11 min | 5.5 min |
 | 05-training-infrastructure | 3 | 21 min | 7.0 min |
 | 06-mission-control-integration | 4 | 15 min | 3.8 min |
+| 09-obstacle-escalation-detection | 1 | 5 min | 5.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 7 min, 5 min, 3 min, 4 min, 3 min
-- Trend: stable to decreasing
+- Last 5 plans: 5 min, 3 min, 4 min, 3 min, 5 min
+- Trend: stable
 
 *Updated after each plan completion*
 
@@ -128,6 +129,11 @@ Recent decisions affecting current work:
 - Plan 06-04: Constraint API generates SHA-256(text + JSON.stringify(scope_paths)) matching Python ConstraintStore
 - Plan 06-04: EpisodeTimeline backfills existing events on mount, then receives live updates via SSE
 - Plan 06-04: Keep-alive comments every 30s to prevent proxy/browser timeout
+- Plan 09-01: EscalationConfig defined inline in config.py (same pattern as EpisodePopulationConfig, RiskModelConfig)
+- Plan 09-01: O_ESC added to Classification valid_labels with escalation_detector as new valid source
+- Plan 09-01: Idempotent ALTER TABLE with try/except for DuckDB escalation column additions
+- Plan 09-01: Constraint status enum: active, candidate, retired (lifecycle for human vs inferred constraints)
+- Plan 09-01: EscalationCandidate.block_event_tag validated to only allow O_GATE or O_CORR
 
 ### Pending Todos
 
@@ -225,5 +231,5 @@ Phase 8 delivered the synthesis and new roadmap (conversation-driven, no formal 
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Phase 8 COMPLETE -- Synthesis document and roadmap extension delivered. Next: Phase 9 (Obstacle Escalation Detection).
-Resume file: docs/analysis/knowledge-architecture-conciliation/PHASE_8_SYNTHESIS.md
+Stopped at: Phase 9, Plan 01 COMPLETE -- Data model foundation delivered. Next: 09-02-PLAN.md (Escalation Detector).
+Resume file: .planning/phases/09-obstacle-escalation-detection/09-01-SUMMARY.md

@@ -339,6 +339,48 @@ def create_schema(conn: duckdb.DuckDBPyConnection) -> None:
         "ON project_wisdom(source_phase)"
     )
 
+    # Phase 12: Governance columns on episodes (nullable, backward-compatible)
+    governance_columns = [
+        ("requires_stability_check", "BOOLEAN DEFAULT FALSE"),
+        ("stability_check_status", "VARCHAR"),
+    ]
+    for col_name, col_type in governance_columns:
+        try:
+            conn.execute(f"ALTER TABLE episodes ADD COLUMN {col_name} {col_type}")
+        except Exception:
+            pass  # Column already exists (idempotent)
+
+    # Phase 12: Stability check outcome records
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS stability_outcomes (
+            run_id VARCHAR PRIMARY KEY,
+            check_id VARCHAR NOT NULL,
+            session_id VARCHAR,
+            status VARCHAR NOT NULL CHECK (status IN ('pass', 'fail', 'error')),
+            exit_code INTEGER,
+            stdout TEXT,
+            stderr TEXT,
+            started_at TIMESTAMPTZ NOT NULL,
+            ended_at TIMESTAMPTZ,
+            actor_name VARCHAR,
+            actor_email VARCHAR
+        )
+    """)
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_stability_session "
+        "ON stability_outcomes(session_id)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_stability_check_id "
+        "ON stability_outcomes(check_id)"
+    )
+
+    # Phase 12: metadata JSON column on project_wisdom
+    try:
+        conn.execute("ALTER TABLE project_wisdom ADD COLUMN metadata JSON")
+    except Exception:
+        pass  # Column already exists
+
 
 def drop_schema(conn: duckdb.DuckDBPyConnection) -> None:
     """Drop all pipeline tables (for testing).
@@ -349,6 +391,7 @@ def drop_schema(conn: duckdb.DuckDBPyConnection) -> None:
     Args:
         conn: DuckDB connection to drop tables from.
     """
+    conn.execute("DROP TABLE IF EXISTS stability_outcomes")
     conn.execute("DROP TABLE IF EXISTS project_wisdom")
     conn.execute("DROP TABLE IF EXISTS amnesia_events")
     conn.execute("DROP TABLE IF EXISTS session_constraint_eval")

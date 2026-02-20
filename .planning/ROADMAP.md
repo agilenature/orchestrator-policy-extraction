@@ -151,13 +151,14 @@ Plans:
   3. Escalation episodes without APPROVE reaction generate `forbidden` constraints automatically
   4. Shadow mode reports escalation rate per session (target: 0 unauthorized escalations)
   5. 30 test cases cover escalation detection (confirmed positive examples from objectivism sessions)
-**Plans:** 4 plans in 3 waves
+**Plans:** 5 plans in 3 waves
 
 Plans:
 - [ ] 09-01-PLAN.md — Models, config, schema foundation (Wave 1)
 - [ ] 09-02-PLAN.md — EscalationDetector [TDD] (Wave 2)
 - [ ] 09-03-PLAN.md — EscalationConstraintGenerator [TDD] (Wave 2)
 - [ ] 09-04-PLAN.md — Pipeline integration + shadow metrics + integration tests (Wave 3)
+- [ ] 09-05-PLAN.md — Gap closure: real session JSONL fixtures + fixture-loading tests (Wave 1)
 
 ### Phase 10: Cross-Session Decision Durability
 **Goal**: The system tracks which constraints were read, honored, and violated in each session. A decision durability index gives each constraint a survival score across sessions. Sessions that violate active constraints are flagged as amnesia events.

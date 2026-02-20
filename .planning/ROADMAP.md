@@ -173,9 +173,9 @@ Plans:
 **Plans:** 3 plans in 3 waves
 
 Plans:
-- [ ] 10-01-PLAN.md — Constraint schema migration + DuckDB eval tables + DurabilityConfig (Wave 1)
-- [ ] 10-02-PLAN.md — Scope extractor + evaluator + amnesia detector + durability index (Wave 2)
-- [ ] 10-03-PLAN.md — Pipeline Step 14 + CLI audit commands + ShadowReporter integration (Wave 3)
+- [x] 10-01-PLAN.md — Constraint schema migration + DuckDB eval tables + DurabilityConfig (Wave 1)
+- [x] 10-02-PLAN.md — Scope extractor + evaluator + amnesia detector + durability index (Wave 2)
+- [x] 10-03-PLAN.md — Pipeline Step 14 + CLI audit commands + ShadowReporter integration (Wave 3)
 
 ### Phase 11: Project-Level Wisdom Layer
 **Goal**: The pipeline captures and retrieves project-level knowledge (breakthroughs, dead ends, scope decisions) as structured entities in a `project_wisdom` DuckDB table. The RAG retriever uses these alongside episode context.
@@ -230,7 +230,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 12 -> 13
 | 7. Objectivism Project Knowledge Extraction | —/— | ✓ Complete | 2026-02-17 |
 | 8. Knowledge Architecture Conciliation | —/— | ✓ Complete | 2026-02-19 |
 | 9. Obstacle Escalation Detection | 5/5 | ✓ Complete | 2026-02-19 |
-| 10. Cross-Session Decision Durability | 0/3 | ⬜ Pending | — |
+| 10. Cross-Session Decision Durability | 3/3 | ✓ Complete | 2026-02-20 |
 | 11. Project-Level Wisdom Layer | 0/TBD | ⬜ Pending | — |
 | 12. Governance Protocol Integration | 0/TBD | ⬜ Pending | — |
 | 13. Policy-to-Constraint Feedback Loop | 0/TBD | ⬜ Pending | — |

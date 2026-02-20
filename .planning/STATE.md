@@ -5,17 +5,17 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 10 In Progress (Cross-Session Decision Durability) — Plan 03 complete, pipeline integration + CLI + reporter wired
+**Current focus:** Phase 10 COMPLETE (Cross-Session Decision Durability) — Ready for Phase 11 (Project-Level Wisdom Layer)
 
 ## Current Position
 
-Phase: 10 of 12 (Cross-Session Decision Durability)
-Plan: 3 of 5 in current phase
-Status: In progress
-Last activity: 2026-02-20 -- Completed 10-03-PLAN.md (Pipeline Integration + CLI)
+Phase: 10 of 13 (Cross-Session Decision Durability)
+Plan: 3 of 3 in current phase
+Status: Phase complete
+Last activity: 2026-02-20 -- Completed 10-03-PLAN.md (Pipeline Integration + CLI + Reporter). Verified 5/5 must-haves. Migrated 185 constraints.
 
-Progress: [██████████████░░░░░░░░░░░░░░] 60% (3/5 plans in phase 10)
-Overall:  [████████████████████████████████████████░] 97% (28/30 plans, +phases 7-8 delivered)
+Progress: [████████████████████████████] 100% (3/3 plans in phase 10)
+Overall:  [████████████████████████████████████████] 97% (28/28 plans, +phases 7-8 delivered)
 
 ## Performance Metrics
 
@@ -155,6 +155,17 @@ Recent decisions affecting current work:
 - Plan 09-05: Window_turns must be tuned per real session; only 1 of 4 positive fixtures works with default window_turns=5
 - Plan 10-01: status_history uses datetime.fromisoformat() comparison (not string) for timezone safety
 - Plan 10-01: Empty status_history falls back to current status field (backward-compatible)
+- Plan 10-01: scopes_overlap() in utils.py treats EITHER empty list as repo-wide (differs from validation/layers.py)
+- Plan 10-01: DurabilityConfig defaults: min_sessions_for_score=3, evidence_excerpt_max_chars=500
+- Plan 10-02: Evaluator operates on raw constraint dicts (no ConstraintStore dependency) for flexibility
+- Plan 10-02: Detection hints scan: case-insensitive substring containment, pre-compiled per constraint
+- Plan 10-02: AmnesiaDetector is stateless; detected_at set to current UTC at detection time
+- Plan 10-02: write_constraint_evals/write_amnesia_events use INSERT OR REPLACE for idempotency
+- Plan 10-03: Pipeline Step 14 inserted between Step 13 (escalation) and Step 15 (stats)
+- Plan 10-03: CLI exit code 2 = amnesia events found, 0 = clean, 1 = runtime error
+- Plan 10-03: ShadowReporter amnesia_rate PASS/FAIL gate: PASS iff rate == 0.0
+- Plan 10-01: status_history uses datetime.fromisoformat() comparison (not string) for timezone safety
+- Plan 10-01: Empty status_history falls back to current status field (backward-compatible)
 - Plan 10-01: get_active_constraints() treats missing status as active (behavioral default)
 - Plan 10-01: Shared scopes_overlap() in utils.py treats EITHER empty list as repo-wide (differs from validation/layers.py)
 - Plan 10-01: DurabilityConfig defaults: min_sessions_for_score=3, evidence_excerpt_max_chars=500
@@ -279,8 +290,18 @@ Phase 9 delivered obstacle escalation detection (all 5 plans, including gap clos
 - **Headline gate**: unapproved_escalation_rate with PASS/FAIL indicator in shadow report
 - **Gap closed**: VERIFICATION.md Truth 5 now confirmed with real objectivism session data
 
+## Phase 10 Completion Summary
+
+Phase 10 delivered cross-session decision durability (all 3 plans, verified 5/5):
+- **Plan 01 COMPLETE**: Constraint schema extended (type/status_history/supersedes), DuckDB session_constraint_eval + amnesia_events tables, DurabilityConfig, ConstraintStore temporal methods, shared scopes_overlap(), 15 new tests
+- **Plan 02 COMPLETE**: SessionConstraintEvaluator (HONORED/VIOLATED/UNKNOWN with temporal+scope+O_ESC+hints), AmnesiaDetector (SHA-256 IDs), DurabilityIndex (SQL aggregation), writer functions, 59 new tests
+- **Plan 03 COMPLETE**: Pipeline Step 14 wired (evaluates constraint compliance after escalation), CLI `audit session` (exit 2 on amnesia) + `audit durability`, ShadowReporter amnesia_rate/avg_durability_score PASS/FAIL, 27 new tests
+- **Gap closure**: Migrated 185 existing constraints with type=behavioral_constraint and bootstrapped status_history
+- **643 tests** passing (542 baseline + 101 new Phase 10 tests, zero regressions)
+- **Real data**: 1309 amnesia events detected across 167 sessions in data/ope.db; 96/166 constraints have durability scores
+
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 10, Plan 03 COMPLETE -- Pipeline Step 14 + CLI audit commands + ShadowReporter amnesia metrics wired. Next: Plan 04 (if exists).
+Stopped at: Phase 10 COMPLETE -- All 3 plans delivered and verified 5/5. Next phase: 11 (Project-Level Wisdom Layer).
 Resume file: .planning/phases/10-cross-session-decision-durability/10-03-SUMMARY.md

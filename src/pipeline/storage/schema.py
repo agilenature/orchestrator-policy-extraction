@@ -1,9 +1,9 @@
 """DuckDB schema creation and connection management.
 
 Creates the events, episode_segments, episodes, episode_search_text,
-episode_embeddings, and shadow_mode_results tables with correct column
-types matching the Pydantic data models. Supports both in-memory (for
-testing) and on-disk databases.
+episode_embeddings, shadow_mode_results, and project_wisdom tables with
+correct column types matching the Pydantic data models. Supports both
+in-memory (for testing) and on-disk databases.
 
 Schema follows the research spec with:
 - 17-column events table with deterministic event_id primary key
@@ -307,6 +307,38 @@ def create_schema(conn: duckdb.DuckDBPyConnection) -> None:
         "ON amnesia_events(constraint_id)"
     )
 
+    # Phase 11: Project wisdom table for breakthroughs, dead ends,
+    # scope decisions, and method decisions
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS project_wisdom (
+            wisdom_id VARCHAR PRIMARY KEY,
+            entity_type VARCHAR NOT NULL CHECK (
+                entity_type IN (
+                    'breakthrough', 'dead_end',
+                    'scope_decision', 'method_decision'
+                )
+            ),
+            title VARCHAR NOT NULL,
+            description TEXT NOT NULL,
+            context_tags VARCHAR[] DEFAULT [],
+            scope_paths VARCHAR[] DEFAULT [],
+            confidence DOUBLE DEFAULT 1.0,
+            source_document VARCHAR,
+            source_phase INTEGER,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            embedding DOUBLE[]
+        )
+    """)
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_project_wisdom_entity_type "
+        "ON project_wisdom(entity_type)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_project_wisdom_source_phase "
+        "ON project_wisdom(source_phase)"
+    )
+
 
 def drop_schema(conn: duckdb.DuckDBPyConnection) -> None:
     """Drop all pipeline tables (for testing).
@@ -317,6 +349,7 @@ def drop_schema(conn: duckdb.DuckDBPyConnection) -> None:
     Args:
         conn: DuckDB connection to drop tables from.
     """
+    conn.execute("DROP TABLE IF EXISTS project_wisdom")
     conn.execute("DROP TABLE IF EXISTS amnesia_events")
     conn.execute("DROP TABLE IF EXISTS session_constraint_eval")
     conn.execute("DROP TABLE IF EXISTS shadow_mode_results")

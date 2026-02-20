@@ -149,7 +149,8 @@ class OrchestratorAction(BaseModel, frozen=True):
     model_config = ConfigDict(populate_by_name=True)
 
     mode: Literal[
-        "Explore", "Plan", "Implement", "Verify", "Integrate", "Triage", "Refactor"
+        "Explore", "Plan", "Implement", "Verify", "Integrate", "Triage", "Refactor",
+        "ESCALATE",
     ]
     goal: str
     scope: Scope

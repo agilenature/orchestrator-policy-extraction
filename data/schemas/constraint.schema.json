@@ -58,6 +58,15 @@
         }
       },
       "description": "Episodes where this constraint was learned or violated"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "candidate", "retired"],
+      "description": "Constraint lifecycle status. Defaults to active for human-extracted constraints."
+    },
+    "source": {
+      "type": "string",
+      "description": "Origin of the constraint: human_correction, inferred_from_escalation"
     }
   }
 }

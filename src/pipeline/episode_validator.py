@@ -147,7 +147,7 @@ class EpisodeValidator:
             mode = action.get("mode")
             valid_modes = {
                 "Explore", "Plan", "Implement", "Verify",
-                "Integrate", "Triage", "Refactor",
+                "Integrate", "Triage", "Refactor", "ESCALATE",
             }
             if mode is not None and mode not in valid_modes:
                 errors.append(

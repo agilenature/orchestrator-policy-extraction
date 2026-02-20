@@ -227,7 +227,7 @@
       "properties": {
         "mode": {
           "type": "string",
-          "enum": ["Explore", "Plan", "Implement", "Verify", "Integrate", "Triage", "Refactor"]
+          "enum": ["Explore", "Plan", "Implement", "Verify", "Integrate", "Triage", "Refactor", "ESCALATE"]
         },
         "goal": { "type": "string" },
 

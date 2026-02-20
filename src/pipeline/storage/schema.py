@@ -247,6 +247,23 @@ def create_schema(conn: duckdb.DuckDBPyConnection) -> None:
         "ON shadow_mode_results(run_batch_id)"
     )
 
+    # Phase 9: Escalation-specific columns (nullable, backward-compatible)
+    escalation_columns = [
+        ("escalate_block_event_ref", "VARCHAR"),
+        ("escalate_bypass_event_ref", "VARCHAR"),
+        ("escalate_bypassed_constraint_id", "VARCHAR"),
+        ("escalate_approval_status", "VARCHAR"),
+        ("escalate_confidence", "FLOAT"),
+        ("escalate_detector_version", "VARCHAR"),
+    ]
+    for col_name, col_type in escalation_columns:
+        try:
+            conn.execute(
+                f"ALTER TABLE episodes ADD COLUMN {col_name} {col_type}"
+            )
+        except Exception:
+            pass  # Column already exists (idempotent)
+
 
 def drop_schema(conn: duckdb.DuckDBPyConnection) -> None:
     """Drop all pipeline tables (for testing).

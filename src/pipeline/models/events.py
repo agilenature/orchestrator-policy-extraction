@@ -40,6 +40,7 @@ class Classification(BaseModel, frozen=True):
             "O_DIR",
             "O_GATE",
             "O_CORR",
+            "O_ESC",
             "X_PROPOSE",
             "X_ASK",
             "T_TEST",
@@ -63,7 +64,7 @@ class Classification(BaseModel, frozen=True):
     @field_validator("source")
     @classmethod
     def source_valid(cls, v: str) -> str:
-        valid_sources = {"direct", "inferred", "risk_model"}
+        valid_sources = {"direct", "inferred", "risk_model", "escalation_detector"}
         if v not in valid_sources:
             raise ValueError(
                 f"Invalid source '{v}'. Must be one of: {sorted(valid_sources)}"

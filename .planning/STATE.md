@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 9 — Obstacle Escalation Detection
+**Current focus:** Phase 9 COMPLETE — Ready for Phase 10 (Decision Durability)
 
 ## Current Position
 
 Phase: 9 of 12 (Obstacle Escalation Detection)
-Plan: 3 of 4 in current phase
-Status: In Progress
-Last activity: 2026-02-20 -- Completed 09-03-PLAN.md (escalation constraint generator)
+Plan: 4 of 4 in current phase
+Status: Phase complete
+Last activity: 2026-02-20 -- Completed 09-04-PLAN.md (Pipeline Integration)
 
-Progress: [███████████████████░░░░░░░░░] 75% (3/4 plans in phase 9)
-Overall:  [█████████████████████████████████████░░] 92% (23/24 plans, +phases 7-8 delivered)
+Progress: [████████████████████████████] 100% (4/4 plans in phase 9)
+Overall:  [████████████████████████████████████████] 96% (24/24 plans, +phases 7-8 delivered)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 23
-- Average duration: 5.0 min
-- Total execution time: 1.9 hours
+- Total plans completed: 24
+- Average duration: 5.1 min
+- Total execution time: 2.0 hours
 
 **By Phase:**
 
@@ -34,10 +34,10 @@ Overall:  [███████████████████████
 | 04-validation-quality | 2 | 11 min | 5.5 min |
 | 05-training-infrastructure | 3 | 21 min | 7.0 min |
 | 06-mission-control-integration | 4 | 15 min | 3.8 min |
-| 09-obstacle-escalation-detection | 3 | 15 min | 5.0 min |
+| 09-obstacle-escalation-detection | 4 | 23 min | 5.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 3 min, 4 min, 3 min, 5 min, 5 min
+- Last 5 plans: 4 min, 3 min, 5 min, 5 min, 8 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -144,6 +144,11 @@ Recent decisions affecting current work:
 - Plan 09-03: find_matching_constraint requires 2+ hint overlap OR tool_name + path prefix for robust matching
 - Plan 09-03: bypassed_constraint_id added to constraint.schema.json as optional string|null (Rule 3 auto-fix)
 - Plan 09-03: Generator is stateless; caller handles ConstraintStore.add() in pipeline integration
+- Plan 09-04: Escalation detection runs as Step 13 after constraint extraction (Step 12) in run_session()
+- Plan 09-04: _determine_approval_status() maps reactions: approve->APPROVED, block/correct->REJECTED, else->UNAPPROVED
+- Plan 09-04: write_escalation_episodes() uses separate staging table for clean MERGE with escalate_* columns
+- Plan 09-04: Escalation metrics in ShadowReporter: escalation_count_per_session, rejection_adherence_rate, unapproved_escalation_rate
+- Plan 09-04: unapproved_escalation_rate is headline PASS/FAIL gate metric (target: 0.0%)
 
 ### Pending Todos
 
@@ -238,8 +243,19 @@ Phase 8 delivered the synthesis and new roadmap (conversation-driven, no formal 
 - Deliverable: `docs/analysis/knowledge-architecture-conciliation/PHASE_8_SYNTHESIS.md`
 - Key finding: the critical missing element is O_ESC (obstacle escalation) — the event type for "agent bypassed authorization constraint via alternative path"
 
+## Phase 9 Completion Summary
+
+Phase 9 delivered obstacle escalation detection (all 4 plans):
+- **Plan 01 COMPLETE**: Data models (EscalationCandidate, EscalationConfig), DuckDB schema extensions (6 escalate_* columns), constraint status lifecycle
+- **Plan 02 COMPLETE**: EscalationDetector with sliding window, two-layer bypass eligibility, 40 tests
+- **Plan 03 COMPLETE**: EscalationConstraintGenerator with three-tier severity, SHA-256 IDs, 38 tests
+- **Plan 04 COMPLETE**: Pipeline integration (Step 13 in run_session), write_escalation_episodes, ShadowReporter escalation metrics, 12 integration tests
+- **529 tests** passing (517 baseline + 12 new integration tests)
+- **Key capability**: Running `python -m src.pipeline.cli extract` now detects escalation sequences and stores them as mode=ESCALATE episodes with auto-generated candidate constraints
+- **Headline gate**: unapproved_escalation_rate with PASS/FAIL indicator in shadow report
+
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 9, Plan 03 COMPLETE -- Constraint generator delivered. Next: 09-04-PLAN.md (Pipeline Integration).
-Resume file: .planning/phases/09-obstacle-escalation-detection/09-03-SUMMARY.md
+Stopped at: Phase 9 COMPLETE -- All 4 plans delivered. Next phase: 10 (Decision Durability) or 11 (Wisdom Layer).
+Resume file: .planning/phases/09-obstacle-escalation-detection/09-04-SUMMARY.md

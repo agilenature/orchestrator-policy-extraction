@@ -34,6 +34,8 @@ from src.pipeline.adapters.git_history import parse_git_history
 from src.pipeline.constraint_extractor import ConstraintExtractor
 from src.pipeline.constraint_store import ConstraintStore
 from src.pipeline.episode_validator import EpisodeValidator
+from src.pipeline.escalation.constraint_gen import EscalationConstraintGenerator
+from src.pipeline.escalation.detector import EscalationDetector
 from src.pipeline.models.config import PipelineConfig, load_config
 from src.pipeline.models.events import TaggedEvent
 from src.pipeline.normalizer import normalize_events
@@ -44,6 +46,7 @@ from src.pipeline.storage.schema import create_schema, get_connection
 from src.pipeline.storage.writer import (
     read_events,
     write_episodes,
+    write_escalation_episodes,
     write_events,
     write_segments,
 )
@@ -429,7 +432,104 @@ class PipelineRunner:
                 self._constraint_store.count,
             )
 
-        # Step 13: Compute stats
+        # Step 13: Escalation detection
+        escalation_detected = 0
+        escalation_constraints_generated = 0
+        try:
+            detector = EscalationDetector(self._config)
+            candidates = detector.detect(tagged_events)
+            escalation_detected = len(candidates)
+
+            if candidates:
+                constraint_gen = EscalationConstraintGenerator()
+                detector_version_major = self._config.escalation.detector_version.split(".")[0]
+                escalation_episodes: list[dict] = []
+
+                for candidate in candidates:
+                    # Generate escalation episode ID: SHA-256(session_id + block_event_ref + bypass_event_ref + detector_version_major)[:16]
+                    esc_id_input = (
+                        f"{candidate.session_id}"
+                        f"{candidate.block_event_id}"
+                        f"{candidate.bypass_event_id}"
+                        f"{detector_version_major}"
+                    )
+                    o_esc_id = hashlib.sha256(esc_id_input.encode()).hexdigest()[:16]
+
+                    # Determine reaction_label from the episode that contains this segment
+                    reaction_label_for_esc = None
+                    for ep_wrapper in populated_episodes:
+                        ep = ep_wrapper["episode"]
+                        outcome = ep.get("outcome", {})
+                        reaction = outcome.get("reaction")
+                        if reaction:
+                            reaction_label_for_esc = reaction.get("label")
+                            break  # Use first available reaction
+
+                    # Generate constraint from escalation
+                    constraint = constraint_gen.generate(
+                        candidate,
+                        reaction_label_for_esc,
+                        existing_constraints=self._constraint_store.constraints,
+                    )
+                    if constraint is not None:
+                        added = self._constraint_store.add(constraint)
+                        if added:
+                            escalation_constraints_generated += 1
+
+                    # Find bypassed constraint ID
+                    bypassed_constraint_id = constraint_gen.find_matching_constraint(
+                        candidate, self._constraint_store.constraints
+                    )
+
+                    # Determine approval status from reaction
+                    approval_status = self._determine_approval_status(reaction_label_for_esc)
+
+                    # Build escalation episode dict
+                    esc_episode = {
+                        "episode_id": o_esc_id,
+                        "session_id": candidate.session_id,
+                        "segment_id": "",
+                        "timestamp": candidate.block_event_id,  # will use block event timestamp
+                        "mode": "ESCALATE",
+                        "escalate_block_event_ref": candidate.block_event_id,
+                        "escalate_bypass_event_ref": candidate.bypass_event_id,
+                        "escalate_bypassed_constraint_id": bypassed_constraint_id,
+                        "escalate_approval_status": approval_status,
+                        "escalate_confidence": candidate.confidence,
+                        "escalate_detector_version": candidate.detector_version,
+                    }
+
+                    # Resolve block event timestamp for the episode
+                    block_ev = event_by_id.get(candidate.block_event_id)
+                    if block_ev:
+                        esc_episode["timestamp"] = block_ev["ts_utc"]
+
+                    escalation_episodes.append(esc_episode)
+
+                # Write escalation episodes to DuckDB
+                if escalation_episodes:
+                    esc_write_stats = write_escalation_episodes(self._conn, escalation_episodes)
+                    logger.info(
+                        "Step 13: Wrote {} escalation episodes ({} inserted, {} updated)",
+                        esc_write_stats["total"],
+                        esc_write_stats["inserted"],
+                        esc_write_stats["updated"],
+                    )
+
+                # Save constraint store if new escalation constraints were generated
+                if escalation_constraints_generated > 0:
+                    self._constraint_store.save()
+
+                logger.info(
+                    "Step 13: Detected {} escalations, generated {} constraints",
+                    escalation_detected,
+                    escalation_constraints_generated,
+                )
+        except Exception as e:
+            logger.warning("Escalation detection failed: {}", e)
+            warnings.append(f"Escalation detection failed: {e}")
+
+        # Step 14: Compute stats
         tag_distribution = self._compute_tag_distribution(tagged_events)
         outcome_distribution = seg_stats.get("by_outcome", {})
         duration_s = time.monotonic() - t0
@@ -451,6 +551,8 @@ class PipelineRunner:
             "constraints_extracted": constraints_new,
             "constraints_duplicate": constraints_dup,
             "constraints_total": self._constraint_store.count,
+            "escalation_detected": escalation_detected,
+            "escalation_constraints_generated": escalation_constraints_generated,
             "errors": errors,
             "warnings": warnings,
             "duration_seconds": round(duration_s, 2),
@@ -644,6 +746,27 @@ class PipelineRunner:
         return dict(counts)
 
     @staticmethod
+    def _determine_approval_status(reaction_label: str | None) -> str:
+        """Determine escalation approval status from human reaction.
+
+        Mapping:
+        - approve -> APPROVED (human approved the escalation)
+        - block/correct -> REJECTED (human explicitly rejected)
+        - None/redirect/question/unknown -> UNAPPROVED (no explicit approval)
+
+        Args:
+            reaction_label: The human reaction label, or None.
+
+        Returns:
+            Approval status string: APPROVED, REJECTED, or UNAPPROVED.
+        """
+        if reaction_label == "approve":
+            return "APPROVED"
+        if reaction_label in ("block", "correct"):
+            return "REJECTED"
+        return "UNAPPROVED"
+
+    @staticmethod
     def _error_result(
         session_id: str,
         error_msg: str,
@@ -667,6 +790,8 @@ class PipelineRunner:
             "constraints_extracted": 0,
             "constraints_duplicate": 0,
             "constraints_total": 0,
+            "escalation_detected": 0,
+            "escalation_constraints_generated": 0,
             "errors": [error_msg],
             "warnings": [],
             "duration_seconds": 0,

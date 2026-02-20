@@ -10,6 +10,7 @@ Exports:
     write_events: Write events to DuckDB with idempotent upsert
     write_segments: Write episode segments to DuckDB
     write_episodes: Write episodes to DuckDB with MERGE upsert
+    write_escalation_episodes: Write escalation episodes with escalate_* columns
     read_events: Query events from DuckDB with optional filtering
     read_episodes_by_session: Read episodes for a session
     get_event_stats: Aggregate statistics about stored events
@@ -642,6 +643,149 @@ def _merge_single_episode(
     """)
 
     conn.execute("DROP TABLE IF EXISTS _staging_episode")
+
+
+def write_escalation_episodes(
+    conn: duckdb.DuckDBPyConnection,
+    episodes: list[dict],
+) -> dict[str, int]:
+    """Write escalation episodes to DuckDB with MERGE for idempotent upserts.
+
+    Escalation episodes use mode='ESCALATE' and populate the 6 escalate_*
+    columns. Episode IDs are content-derived SHA-256 hashes ensuring
+    idempotent re-processing (UPSERT, no duplicates).
+
+    Args:
+        conn: DuckDB connection with episodes table created.
+        episodes: List of escalation episode dicts with escalate_* fields.
+
+    Returns:
+        Stats dict: {inserted: N, updated: N, total: N}
+    """
+    if not episodes:
+        return {"inserted": 0, "updated": 0, "total": 0}
+
+    initial_count = conn.execute("SELECT count(*) FROM episodes").fetchone()[0]
+
+    for ep in episodes:
+        _merge_single_escalation_episode(conn, ep)
+
+    final_count = conn.execute("SELECT count(*) FROM episodes").fetchone()[0]
+    inserted = final_count - initial_count
+    updated = len(episodes) - inserted
+
+    logger.info(
+        "Wrote {} escalation episodes ({} inserted, {} updated)",
+        len(episodes),
+        inserted,
+        updated,
+    )
+
+    return {"inserted": inserted, "updated": updated, "total": len(episodes)}
+
+
+def _merge_single_escalation_episode(
+    conn: duckdb.DuckDBPyConnection,
+    ep: dict,
+) -> None:
+    """MERGE a single escalation episode into the episodes table.
+
+    Uses a staging table with flat columns to match the existing pattern,
+    then MERGEs with escalate_* columns populated.
+    """
+    episode_id = ep["episode_id"]
+    session_id = ep.get("session_id", "")
+    segment_id = ep.get("segment_id", "")
+    timestamp = ep.get("timestamp", "")
+    mode = ep.get("mode", "ESCALATE")
+
+    # Escalation-specific columns
+    escalate_block_event_ref = ep.get("escalate_block_event_ref")
+    escalate_bypass_event_ref = ep.get("escalate_bypass_event_ref")
+    escalate_bypassed_constraint_id = ep.get("escalate_bypassed_constraint_id")
+    escalate_approval_status = ep.get("escalate_approval_status")
+    escalate_confidence = ep.get("escalate_confidence")
+    escalate_detector_version = ep.get("escalate_detector_version")
+
+    # Use staging table for clean MERGE
+    conn.execute("DROP TABLE IF EXISTS _staging_esc_episode")
+    conn.execute("""
+        CREATE TEMPORARY TABLE _staging_esc_episode (
+            episode_id VARCHAR,
+            session_id VARCHAR,
+            segment_id VARCHAR,
+            timestamp VARCHAR,
+            mode VARCHAR,
+            escalate_block_event_ref VARCHAR,
+            escalate_bypass_event_ref VARCHAR,
+            escalate_bypassed_constraint_id VARCHAR,
+            escalate_approval_status VARCHAR,
+            escalate_confidence FLOAT,
+            escalate_detector_version VARCHAR
+        )
+    """)
+
+    conn.execute(
+        "INSERT INTO _staging_esc_episode VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [
+            episode_id,
+            session_id,
+            segment_id,
+            str(timestamp) if timestamp else None,
+            mode,
+            escalate_block_event_ref,
+            escalate_bypass_event_ref,
+            escalate_bypassed_constraint_id,
+            escalate_approval_status,
+            escalate_confidence,
+            escalate_detector_version,
+        ],
+    )
+
+    # MERGE: update if exists, insert if not
+    conn.execute("""
+        MERGE INTO episodes AS target
+        USING (
+            SELECT
+                s.episode_id,
+                s.session_id,
+                s.segment_id,
+                CAST(s.timestamp AS TIMESTAMPTZ) AS timestamp,
+                s.mode,
+                s.escalate_block_event_ref,
+                s.escalate_bypass_event_ref,
+                s.escalate_bypassed_constraint_id,
+                s.escalate_approval_status,
+                s.escalate_confidence,
+                s.escalate_detector_version
+            FROM _staging_esc_episode s
+        ) AS source
+        ON target.episode_id = source.episode_id
+        WHEN MATCHED THEN UPDATE SET
+            mode = source.mode,
+            escalate_block_event_ref = source.escalate_block_event_ref,
+            escalate_bypass_event_ref = source.escalate_bypass_event_ref,
+            escalate_bypassed_constraint_id = source.escalate_bypassed_constraint_id,
+            escalate_approval_status = source.escalate_approval_status,
+            escalate_confidence = source.escalate_confidence,
+            escalate_detector_version = source.escalate_detector_version,
+            updated_at = current_timestamp
+        WHEN NOT MATCHED THEN INSERT (
+            episode_id, session_id, segment_id, timestamp,
+            mode,
+            escalate_block_event_ref, escalate_bypass_event_ref,
+            escalate_bypassed_constraint_id, escalate_approval_status,
+            escalate_confidence, escalate_detector_version
+        ) VALUES (
+            source.episode_id, source.session_id, source.segment_id, source.timestamp,
+            source.mode,
+            source.escalate_block_event_ref, source.escalate_bypass_event_ref,
+            source.escalate_bypassed_constraint_id, source.escalate_approval_status,
+            source.escalate_confidence, source.escalate_detector_version
+        )
+    """)
+
+    conn.execute("DROP TABLE IF EXISTS _staging_esc_episode")
 
 
 def read_episodes_by_session(

@@ -67,6 +67,10 @@
     "source": {
       "type": "string",
       "description": "Origin of the constraint: human_correction, inferred_from_escalation"
+    },
+    "bypassed_constraint_id": {
+      "type": ["string", "null"],
+      "description": "ID of an existing constraint that was bypassed (for escalation-inferred constraints)"
     }
   }
 }

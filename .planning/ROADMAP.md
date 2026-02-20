@@ -229,9 +229,9 @@ Plans:
 **Plans:** 3 plans in 3 waves
 
 Plans:
-- [ ] 13-01-PLAN.md — Data models + schema foundation (Wave 1)
-- [ ] 13-02-PLAN.md — PolicyViolationChecker + PolicyFeedbackExtractor [TDD] (Wave 2)
-- [ ] 13-03-PLAN.md — Pipeline integration + ShadowReporter metric + CLI (Wave 3)
+- [x] 13-01-PLAN.md — Data models + schema foundation (Wave 1)
+- [x] 13-02-PLAN.md — PolicyViolationChecker + PolicyFeedbackExtractor [TDD] (Wave 2)
+- [x] 13-03-PLAN.md — Pipeline integration + ShadowReporter metric + CLI (Wave 3)
 
 ## Progress
 
@@ -252,4 +252,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 12 -> 13
 | 10. Cross-Session Decision Durability | 3/3 | ✓ Complete | 2026-02-20 |
 | 11. Project-Level Wisdom Layer | 6/6 | ✓ Complete | 2026-02-20 |
 | 12. Governance Protocol Integration | 4/4 | ✓ Complete | 2026-02-20 |
-| 13. Policy-to-Constraint Feedback Loop | 0/3 | ⬜ Pending | — |
+| 13. Policy-to-Constraint Feedback Loop | 3/3 | ✓ Complete | 2026-02-20 |

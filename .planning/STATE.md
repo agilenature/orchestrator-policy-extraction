@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 13 IN PROGRESS (Policy-to-Constraint Feedback Loop) — Plan 01 complete, 2 remaining.
+**Current focus:** Phase 13 IN PROGRESS (Policy-to-Constraint Feedback Loop) — Plans 01-02 complete, 1 remaining.
 
 ## Current Position
 
 Phase: 13 of 13 (Policy-to-Constraint Feedback Loop)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-02-20 -- Completed 13-01-PLAN.md (feedback data models, schema, writer, constraint ID source). 845 tests passing.
+Last activity: 2026-02-20 -- Completed 13-02-PLAN.md (PolicyViolationChecker, PolicyFeedbackExtractor, find_by_hints). 1022 tests passing.
 
-Progress: [██████████░░░░░░░░░░░░░░░░░░░░░░] 33% (1/3 plans in phase 13)
-Overall:  [████████████████████████████████████████████████████░░░] 95% (39/41 plans total)
+Progress: [████████████████████░░░░░░░░░░░░] 67% (2/3 plans in phase 13)
+Overall:  [██████████████████████████████████████████████████████░░] 98% (40/41 plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 39
+- Total plans completed: 40
 - Average duration: 5.1 min
-- Total execution time: 3.32 hours
+- Total execution time: 3.44 hours
 
 **By Phase:**
 
@@ -39,10 +39,10 @@ Overall:  [███████████████████████
 | 11-project-level-wisdom-layer | 6 | 35 min | 5.8 min |
 
 | 12-governance-protocol-integration | 4 | ~30 min | 7.5 min |
-| 13-policy-to-constraint-feedback-loop | 1 | 4 min | 4.0 min |
+| 13-policy-to-constraint-feedback-loop | 2 | 11 min | 5.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min, 5 min, 4 min, 9 min, 4 min
+- Last 5 plans: 5 min, 4 min, 9 min, 4 min, 7 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -240,6 +240,12 @@ Recent decisions affecting current work:
 - Plan 13-01: Pipe separator kept in ConstraintExtractor per locked decision; JSON separator for PolicyFeedbackExtractor in Plan 02
 - Plan 13-01: PolicyFeedbackConfig defaults: promote_after_sessions=3, error_rate_target=0.05, rolling_window_sessions=100
 - Plan 13-01: 845 tests passing (822 baseline + 23 new)
+- Plan 13-02: Scope overlap without detection_hints intentionally NOT matched (deferred to future gap closure)
+- Plan 13-02: Warning-severity constraints logged but never suppressed (return (False, constraint))
+- Plan 13-02: Dedup threshold: 2+ shared detection_hints (case-insensitive) to match existing human constraints
+- Plan 13-02: Promotion threshold: 3+ distinct sessions with surfaced_and_blocked events
+- Plan 13-02: SHA-256 constraint ID with :policy_feedback suffix for namespace isolation from human_correction IDs
+- Plan 13-02: 1022 tests passing (994 baseline + 28 new)
 
 ### Pending Todos
 
@@ -387,5 +393,5 @@ Phase 12 delivered governance protocol integration (all 4 plans):
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 13 Plan 01 complete (feedback data models). Plan 02 next (policy checker + feedback extractor).
-Resume file: .planning/phases/13-policy-to-constraint-feedback-loop/13-02-PLAN.md
+Stopped at: Phase 13 Plan 02 complete (PolicyViolationChecker, PolicyFeedbackExtractor, find_by_hints). Plan 03 next (pipeline integration).
+Resume file: .planning/phases/13-policy-to-constraint-feedback-loop/13-03-PLAN.md

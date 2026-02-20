@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 9 COMPLETE — Ready for Phase 10 (Decision Durability)
+**Current focus:** Phase 9 COMPLETE (including gap closure plan 05) — Ready for Phase 10 (Decision Durability)
 
 ## Current Position
 
 Phase: 9 of 12 (Obstacle Escalation Detection)
-Plan: 4 of 4 in current phase
-Status: Phase complete
-Last activity: 2026-02-20 -- Completed 09-04-PLAN.md (Pipeline Integration)
+Plan: 5 of 5 in current phase (plan 05 = gap closure)
+Status: Phase complete (including gap closure)
+Last activity: 2026-02-20 -- Completed 09-05-PLAN.md (Real Session Fixture Extraction)
 
-Progress: [████████████████████████████] 100% (4/4 plans in phase 9)
-Overall:  [████████████████████████████████████████] 96% (24/24 plans, +phases 7-8 delivered)
+Progress: [████████████████████████████] 100% (5/5 plans in phase 9)
+Overall:  [████████████████████████████████████████] 96% (25/25 plans, +phases 7-8 delivered)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 24
+- Total plans completed: 25
 - Average duration: 5.1 min
-- Total execution time: 2.0 hours
+- Total execution time: 2.1 hours
 
 **By Phase:**
 
@@ -34,10 +34,10 @@ Overall:  [███████████████████████
 | 04-validation-quality | 2 | 11 min | 5.5 min |
 | 05-training-infrastructure | 3 | 21 min | 7.0 min |
 | 06-mission-control-integration | 4 | 15 min | 3.8 min |
-| 09-obstacle-escalation-detection | 4 | 23 min | 5.8 min |
+| 09-obstacle-escalation-detection | 5 | 29 min | 5.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min, 3 min, 5 min, 5 min, 8 min
+- Last 5 plans: 3 min, 5 min, 5 min, 8 min, 6 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -149,6 +149,9 @@ Recent decisions affecting current work:
 - Plan 09-04: write_escalation_episodes() uses separate staging table for clean MERGE with escalate_* columns
 - Plan 09-04: Escalation metrics in ShadowReporter: escalation_count_per_session, rejection_adherence_rate, unapproved_escalation_rate
 - Plan 09-04: unapproved_escalation_rate is headline PASS/FAIL gate metric (target: 0.0%)
+- Plan 09-05: JSONL comment lines (# prefix) used for fixture provenance headers
+- Plan 09-05: tool_result events from exempt tools (Read) are non-exempt because they lack tool_name in payload
+- Plan 09-05: Window_turns must be tuned per real session; only 1 of 4 positive fixtures works with default window_turns=5
 
 ### Pending Todos
 
@@ -245,17 +248,19 @@ Phase 8 delivered the synthesis and new roadmap (conversation-driven, no formal 
 
 ## Phase 9 Completion Summary
 
-Phase 9 delivered obstacle escalation detection (all 4 plans):
+Phase 9 delivered obstacle escalation detection (all 5 plans, including gap closure):
 - **Plan 01 COMPLETE**: Data models (EscalationCandidate, EscalationConfig), DuckDB schema extensions (6 escalate_* columns), constraint status lifecycle
 - **Plan 02 COMPLETE**: EscalationDetector with sliding window, two-layer bypass eligibility, 40 tests
 - **Plan 03 COMPLETE**: EscalationConstraintGenerator with three-tier severity, SHA-256 IDs, 38 tests
 - **Plan 04 COMPLETE**: Pipeline integration (Step 13 in run_session), write_escalation_episodes, ShadowReporter escalation metrics, 12 integration tests
-- **529 tests** passing (517 baseline + 12 new integration tests)
+- **Plan 05 COMPLETE**: Real session fixture extraction (5 JSONL files from ope.db), 13 real-fixture tests
+- **542 tests** passing (529 baseline + 13 new real-fixture tests)
 - **Key capability**: Running `python -m src.pipeline.cli extract` now detects escalation sequences and stores them as mode=ESCALATE episodes with auto-generated candidate constraints
 - **Headline gate**: unapproved_escalation_rate with PASS/FAIL indicator in shadow report
+- **Gap closed**: VERIFICATION.md Truth 5 now confirmed with real objectivism session data
 
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 9 COMPLETE -- All 4 plans delivered. Next phase: 10 (Decision Durability) or 11 (Wisdom Layer).
-Resume file: .planning/phases/09-obstacle-escalation-detection/09-04-SUMMARY.md
+Stopped at: Phase 9 COMPLETE (including gap closure plan 05) -- All 5 plans delivered. Next phase: 10 (Decision Durability) or 11 (Wisdom Layer).
+Resume file: .planning/phases/09-obstacle-escalation-detection/09-05-SUMMARY.md

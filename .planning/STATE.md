@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 11 COMPLETE (Project-Level Wisdom Layer) — All 6 plans delivered including gap closure
+**Current focus:** Phase 12 IN PROGRESS (Governance Protocol Integration) — Plan 01 complete, 3 remaining
 
 ## Current Position
 
-Phase: 11 of 13 (Project-Level Wisdom Layer)
-Plan: 6 of 6 in current phase (gap closure complete)
-Status: Phase complete (all gaps closed)
-Last activity: 2026-02-20 -- Completed 11-06-PLAN.md (check-scope validation gap closure). 5 new tests, 712 total.
+Phase: 12 of 13 (Governance Protocol Integration)
+Plan: 1 of 4 in current phase
+Status: In progress
+Last activity: 2026-02-20 -- Completed 12-01-PLAN.md (governance foundation: schema, config, models, DuckDB tables). 733 tests passing.
 
-Progress: [████████████████████████████] 100% (6/6 plans in phase 11, including gap closure)
-Overall:  [██████████████████████████████████████████████] 100% (34/34 plans, +phases 7-8 delivered)
+Progress: [███████░░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans in phase 12)
+Overall:  [████████████████████████████████████████████████░] 97% (35/38 plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 34
-- Average duration: 5.2 min
-- Total execution time: 2.9 hours
+- Total plans completed: 35
+- Average duration: 5.3 min
+- Total execution time: 3.0 hours
 
 **By Phase:**
 
@@ -218,6 +218,10 @@ Recent decisions affecting current work:
 - Plan 11-06: All wisdom CLI commands use exit code 2 for runtime errors (was 1)
 - Plan 11-06: Severity filter: only "forbidden" and "requires_approval" count as violations
 - Plan 11-06: 712 tests passing (707 baseline + 5 new)
+- Plan 12-01: WisdomEntity.metadata stored as DuckDB JSON column, serialized via json.dumps/json.loads
+- Plan 12-01: stability_outcomes table uses CHECK constraint for status IN ('pass', 'fail', 'error')
+- Plan 12-01: Governance columns on episodes are nullable BOOLEAN/VARCHAR for backward compatibility
+- Plan 12-01: 733 tests passing (712 baseline + 21 new)
 
 ### Pending Todos
 
@@ -352,5 +356,5 @@ Phase 11 delivered the project-level wisdom layer (all 6 plans including gap clo
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 11 COMPLETE -- All 6 plans delivered including gap closure. Ready for Phase 12 (Governance).
-Resume file: .planning/phases/11-project-level-wisdom-layer/11-06-SUMMARY.md
+Stopped at: Phase 12 plan 01 complete (governance foundation). Continue with plan 12-02.
+Resume file: .planning/phases/12-governance-protocol-integration/12-02-PLAN.md

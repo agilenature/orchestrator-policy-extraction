@@ -176,6 +176,13 @@ class EscalationConfig(BaseModel):
     detector_version: str = "1.0.0"
 
 
+class DurabilityConfig(BaseModel):
+    """Decision durability tracking settings (Phase 10)."""
+
+    min_sessions_for_score: int = 3
+    evidence_excerpt_max_chars: int = 500
+
+
 class GitCommands(BaseModel):
     """Git command patterns for tagging."""
 
@@ -229,6 +236,9 @@ class PipelineConfig(BaseModel):
     )
     escalation: EscalationConfig = Field(
         default_factory=EscalationConfig
+    )
+    durability: DurabilityConfig = Field(
+        default_factory=DurabilityConfig
     )
 
     # Preserved from existing config (used by downstream components)

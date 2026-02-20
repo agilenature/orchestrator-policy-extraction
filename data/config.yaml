@@ -226,6 +226,11 @@ escalation:
     - Bash
   detector_version: "1.0.0"
 
+# Phase 10: Decision durability tracking
+durability:
+  min_sessions_for_score: 3
+  evidence_excerpt_max_chars: 500
+
 # Orchestrator Mode Inference Rules (preserved from existing config)
 mode_inference:
   Explore:

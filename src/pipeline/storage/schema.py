@@ -264,6 +264,49 @@ def create_schema(conn: duckdb.DuckDBPyConnection) -> None:
         except Exception:
             pass  # Column already exists (idempotent)
 
+    # Phase 10: Decision durability evaluation tables
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS session_constraint_eval (
+            session_id VARCHAR NOT NULL,
+            constraint_id VARCHAR NOT NULL,
+            eval_state VARCHAR NOT NULL,
+            evidence_json JSON,
+            scope_matched BOOLEAN NOT NULL DEFAULT TRUE,
+            eval_ts TIMESTAMPTZ DEFAULT current_timestamp,
+            PRIMARY KEY (session_id, constraint_id)
+        )
+    """)
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS amnesia_events (
+            amnesia_id VARCHAR PRIMARY KEY,
+            session_id VARCHAR NOT NULL,
+            constraint_id VARCHAR NOT NULL,
+            constraint_type VARCHAR,
+            severity VARCHAR,
+            evidence_json JSON,
+            detected_at TIMESTAMPTZ DEFAULT current_timestamp
+        )
+    """)
+
+    # Phase 10: Indexes for evaluation tables
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_eval_constraint "
+        "ON session_constraint_eval(constraint_id)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_eval_session "
+        "ON session_constraint_eval(session_id)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_amnesia_session "
+        "ON amnesia_events(session_id)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_amnesia_constraint "
+        "ON amnesia_events(constraint_id)"
+    )
+
 
 def drop_schema(conn: duckdb.DuckDBPyConnection) -> None:
     """Drop all pipeline tables (for testing).
@@ -274,6 +317,8 @@ def drop_schema(conn: duckdb.DuckDBPyConnection) -> None:
     Args:
         conn: DuckDB connection to drop tables from.
     """
+    conn.execute("DROP TABLE IF EXISTS amnesia_events")
+    conn.execute("DROP TABLE IF EXISTS session_constraint_eval")
     conn.execute("DROP TABLE IF EXISTS shadow_mode_results")
     conn.execute("DROP TABLE IF EXISTS episode_embeddings")
     conn.execute("DROP TABLE IF EXISTS episode_search_text")

@@ -1,0 +1,172 @@
+[
+  {
+    "entity_type": "breakthrough",
+    "title": "Observation-context separation unlocks episode quality",
+    "description": "Separating the observation (context BEFORE a decision point) from the episode body events was the key insight that made episode population work. Context events come from the PRECEDING episode, not the current segment body. Without this distinction, observations contained events that belonged to the body, corrupting the episode structure.",
+    "context_tags": ["episode-population", "observation", "context-events", "segmenter"],
+    "scope_paths": ["src/pipeline/population/populator.py"],
+    "confidence": 0.95,
+    "source_document": "REUSABLE_KNOWLEDGE_GUIDE.md",
+    "source_phase": 7
+  },
+  {
+    "entity_type": "breakthrough",
+    "title": "Write-ahead intent logging for crash recovery in API pipelines",
+    "description": "Before any external API call, write intent to the database (status='uploading'). After success, write result (status='uploaded'). On restart, any item showing 'uploading' state is treated as interrupted and retried. This pattern creates a crash anchor that survives process termination and enables idempotent restart without data loss or duplication.",
+    "context_tags": ["crash-recovery", "api-pipeline", "idempotency", "state-machine"],
+    "scope_paths": ["src/pipeline/"],
+    "confidence": 0.95,
+    "source_document": "REUSABLE_KNOWLEDGE_GUIDE.md",
+    "source_phase": 7
+  },
+  {
+    "entity_type": "breakthrough",
+    "title": "Pydantic as both prompt schema and response validator",
+    "description": "Using a single Pydantic model to generate the JSON schema injected into an LLM prompt AND to validate the LLM response eliminates schema drift between prompt and validation. The model_json_schema() method produces the schema for the prompt; model_validate() parses the response. ConfigDict(extra='ignore') silently drops hallucinated fields. field_validator can silently filter invalid values rather than hard-failing, reducing retries.",
+    "context_tags": ["pydantic", "llm-integration", "validation", "schema"],
+    "scope_paths": [],
+    "confidence": 0.9,
+    "source_document": "REUSABLE_KNOWLEDGE_GUIDE.md",
+    "source_phase": 7
+  },
+  {
+    "entity_type": "breakthrough",
+    "title": "Idempotency via content hash prevents re-processing unchanged data",
+    "description": "Computing a deterministic hash of all inputs that affect processing output (SHA-256 of metadata + content + config) and comparing against the stored hash on re-run enables true idempotency. Items with unchanged hashes are skipped. This pattern prevented re-uploading thousands of files when re-running the pipeline and is reusable in any batch processing system where inputs may not have changed between runs.",
+    "context_tags": ["idempotency", "hashing", "batch-processing", "sha256"],
+    "scope_paths": ["src/pipeline/"],
+    "confidence": 0.9,
+    "source_document": "REUSABLE_KNOWLEDGE_GUIDE.md",
+    "source_phase": 7
+  },
+  {
+    "entity_type": "breakthrough",
+    "title": "400 API errors are often transient, not permanent",
+    "description": "After an initial upload run, 38 files had status='failed' with HTTP 400 INVALID_ARGUMENT. The assumption was these files were broken. Manual testing of a single 'failed' file succeeded immediately. Retrying all 38 recovered 36 (95%). The lesson: treat 400 errors from managed cloud APIs as potentially transient. Always retry before classifying as permanent failure. Check for evidence of success (e.g., a file ID assigned despite error status) before marking items as failed.",
+    "context_tags": ["error-handling", "api-integration", "retry-logic", "transient-errors"],
+    "scope_paths": [],
+    "confidence": 0.95,
+    "source_document": "REUSABLE_KNOWLEDGE_GUIDE.md",
+    "source_phase": 7
+  },
+  {
+    "entity_type": "dead_end",
+    "title": "Scope amnesia: declaring infrastructure complete as delivery complete",
+    "description": "Phase 6 built the AI metadata extraction pipeline (5 plans, all marked done) and declared the phase complete -- but the pipeline had only processed ~96 of 473 target files. Infrastructure completion was conflated with outcome delivery. Future sessions read 'Phase 6: Complete' from STATE.md and had no reason to question whether extraction had actually run on all targets. Prevention: define completion as an observable database state query (COUNT of processed items == target), not as 'all plan tasks done'.",
+    "context_tags": ["scope-amnesia", "false-completion", "decision-durability", "session-boundary"],
+    "scope_paths": [],
+    "confidence": 0.95,
+    "source_document": "DECISION_AMNESIA_REPORT.md",
+    "source_phase": 7
+  },
+  {
+    "entity_type": "dead_end",
+    "title": "Method amnesia: superior batch approach not propagated across sessions",
+    "description": "A synchronous API orchestrator with 24% 429 error rate was built and used for production processing. A later session discovered the Mistral Batch API (50% cheaper, zero rate limiting), built a separate batch client, but did not deprecate or replace the original. The standard CLI command still invoked the inferior synchronous approach. The batch discovery was not recorded in DECISIONS.md, so future sessions had no way to know the batch method existed. Prevention: record method decisions in persistent state and deprecate superseded approaches.",
+    "context_tags": ["method-amnesia", "batch-api", "rate-limiting", "decision-propagation"],
+    "scope_paths": [],
+    "confidence": 0.9,
+    "source_document": "DECISION_AMNESIA_REPORT.md",
+    "source_phase": 7
+  },
+  {
+    "entity_type": "dead_end",
+    "title": "Status column as lossy state: idempotency skip path did not update status",
+    "description": "The upload pipeline's idempotent skip logic correctly prevented duplicate uploads but did not update the status column for files it confirmed as already uploaded. This caused 750 files to show status='pending' or 'failed' despite having valid Gemini file IDs. The system underreported uploads by 44% (956 reported vs 1706 actual). Prevention: every code path that observes an item's state must also update the canonical status column, including skip/no-op paths.",
+    "context_tags": ["state-management", "idempotency", "status-sync", "data-integrity"],
+    "scope_paths": [],
+    "confidence": 0.95,
+    "source_document": "DECISION_AMNESIA_REPORT.md",
+    "source_phase": 7
+  },
+  {
+    "entity_type": "dead_end",
+    "title": "Cross-phase constraint forgotten: 48-hour Gemini TTL not applied to reset flow",
+    "description": "The Gemini File Search API enforces a 48-hour TTL on uploaded files. This was a known constraint from Phase 2 but was not carried forward into the Phase 6.2 reset implementation. When the reset flow tried to delete expired files, it raised exceptions and halted. The constraint lived in Phase 2 decisions but not as a cross-cutting concern visible to all phases. Prevention: tag constraints that apply across phases and surface them automatically in dependent phase planning.",
+    "context_tags": ["constraint-amnesia", "cross-phase-dependency", "ttl", "api-constraints"],
+    "scope_paths": [],
+    "confidence": 0.9,
+    "source_document": "DECISION_AMNESIA_REPORT.md",
+    "source_phase": 7
+  },
+  {
+    "entity_type": "scope_decision",
+    "title": "Phase completion requires count-query verification, not task-checklist completion",
+    "description": "The most dangerous false completion pattern is marking a phase done because all plan tasks are checked off, when the actual deliverable (e.g., processing N files) is incomplete. Completion criteria must be expressed as a database query with an expected count: SELECT COUNT(*) FROM table WHERE condition == expected_total. A percentage (97% complete) is not a completion criterion. The equation must be: completed + permanent_failures + excluded == expected_total.",
+    "context_tags": ["validation-gates", "completion-criteria", "100-percent-principle"],
+    "scope_paths": [],
+    "confidence": 0.95,
+    "source_document": "VALIDATION_GATE_AUDIT.md",
+    "source_phase": 7
+  },
+  {
+    "entity_type": "scope_decision",
+    "title": "Progressive gate strategy: gates grow in rigor as project scope grows",
+    "description": "Validation checkpoints should start coarse and become precise as a project progresses. Level 0: pre-execution scope declaration (declare total expected). Level 1: post-discovery count verification. Level 2: post-batch status sync check. Level 3: post-phase gap closure requirement. Level 4: post-extraction completeness. Each gate is a pass/fail query against the database that blocks phase transition on failure.",
+    "context_tags": ["validation-gates", "progressive-gates", "pipeline-design", "phase-transitions"],
+    "scope_paths": [],
+    "confidence": 0.9,
+    "source_document": "VALIDATION_GATE_AUDIT.md",
+    "source_phase": 7
+  },
+  {
+    "entity_type": "scope_decision",
+    "title": "Every failed item must be classified, not just counted",
+    "description": "An item may not be classified as permanent_failure unless it has been retried with distinct retry conditions. 'Failed' is not a unitary category in distributed systems. The minimum useful failure schema is: failed_permanent (verified unreprocessable), failed_transient (retry with backoff), and uploaded_unconfirmed (succeeded but confirmation timed out). The phrase 'edge cases that may require manual intervention' is not a classification.",
+    "context_tags": ["error-classification", "failure-handling", "retry-logic", "distributed-systems"],
+    "scope_paths": [],
+    "confidence": 0.9,
+    "source_document": "VALIDATION_GATE_AUDIT.md",
+    "source_phase": 7
+  },
+  {
+    "entity_type": "scope_decision",
+    "title": "Percentage-based progress reporting obscures accountability for gaps",
+    "description": "Reporting '91.5% success rate' instead of '149 files not indexed' obscures accountability. The agent consistently framed progress using percentages which creates a ratchet effect where each new percentage feels like progress. Enforcement: always report expected count, completed count, and gap. For each item in the gap, provide classification and reason. A report with an unclassified gap may not declare the phase complete or production-ready.",
+    "context_tags": ["reporting", "accountability", "validation-gates", "metrics"],
+    "scope_paths": [],
+    "confidence": 0.9,
+    "source_document": "VALIDATION_GATE_AUDIT.md",
+    "source_phase": 7
+  },
+  {
+    "entity_type": "method_decision",
+    "title": "Map external service boundaries before designing pipeline stages",
+    "description": "When adopting a managed cloud service, the first question must map what the service handles internally versus what remains external. The Gemini File Search API handles chunking, embedding, and vector storage internally, collapsing a seven-stage RAG pipeline to three stages (scan-upload-query). Every stage the service handles is a stage the implementer does not build. Ask: 'What does each external service handle internally that I do not need to build?'",
+    "context_tags": ["architecture", "managed-services", "pipeline-design", "api-boundaries"],
+    "scope_paths": [],
+    "confidence": 0.9,
+    "source_document": "PROBLEM_FORMULATION_RETROSPECTIVE.md",
+    "source_phase": 7
+  },
+  {
+    "entity_type": "method_decision",
+    "title": "Verify API parameter constraints before designing experiments",
+    "description": "When integrating an LLM SDK, verify the exact parameter constraints (required values, restricted ranges, correct parameter names) BEFORE designing experiments that vary those parameters. The magistral-medium-latest model requires temperature=1.0 and rejects other values, but three competitive prompt strategies were designed with temperatures 0.1, 0.3, 0.5. The research phase must include a verification pass on the actual API call signature against documentation.",
+    "context_tags": ["api-integration", "parameter-constraints", "llm-sdk", "research-methodology"],
+    "scope_paths": [],
+    "confidence": 0.85,
+    "source_document": "PROBLEM_FORMULATION_RETROSPECTIVE.md",
+    "source_phase": 7
+  },
+  {
+    "entity_type": "method_decision",
+    "title": "Place data enrichment stages before immutable-store ingestion",
+    "description": "When a pipeline enriches data that will be embedded in an immutable external store (e.g., Gemini custom_metadata cannot be updated without re-upload), the enrichment stage must run before the store interaction. The metadata-first execution strategy moved Phase 6 (AI enrichment) before Phase 4/5 (upload) to avoid re-uploading 1,721 files. Ask at roadmap design time: 'For each enrichment stage, can the external store metadata be updated without re-uploading? If not, when must this stage run?'",
+    "context_tags": ["pipeline-ordering", "immutable-stores", "metadata-enrichment", "execution-strategy"],
+    "scope_paths": [],
+    "confidence": 0.9,
+    "source_document": "PROBLEM_FORMULATION_RETROSPECTIVE.md",
+    "source_phase": 7
+  },
+  {
+    "entity_type": "method_decision",
+    "title": "Enumerate all entity types in corpus before designing metadata schema",
+    "description": "When designing a metadata extraction phase, enumerate all entity types in the corpus before writing the schema. Phase 6.1 (entity extraction) was an unplanned dependency inserted urgently between Phase 6 and 6.2 because named-person entities were not considered during initial schema design. The question at schema design time is not 'what metadata do I need now?' but 'what structured entities exist in this corpus that a future search query might want to filter by?' Named persons, places, organizations, and referenced works are standard categories.",
+    "context_tags": ["schema-design", "entity-extraction", "metadata", "corpus-analysis"],
+    "scope_paths": [],
+    "confidence": 0.85,
+    "source_document": "PROBLEM_FORMULATION_RETROSPECTIVE.md",
+    "source_phase": 7
+  }
+]

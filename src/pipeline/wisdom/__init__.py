@@ -16,9 +16,11 @@ from src.pipeline.wisdom.models import (
     WisdomEntity,
     WisdomRef,
 )
+from src.pipeline.wisdom.store import WisdomStore
 
 __all__ = [
     "EnrichedRecommendation",
     "WisdomEntity",
     "WisdomRef",
+    "WisdomStore",
 ]

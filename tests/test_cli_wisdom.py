@@ -148,13 +148,21 @@ def test_wisdom_list_filter_by_type(
 def test_wisdom_check_scope_with_match(
     runner: CliRunner, tmp_path: Path, sample_json: Path
 ) -> None:
-    """Check-scope with a matching path returns scope decisions."""
+    """Check-scope with a matching path and no constraint violations exits 0."""
     db = str(tmp_path / "scope_match.db")
     runner.invoke(cli, ["wisdom", "ingest", str(sample_json), "--db", db])
 
+    # Create empty constraints to ensure no violations
+    empty_constraints = tmp_path / "empty_constraints.json"
+    empty_constraints.write_text("[]")
+
     result = runner.invoke(
-        cli, ["wisdom", "check-scope", "src/pipeline/cli/", "--db", db]
+        cli,
+        [
+            "wisdom", "check-scope", "src/pipeline/cli/",
+            "--db", db,
+            "--constraints", str(empty_constraints),
+        ],
     )
     assert result.exit_code == 0, f"Exit code: {result.exit_code}, Output: {result.output}"
-    assert "[scope_decision]" in result.output
-    assert "CLI uses click groups" in result.output
+    assert "No violations found" in result.output

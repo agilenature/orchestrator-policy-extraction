@@ -34,6 +34,9 @@ from src.pipeline.adapters.git_history import parse_git_history
 from src.pipeline.constraint_extractor import ConstraintExtractor
 from src.pipeline.constraint_store import ConstraintStore
 from src.pipeline.episode_validator import EpisodeValidator
+from src.pipeline.durability.amnesia import AmnesiaDetector
+from src.pipeline.durability.evaluator import SessionConstraintEvaluator
+from src.pipeline.durability.scope_extractor import extract_session_scope
 from src.pipeline.escalation.constraint_gen import EscalationConstraintGenerator
 from src.pipeline.escalation.detector import EscalationDetector
 from src.pipeline.models.config import PipelineConfig, load_config
@@ -45,6 +48,8 @@ from src.pipeline.segmenter import EpisodeSegmenter
 from src.pipeline.storage.schema import create_schema, get_connection
 from src.pipeline.storage.writer import (
     read_events,
+    write_amnesia_events,
+    write_constraint_evals,
     write_episodes,
     write_escalation_episodes,
     write_events,
@@ -121,7 +126,10 @@ class PipelineRunner:
         9. Label reactions from next human messages
         10. Validate episodes against JSON Schema
         11. Write valid episodes to DuckDB via MERGE
-        12. Compute and return stats
+        12. Extract constraints from correct/block episodes
+        13. Escalation detection
+        14. Session constraint evaluation (decision durability)
+        15. Compute and return stats
 
         Args:
             jsonl_path: Path to the JSONL session file.
@@ -529,7 +537,72 @@ class PipelineRunner:
             logger.warning("Escalation detection failed: {}", e)
             warnings.append(f"Escalation detection failed: {e}")
 
-        # Step 14: Compute stats
+        # Step 14: Session constraint evaluation (decision durability)
+        eval_count = 0
+        amnesia_count = 0
+        try:
+            # Derive session scope from events
+            session_scope_paths = extract_session_scope(
+                [e.__dict__ if hasattr(e, '__dict__') and not isinstance(e, dict) else e
+                 for e in all_session_events]
+            )
+
+            # Get session start time
+            session_start_time = None
+            if all_session_events:
+                first_ev = all_session_events[0]
+                first_ts = first_ev.get("ts_utc") if isinstance(first_ev, dict) else getattr(first_ev, "ts_utc", None)
+                session_start_time = str(first_ts) if first_ts else None
+
+            if session_start_time and self._constraint_store.constraints:
+                # Build escalation violations map from DuckDB
+                escalation_violations: dict[str, str] = {}
+                try:
+                    esc_rows = self._conn.execute(
+                        "SELECT escalate_bypassed_constraint_id FROM episodes "
+                        "WHERE session_id = ? AND mode = 'ESCALATE' "
+                        "AND escalate_bypassed_constraint_id IS NOT NULL",
+                        [session_id],
+                    ).fetchall()
+                    for (cid,) in esc_rows:
+                        escalation_violations[cid] = session_id
+                except Exception:
+                    pass  # Table may not have escalation columns in old DBs
+
+                # Evaluate constraints
+                evaluator = SessionConstraintEvaluator(self._config)
+                eval_results = evaluator.evaluate(
+                    session_id=session_id,
+                    session_scope_paths=session_scope_paths,
+                    session_start_time=session_start_time,
+                    events=all_session_events,
+                    constraints=self._constraint_store.constraints,
+                    escalation_violations=escalation_violations,
+                )
+
+                if eval_results:
+                    write_constraint_evals(self._conn, eval_results)
+                    eval_count = len(eval_results)
+
+                    # Detect amnesia events
+                    detector = AmnesiaDetector()
+                    amnesia_events = detector.detect(
+                        eval_results, self._constraint_store.constraints
+                    )
+                    if amnesia_events:
+                        write_amnesia_events(self._conn, amnesia_events)
+                        amnesia_count = len(amnesia_events)
+
+                    logger.info(
+                        "Step 14: Evaluated {} constraints ({} amnesia events)",
+                        eval_count,
+                        amnesia_count,
+                    )
+        except Exception as e:
+            logger.warning("Constraint evaluation failed: {}", e)
+            warnings.append(f"Constraint evaluation failed: {e}")
+
+        # Step 15: Compute stats
         tag_distribution = self._compute_tag_distribution(tagged_events)
         outcome_distribution = seg_stats.get("by_outcome", {})
         duration_s = time.monotonic() - t0
@@ -553,6 +626,8 @@ class PipelineRunner:
             "constraints_total": self._constraint_store.count,
             "escalation_detected": escalation_detected,
             "escalation_constraints_generated": escalation_constraints_generated,
+            "constraint_evals": eval_count,
+            "amnesia_events_detected": amnesia_count,
             "errors": errors,
             "warnings": warnings,
             "duration_seconds": round(duration_s, 2),
@@ -792,6 +867,8 @@ class PipelineRunner:
             "constraints_total": 0,
             "escalation_detected": 0,
             "escalation_constraints_generated": 0,
+            "constraint_evals": 0,
+            "amnesia_events_detected": 0,
             "errors": [error_msg],
             "warnings": [],
             "duration_seconds": 0,

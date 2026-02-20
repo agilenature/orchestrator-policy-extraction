@@ -245,11 +245,11 @@ Plans:
   3. Inter-session coordination bus design: protocol, transport (local HTTP server vs Unix socket vs file-based), shared constraint state model, how parallel Claude Code sessions discover and signal each other
   4. "Governing session" pattern design: a dedicated Claude Code session that monitors all other active sessions, holds the full constraint store, and can broadcast blocks or briefings across the bus
   5. A concrete Phase 15 implementation plan derived from the research — broken into executable waves with specific file targets, API contracts, and test strategies
-**Plans:** Research plans producing design documents
+**Plans:** 3 plans in 2 waves
 
 Plans:
-- [ ] 14-01-PLAN.md — Claude Code hooks deep dive + stream processor architecture (Wave 1)
-- [ ] 14-02-PLAN.md — Inter-session bus design + governing session pattern (Wave 1)
+- [ ] 14-01-PLAN.md — Hook contracts (LIVE-01, LIVE-02) + stream processor architecture (LIVE-03) (Wave 1)
+- [ ] 14-02-PLAN.md — Inter-session bus design (LIVE-04) + governing session pattern (LIVE-05) (Wave 1)
 - [ ] 14-03-PLAN.md — Phase 15 implementation blueprint (Wave 2, depends on 14-01, 14-02)
 
 ## Progress

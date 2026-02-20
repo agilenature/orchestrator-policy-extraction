@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 13 IN PROGRESS (Policy-to-Constraint Feedback Loop) — Plans 01-02 complete, 1 remaining.
+**Current focus:** Phase 13 COMPLETE (Policy-to-Constraint Feedback Loop) -- All 3 plans delivered. Project complete.
 
 ## Current Position
 
 Phase: 13 of 13 (Policy-to-Constraint Feedback Loop)
-Plan: 2 of 3 in current phase
-Status: In progress
-Last activity: 2026-02-20 -- Completed 13-02-PLAN.md (PolicyViolationChecker, PolicyFeedbackExtractor, find_by_hints). 1022 tests passing.
+Plan: 3 of 3 in current phase
+Status: Phase complete / Project complete
+Last activity: 2026-02-20 -- Completed 13-03-PLAN.md (pipeline integration, ShadowReporter policy_error_rate, CLI audit policy-errors). 889 tests passing.
 
-Progress: [████████████████████░░░░░░░░░░░░] 67% (2/3 plans in phase 13)
-Overall:  [██████████████████████████████████████████████████████░░] 98% (40/41 plans total)
+Progress: [██████████████████████████████] 100% (3/3 plans in phase 13)
+Overall:  [████████████████████████████████████████████████████████] 100% (41/41 plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 40
+- Total plans completed: 41
 - Average duration: 5.1 min
-- Total execution time: 3.44 hours
+- Total execution time: 3.57 hours
 
 **By Phase:**
 
@@ -39,10 +39,10 @@ Overall:  [███████████████████████
 | 11-project-level-wisdom-layer | 6 | 35 min | 5.8 min |
 
 | 12-governance-protocol-integration | 4 | ~30 min | 7.5 min |
-| 13-policy-to-constraint-feedback-loop | 2 | 11 min | 5.5 min |
+| 13-policy-to-constraint-feedback-loop | 3 | 19 min | 6.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min, 4 min, 9 min, 4 min, 7 min
+- Last 5 plans: 4 min, 9 min, 4 min, 7 min, 8 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -246,6 +246,13 @@ Recent decisions affecting current work:
 - Plan 13-02: Promotion threshold: 3+ distinct sessions with surfaced_and_blocked events
 - Plan 13-02: SHA-256 constraint ID with :policy_feedback suffix for namespace isolation from human_correction IDs
 - Plan 13-02: 1022 tests passing (994 baseline + 28 new)
+- Plan 13-03: Pre-surfacing check uses PolicyViolationChecker.build_recommendation_text() for hint matching
+- Plan 13-03: Suppressed recs skip evaluation (continue) and are NOT in shadow_mode_results
+- Plan 13-03: Surfaced-and-blocked detected via reaction_label in (block, correct) after evaluation
+- Plan 13-03: Batch constraint write and promotion AFTER run_all completes (not during sessions)
+- Plan 13-03: Policy error rate denominator = evaluated + suppressed (includes suppressed in denominator)
+- Plan 13-03: CLI exit code 2 for rate >= 5%, 0 for clean or no data
+- Plan 13-03: 889 tests passing (873 baseline + 16 new)
 
 ### Pending Todos
 
@@ -390,8 +397,18 @@ Phase 12 delivered governance protocol integration (all 4 plans):
 - **Key modules**: src/pipeline/governance/ (parser.py, ingestor.py, stability.py), src/pipeline/cli/govern.py
 - **Reference data**: objectivism_premortem.md produces 11 dead_end wisdom + 15 behavioral constraints
 
+## Phase 13 Completion Summary
+
+Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
+- **Plan 01 COMPLETE**: PolicyErrorEvent model, policy_error_events DuckDB table, write_policy_error_events, PolicyFeedbackConfig, forward-only ID break in ConstraintExtractor, 23 new tests
+- **Plan 02 COMPLETE**: PolicyViolationChecker (regex hint matching, forbidden/requires_approval suppression), PolicyFeedbackExtractor (constraint generation from blocked recs, dedup, promote_confirmed), ConstraintStore.find_by_hints(), 28 new tests
+- **Plan 03 COMPLETE**: ShadowModeRunner integration (pre-surfacing check, batch extraction, promote_confirmed), ShadowReporter policy_error_rate metric, CLI audit policy-errors, 16 integration tests
+- **889 tests** passing (873 baseline + 16 new Phase 13 Plan 03 tests, zero regressions)
+- **Full feedback loop**: policy violations suppressed -> error events recorded -> constraints extracted -> candidates promoted
+- **Key modules**: src/pipeline/feedback/ (models.py, checker.py, extractor.py), modified shadow/runner.py + shadow/reporter.py + cli/audit.py
+
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 13 Plan 02 complete (PolicyViolationChecker, PolicyFeedbackExtractor, find_by_hints). Plan 03 next (pipeline integration).
-Resume file: .planning/phases/13-policy-to-constraint-feedback-loop/13-03-PLAN.md
+Stopped at: Phase 13 Plan 03 complete. Project complete (41/41 plans across 13 phases).
+Resume file: N/A (project complete)

@@ -223,6 +223,36 @@ class ConstraintStore:
             if c.get("status", "active") == "active"
         ]
 
+    def find_by_hints(
+        self, detection_hints: list[str], min_overlap: int = 2
+    ) -> dict | None:
+        """Find the first constraint with >= min_overlap shared detection_hints.
+
+        Case-insensitive comparison of hint keywords. Used for deduplication:
+        checking if an equivalent human_correction constraint already exists
+        before creating a policy_feedback constraint.
+
+        Args:
+            detection_hints: List of hint strings to compare.
+            min_overlap: Minimum number of shared hints required for a match.
+
+        Returns:
+            First matching constraint dict, or None if no match found.
+        """
+        given_set = {h.lower() for h in detection_hints}
+        if not given_set:
+            return None
+
+        for constraint in self._constraints:
+            existing_hints = constraint.get("detection_hints", [])
+            if not existing_hints:
+                continue
+            existing_set = {h.lower() for h in existing_hints}
+            if len(given_set & existing_set) >= min_overlap:
+                return constraint
+
+        return None
+
     # --- Private helpers ---
 
     def _load(self) -> list[dict]:

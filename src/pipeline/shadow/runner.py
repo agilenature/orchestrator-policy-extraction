@@ -6,6 +6,16 @@ then compares the recommendation against the actual human decision.
 
 Results are stored in the DuckDB shadow_mode_results table.
 
+When a PolicyViolationChecker is provided, recommendations are checked
+against active constraints before evaluation. Forbidden/requires_approval
+matches are suppressed (not evaluated) and recorded as PolicyErrorEvent
+with type='suppressed'. Surfaced-and-blocked recommendations (reaction
+block/correct) are recorded as PolicyErrorEvent with type='surfaced_and_blocked'.
+
+After all sessions complete, batch feedback extraction generates new
+candidate constraints from blocked recommendations, and promote_confirmed()
+promotes candidates with sufficient session evidence.
+
 Exports:
     ShadowModeRunner: Run shadow mode testing in batch over historical episodes
 """
@@ -18,8 +28,12 @@ from uuid import uuid4
 import duckdb
 from loguru import logger
 
+from src.pipeline.feedback.checker import PolicyViolationChecker
+from src.pipeline.feedback.extractor import PolicyFeedbackExtractor
+from src.pipeline.feedback.models import make_policy_error_event
 from src.pipeline.rag.embedder import observation_to_text
 from src.pipeline.shadow.evaluator import ShadowEvaluator
+from src.pipeline.storage.writer import write_policy_error_events
 
 
 class ShadowModeRunner:
@@ -29,11 +43,17 @@ class ShadowModeRunner:
     EXCLUDING that episode from retrieval, ensuring the recommender does not
     cheat by seeing the answer.
 
+    Optionally integrates PolicyViolationChecker for pre-surfacing constraint
+    checks and PolicyFeedbackExtractor for generating new constraints from
+    blocked recommendations.
+
     Args:
         conn: DuckDB connection with episodes, embeddings, search text.
         embedder: EpisodeEmbedder for generating query embeddings.
         recommender: Recommender for generating recommendations.
         evaluator: Optional ShadowEvaluator (created if not provided).
+        checker: Optional PolicyViolationChecker for pre-surfacing checks.
+        constraint_store: Optional ConstraintStore for feedback extraction.
     """
 
     def __init__(
@@ -42,14 +62,24 @@ class ShadowModeRunner:
         embedder,
         recommender,
         evaluator: ShadowEvaluator | None = None,
+        checker: PolicyViolationChecker | None = None,
+        constraint_store=None,
     ) -> None:
         self._conn = conn
         self._embedder = embedder
         self._recommender = recommender
         self._evaluator = evaluator or ShadowEvaluator()
+        self._checker = checker
+        self._constraint_store = constraint_store
+        self._policy_errors: list = []
+        self._blocked_recommendations: list[tuple] = []
 
     def run_all(self, batch_id: str | None = None) -> dict:
         """Run shadow mode for ALL episodes in the database.
+
+        After writing evaluation results, persists policy error events,
+        batch-extracts feedback constraints from blocked recommendations,
+        and promotes confirmed candidates.
 
         Args:
             batch_id: Optional batch ID for grouping results. Generated
@@ -57,10 +87,14 @@ class ShadowModeRunner:
 
         Returns:
             Aggregate stats dict with total, agreements, dangerous,
-            results_by_session keys.
+            policy_errors, results_by_session keys.
         """
         if batch_id is None:
             batch_id = str(uuid4())
+
+        # Reset per-run collections
+        self._policy_errors = []
+        self._blocked_recommendations = []
 
         # Fetch all distinct session_ids
         rows = self._conn.execute(
@@ -81,6 +115,29 @@ class ShadowModeRunner:
         # Write results to shadow_mode_results table
         self._write_results(all_results)
 
+        # Persist policy error events AFTER writing results
+        if self._policy_errors:
+            write_policy_error_events(self._conn, self._policy_errors)
+
+        # Batch feedback extraction AFTER run completes
+        if self._constraint_store and self._blocked_recommendations:
+            extractor = PolicyFeedbackExtractor()
+            any_new = False
+            for recommendation, episode in self._blocked_recommendations:
+                constraint = extractor.extract(
+                    recommendation, episode, self._constraint_store
+                )
+                if constraint:
+                    added = self._constraint_store.add(constraint)
+                    if added:
+                        any_new = True
+
+            if any_new:
+                self._constraint_store.save()
+
+            # Promote confirmed candidates with 3+ sessions
+            extractor.promote_confirmed(self._constraint_store, self._conn)
+
         # Compute aggregate stats
         total = len(all_results)
         mode_agreements = sum(1 for r in all_results if r["mode_agrees"])
@@ -97,14 +154,24 @@ class ShadowModeRunner:
             "results_by_session": {
                 sid: len(res) for sid, res in results_by_session.items()
             },
+            "policy_errors": len(self._policy_errors),
+            "policy_errors_suppressed": sum(
+                1 for e in self._policy_errors if e.error_type == "suppressed"
+            ),
+            "policy_errors_blocked": sum(
+                1 for e in self._policy_errors
+                if e.error_type == "surfaced_and_blocked"
+            ),
         }
 
         logger.info(
-            "Shadow mode complete: {} episodes, {} mode agreements ({:.1%}), {} dangerous",
+            "Shadow mode complete: {} episodes, {} mode agreements ({:.1%}), "
+            "{} dangerous, {} policy errors",
             total,
             mode_agreements,
             mode_agreements / max(total, 1),
             dangerous,
+            len(self._policy_errors),
         )
 
         return stats
@@ -113,6 +180,12 @@ class ShadowModeRunner:
         self, session_id: str, batch_id: str | None = None
     ) -> list[dict]:
         """Run shadow mode for all episodes in a single session.
+
+        If a checker is configured, each recommendation is checked against
+        active constraints before evaluation. Forbidden/requires_approval
+        matches are suppressed and recorded as PolicyErrorEvent(type='suppressed').
+        After evaluation, blocked/corrected recommendations are recorded as
+        PolicyErrorEvent(type='surfaced_and_blocked').
 
         Args:
             session_id: Session ID to process.
@@ -183,11 +256,55 @@ class ShadowModeRunner:
                 )
                 continue
 
+            # Pre-surfacing check: suppress forbidden/requires_approval matches
+            if self._checker is not None:
+                rec_text = PolicyViolationChecker.build_recommendation_text(
+                    recommendation
+                )
+                should_suppress, matched_constraint = self._checker.check(
+                    rec_text
+                )
+                if should_suppress and matched_constraint is not None:
+                    error_event = make_policy_error_event(
+                        session_id=session,
+                        episode_id=episode_id,
+                        constraint_id=matched_constraint.get(
+                            "constraint_id", ""
+                        ),
+                        error_type="suppressed",
+                        recommendation_mode=recommendation.recommended_mode,
+                        recommendation_risk=recommendation.recommended_risk,
+                    )
+                    self._policy_errors.append(error_event)
+                    logger.debug(
+                        "Suppressed recommendation for episode {} "
+                        "(constraint {})",
+                        episode_id,
+                        matched_constraint.get("constraint_id", ""),
+                    )
+                    continue  # Skip evaluation
+
             # Evaluate recommendation against actual decision
             result = self._evaluator.evaluate(episode, recommendation)
             result["run_batch_id"] = batch_id
             result["session_id"] = session_id
             results.append(result)
+
+            # Detect surfaced-and-blocked: recommendation was evaluated but
+            # human reaction was block or correct
+            if reaction_label in ("block", "correct"):
+                error_event = make_policy_error_event(
+                    session_id=session,
+                    episode_id=episode_id,
+                    constraint_id="",  # No specific constraint matched
+                    error_type="surfaced_and_blocked",
+                    recommendation_mode=recommendation.recommended_mode,
+                    recommendation_risk=recommendation.recommended_risk,
+                )
+                self._policy_errors.append(error_event)
+                self._blocked_recommendations.append(
+                    (recommendation, episode)
+                )
 
         return results
 

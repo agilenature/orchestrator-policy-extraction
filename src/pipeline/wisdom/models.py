@@ -75,6 +75,7 @@ class WisdomEntity(BaseModel):
     source_document: str | None = None
     source_phase: int | None = None
     embedding: list[float] | None = None
+    metadata: dict | None = None
 
     @classmethod
     def create(

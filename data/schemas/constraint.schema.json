@@ -99,6 +99,10 @@
     "supersedes": {
       "type": ["string", "null"],
       "description": "ID of a prior constraint this one supersedes (for architectural decisions)"
+    },
+    "source_excerpt": {
+      "type": "string",
+      "description": "Original text excerpt from the source document"
     }
   }
 }

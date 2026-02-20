@@ -16,6 +16,7 @@ Exports:
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import duckdb
@@ -58,9 +59,15 @@ class WisdomStore:
                 source_phase INTEGER,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                embedding DOUBLE[]
+                embedding DOUBLE[],
+                metadata JSON
             )
         """)
+        # Phase 12: idempotent metadata column for existing databases
+        try:
+            self._conn.execute("ALTER TABLE project_wisdom ADD COLUMN metadata JSON")
+        except Exception:
+            pass  # Column already exists
         self._conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_project_wisdom_entity_type "
             "ON project_wisdom(entity_type)"
@@ -99,8 +106,8 @@ class WisdomStore:
             INSERT INTO project_wisdom (
                 wisdom_id, entity_type, title, description,
                 context_tags, scope_paths, confidence,
-                source_document, source_phase, embedding
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                source_document, source_phase, embedding, metadata
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             [
                 entity.wisdom_id,
@@ -113,6 +120,7 @@ class WisdomStore:
                 entity.source_document,
                 entity.source_phase,
                 entity.embedding,
+                json.dumps(entity.metadata) if entity.metadata else None,
             ],
         )
         return entity.wisdom_id
@@ -130,7 +138,7 @@ class WisdomStore:
             """
             SELECT wisdom_id, entity_type, title, description,
                    context_tags, scope_paths, confidence,
-                   source_document, source_phase, embedding
+                   source_document, source_phase, embedding, metadata
             FROM project_wisdom
             WHERE wisdom_id = ?
             """,
@@ -175,6 +183,7 @@ class WisdomStore:
                 source_document = ?,
                 source_phase = ?,
                 embedding = ?,
+                metadata = ?,
                 last_updated = CURRENT_TIMESTAMP
             WHERE wisdom_id = ?
             """,
@@ -188,6 +197,7 @@ class WisdomStore:
                 entity.source_document,
                 entity.source_phase,
                 entity.embedding,
+                json.dumps(entity.metadata) if entity.metadata else None,
                 entity.wisdom_id,
             ],
         )
@@ -219,7 +229,7 @@ class WisdomStore:
                 """
                 SELECT wisdom_id, entity_type, title, description,
                        context_tags, scope_paths, confidence,
-                       source_document, source_phase, embedding
+                       source_document, source_phase, embedding, metadata
                 FROM project_wisdom
                 WHERE entity_type = ?
                 ORDER BY wisdom_id
@@ -231,7 +241,7 @@ class WisdomStore:
                 """
                 SELECT wisdom_id, entity_type, title, description,
                        context_tags, scope_paths, confidence,
-                       source_document, source_phase, embedding
+                       source_document, source_phase, embedding, metadata
                 FROM project_wisdom
                 ORDER BY wisdom_id
                 """
@@ -257,7 +267,7 @@ class WisdomStore:
             """
             SELECT wisdom_id, entity_type, title, description,
                    context_tags, scope_paths, confidence,
-                   source_document, source_phase, embedding
+                   source_document, source_phase, embedding, metadata
             FROM project_wisdom
             WHERE list_has_any(context_tags, ?)
             ORDER BY wisdom_id
@@ -284,7 +294,7 @@ class WisdomStore:
             """
             SELECT wisdom_id, entity_type, title, description,
                    context_tags, scope_paths, confidence,
-                   source_document, source_phase, embedding
+                   source_document, source_phase, embedding, metadata
             FROM project_wisdom
             WHERE list_contains(scope_paths, ?)
                OR len(scope_paths) = 0
@@ -313,8 +323,8 @@ class WisdomStore:
                 wisdom_id, entity_type, title, description,
                 context_tags, scope_paths, confidence,
                 source_document, source_phase, embedding,
-                last_updated
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                metadata, last_updated
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
             """,
             [
                 entity.wisdom_id,
@@ -327,6 +337,7 @@ class WisdomStore:
                 entity.source_document,
                 entity.source_phase,
                 entity.embedding,
+                json.dumps(entity.metadata) if entity.metadata else None,
             ],
         )
         return entity.wisdom_id
@@ -338,7 +349,7 @@ class WisdomStore:
         Args:
             row: Tuple of (wisdom_id, entity_type, title, description,
                  context_tags, scope_paths, confidence, source_document,
-                 source_phase, embedding).
+                 source_phase, embedding, metadata).
 
         Returns:
             WisdomEntity instance.
@@ -354,6 +365,7 @@ class WisdomStore:
             source_document,
             source_phase,
             embedding,
+            metadata,
         ) = row
 
         return WisdomEntity(
@@ -367,4 +379,5 @@ class WisdomStore:
             source_document=source_document,
             source_phase=source_phase,
             embedding=list(embedding) if embedding else None,
+            metadata=json.loads(metadata) if metadata else None,
         )

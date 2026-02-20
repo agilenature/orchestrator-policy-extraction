@@ -183,6 +183,22 @@ class DurabilityConfig(BaseModel):
     evidence_excerpt_max_chars: int = 500
 
 
+class StabilityCheckDef(BaseModel):
+    """Single stability check command definition (Phase 12)."""
+
+    id: str
+    command: list[str]
+    timeout_seconds: int = 120
+    description: str = ""
+
+
+class GovernanceConfig(BaseModel):
+    """Governance protocol settings (Phase 12)."""
+
+    bulk_ingest_threshold: int = 5
+    stability_checks: list[StabilityCheckDef] = Field(default_factory=list)
+
+
 class GitCommands(BaseModel):
     """Git command patterns for tagging."""
 
@@ -239,6 +255,9 @@ class PipelineConfig(BaseModel):
     )
     durability: DurabilityConfig = Field(
         default_factory=DurabilityConfig
+    )
+    governance: GovernanceConfig = Field(
+        default_factory=GovernanceConfig
     )
 
     # Preserved from existing config (used by downstream components)

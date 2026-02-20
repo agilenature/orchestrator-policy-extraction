@@ -231,6 +231,11 @@ durability:
   min_sessions_for_score: 3
   evidence_excerpt_max_chars: 500
 
+# Phase 12: Governance protocol
+governance:
+  bulk_ingest_threshold: 5
+  stability_checks: []
+
 # Orchestrator Mode Inference Rules (preserved from existing config)
 mode_inference:
   Explore:

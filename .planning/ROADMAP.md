@@ -194,8 +194,8 @@ Plans:
 - [x] 11-02-PLAN.md — WisdomRetriever + Recommender integration (Wave 2)
 - [x] 11-03-PLAN.md — WisdomIngestor + seed_wisdom.json extraction (Wave 2)
 - [x] 11-04-PLAN.md — CLI wisdom subcommands + check-scope (Wave 3)
-- [ ] 11-05-PLAN.md — Gap closure: wire EpisodeEmbedder into WisdomRetriever vector search (Wave 4)
-- [ ] 11-06-PLAN.md — Gap closure: check-scope validation with 0/1/2 exit codes (Wave 4)
+- [x] 11-05-PLAN.md — Gap closure: wire EpisodeEmbedder into WisdomRetriever vector search (Wave 4)
+- [x] 11-06-PLAN.md — Gap closure: check-scope validation with 0/1/2 exit codes (Wave 4)
 
 ### Phase 12: Governance Protocol Integration
 **Goal**: The pipeline ingests governance documents (pre-mortem files, DECISIONS.md) as structured constraint and wisdom sources. Stability check scripts run as episode outcome validators. Sessions performing bulk operations without a stability check are flagged.
@@ -207,7 +207,13 @@ Plans:
   3. Stability scripts run via `python -m src.pipeline.cli govern check-stability` and produce episode outcome records
   4. Sessions with bulk operations and no subsequent stability check are flagged as missing required validation
   5. The objectivism pre-mortem is fully ingested: 11 stories → 11 dead-end entries, 15 assumptions → 15 constraints
-**Plans:** TBD — to be planned via /gsd:plan-phase
+**Plans:** 4 plans in 3 waves
+
+Plans:
+- [ ] 12-01-PLAN.md — Schema + config + model foundation (Wave 1)
+- [ ] 12-02-PLAN.md — Markdown parser + governance ingestor + pre-mortem fixture (Wave 2)
+- [ ] 12-03-PLAN.md — Stability runner + missing validation flagging (Wave 2)
+- [ ] 12-04-PLAN.md — CLI govern group + integration tests (Wave 3)
 
 ### Phase 13: Policy-to-Constraint Feedback Loop
 
@@ -239,6 +245,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 12 -> 13
 | 8. Knowledge Architecture Conciliation | —/— | ✓ Complete | 2026-02-19 |
 | 9. Obstacle Escalation Detection | 5/5 | ✓ Complete | 2026-02-19 |
 | 10. Cross-Session Decision Durability | 3/3 | ✓ Complete | 2026-02-20 |
-| 11. Project-Level Wisdom Layer | 4/6 | Gap Closure | — |
-| 12. Governance Protocol Integration | 0/TBD | ⬜ Pending | — |
+| 11. Project-Level Wisdom Layer | 6/6 | ✓ Complete | 2026-02-20 |
+| 12. Governance Protocol Integration | 0/4 | ⬜ Planned | — |
 | 13. Policy-to-Constraint Feedback Loop | 0/TBD | ⬜ Pending | — |

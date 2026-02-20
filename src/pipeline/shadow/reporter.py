@@ -95,6 +95,9 @@ class ShadowReporter:
         # Escalation metrics (from episodes table, not shadow_mode_results)
         escalation_metrics = self._compute_escalation_metrics()
 
+        # Amnesia and durability metrics (Phase 10)
+        amnesia_metrics = self._compute_amnesia_metrics()
+
         return {
             "total_episodes": total,
             "total_sessions": sessions,
@@ -108,6 +111,7 @@ class ShadowReporter:
             "meets_session_minimum": sessions >= 50,
             "per_session": per_session,
             "escalation": escalation_metrics,
+            "amnesia": amnesia_metrics,
         }
 
     def _compute_danger_categories(self, batch_id: str | None) -> dict:
@@ -202,6 +206,54 @@ class ShadowReporter:
             "unapproved_escalation_rate": unapproved_rate,
         }
 
+    def _compute_amnesia_metrics(self) -> dict:
+        """Compute amnesia and durability metrics from DuckDB tables.
+
+        Returns:
+            Dict with amnesia_rate (float|None) and
+            avg_durability_score (float|None).
+        """
+        try:
+            # Amnesia rate: sessions with at least one amnesia event / total audited sessions
+            row = self._conn.execute("""
+                SELECT
+                    COUNT(DISTINCT e.session_id) as audited_sessions,
+                    COUNT(DISTINCT a.session_id) as sessions_with_amnesia
+                FROM (SELECT DISTINCT session_id FROM session_constraint_eval) e
+                LEFT JOIN amnesia_events a ON e.session_id = a.session_id
+            """).fetchone()
+        except Exception:
+            return {"amnesia_rate": None, "avg_durability_score": None}
+
+        audited = row[0] or 0
+        with_amnesia = row[1] or 0
+        amnesia_rate = with_amnesia / audited if audited > 0 else None
+
+        try:
+            # Average durability score across all constraints with sufficient data (>= 3 sessions)
+            dur_row = self._conn.execute("""
+                SELECT AVG(durability_score)
+                FROM (
+                    SELECT
+                        constraint_id,
+                        CAST(SUM(CASE WHEN eval_state = 'HONORED' THEN 1 ELSE 0 END) AS FLOAT)
+                            / COUNT(*) as durability_score
+                    FROM session_constraint_eval
+                    WHERE eval_state IN ('HONORED', 'VIOLATED')
+                    GROUP BY constraint_id
+                    HAVING COUNT(*) >= 3
+                )
+            """).fetchone()
+        except Exception:
+            dur_row = (None,)
+
+        avg_durability = dur_row[0] if dur_row else None
+
+        return {
+            "amnesia_rate": amnesia_rate,
+            "avg_durability_score": avg_durability,
+        }
+
     def format_report(self, report: dict) -> str:
         """Format report dict as human-readable text for CLI output.
 
@@ -279,6 +331,31 @@ class ShadowReporter:
                 )
             else:
                 lines.append("  Unapproved escalation rate: N/A")
+
+        # Decision Durability Metrics section (Phase 10)
+        amnesia = report.get("amnesia", {})
+        if amnesia:
+            lines.append("")
+            lines.append("Decision Durability Metrics:")
+
+            amnesia_rate = amnesia.get("amnesia_rate")
+            if amnesia_rate is not None:
+                amnesia_gate = "PASS" if amnesia_rate == 0.0 else "FAIL"
+                lines.append(
+                    f"  Amnesia rate: {amnesia_rate:.1%} "
+                    f"(sessions with amnesia / audited sessions)  {amnesia_gate}"
+                )
+            else:
+                lines.append("  Amnesia rate: N/A")
+
+            avg_durability = amnesia.get("avg_durability_score")
+            if avg_durability is not None:
+                lines.append(
+                    f"  Avg durability score: {avg_durability:.2f} "
+                    f"(across constraints with >= 3 sessions)"
+                )
+            else:
+                lines.append("  Avg durability score: N/A")
 
         if per_session:
             lines.append("")

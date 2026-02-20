@@ -134,6 +134,12 @@ Recent decisions affecting current work:
 - Plan 09-01: Idempotent ALTER TABLE with try/except for DuckDB escalation column additions
 - Plan 09-01: Constraint status enum: active, candidate, retired (lifecycle for human vs inferred constraints)
 - Plan 09-01: EscalationCandidate.block_event_tag validated to only allow O_GATE or O_CORR
+- Plan 09-02: Two-layer bypass eligibility: tag-based (T_RISKY/T_GIT_COMMIT/T_TEST) AND tool-name-based (Write/Edit/Bash) -- either triggers bypass
+- Plan 09-02: Exempt tools transparent to window (no turn decrement, never trigger bypass)
+- Plan 09-02: X_ASK/X_PROPOSE resets ALL pending windows via pending.clear()
+- Plan 09-02: Sequential block dedup: oldest window consumed per bypass event, at most 1 candidate per bypass
+- Plan 09-02: Window expiry uses > comparison so window_turns=5 allows exactly 5 non-exempt events
+- Plan 09-02: Always-bypass pattern matching uses case-insensitive substring containment
 - Plan 09-03: Operation type inferred from command regex patterns with tool_name fallback (Write->write, Edit->write, default->execute)
 - Plan 09-03: find_matching_constraint requires 2+ hint overlap OR tool_name + path prefix for robust matching
 - Plan 09-03: bypassed_constraint_id added to constraint.schema.json as optional string|null (Rule 3 auto-fix)

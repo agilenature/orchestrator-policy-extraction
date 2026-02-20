@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 11 IN PROGRESS (Project-Level Wisdom Layer) — Plan 02 complete, 2 remaining
+**Current focus:** Phase 11 IN PROGRESS (Project-Level Wisdom Layer) — Plan 03 complete, 1 remaining
 
 ## Current Position
 
 Phase: 11 of 13 (Project-Level Wisdom Layer)
-Plan: 2 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-20 -- Completed 11-02-PLAN.md (WisdomRetriever + Recommender Integration). 15 new tests, 687 total.
+Last activity: 2026-02-20 -- Completed 11-03-PLAN.md (WisdomIngestor + seed_wisdom.json). 5 new tests, 692 total.
 
-Progress: [██████████████░░░░░░░░░░░░░░░] 50% (2/4 plans in phase 11)
-Overall:  [█████████████████████████████████████████░] 97% (30/32 plans, +phases 7-8 delivered)
+Progress: [█████████████████████░░░░░░░░] 75% (3/4 plans in phase 11)
+Overall:  [██████████████████████████████████████████░] 97% (31/32 plans, +phases 7-8 delivered)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 30
-- Average duration: 5.4 min
-- Total execution time: 2.6 hours
+- Total plans completed: 31
+- Average duration: 5.3 min
+- Total execution time: 2.7 hours
 
 **By Phase:**
 
@@ -36,10 +36,10 @@ Overall:  [███████████████████████
 | 06-mission-control-integration | 4 | 15 min | 3.8 min |
 | 09-obstacle-escalation-detection | 5 | 29 min | 5.8 min |
 | 10-cross-session-decision-durability | 3 | 21 min | 7.0 min |
-| 11-project-level-wisdom-layer | 2 | 16 min | 8.0 min |
+| 11-project-level-wisdom-layer | 3 | 21 min | 7.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 7 min, 6 min, 8 min, 7 min, 9 min
+- Last 5 plans: 6 min, 8 min, 7 min, 9 min, 5 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -198,6 +198,11 @@ Recent decisions affecting current work:
 - Plan 11-02: Lazy import of EnrichedRecommendation in recommender._maybe_enrich() to avoid circular imports
 - Plan 11-02: FTS index auto-built on first retrieve() if not explicitly rebuilt
 - Plan 11-02: 687 tests passing (672 baseline + 15 new)
+- Plan 11-03: IngestResult uses Pydantic model_copy(update={}) for immutable result accumulation
+- Plan 11-03: ingest_file accepts both bare JSON arrays and {entries:[]} format
+- Plan 11-03: Invalid entries skipped with error messages (not raised), enabling partial ingestion
+- Plan 11-03: Upsert semantics for idempotent re-running of seed files
+- Plan 11-03: 692 tests passing (687 baseline + 5 new)
 
 ### Pending Todos
 
@@ -318,5 +323,5 @@ Phase 10 delivered cross-session decision durability (all 3 plans, verified 5/5)
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 11 Plan 02 COMPLETE -- WisdomRetriever + Recommender Integration. Next: 11-03.
-Resume file: .planning/phases/11-project-level-wisdom-layer/11-02-SUMMARY.md
+Stopped at: Phase 11 Plan 03 COMPLETE -- WisdomIngestor + seed_wisdom.json. Next: 11-04.
+Resume file: .planning/phases/11-project-level-wisdom-layer/11-03-SUMMARY.md

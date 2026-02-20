@@ -128,6 +128,8 @@ class EscalationConstraintGenerator:
                 candidate, existing_constraints
             )
 
+        created_at = datetime.now(timezone.utc).isoformat()
+
         return {
             "constraint_id": constraint_id,
             "text": text,
@@ -135,11 +137,13 @@ class EscalationConstraintGenerator:
             "scope": {"paths": scope_paths},
             "detection_hints": detection_hints,
             "source_episode_id": "",
-            "created_at": datetime.now(timezone.utc).isoformat(),
+            "created_at": created_at,
             "status": "candidate",
             "source": "inferred_from_escalation",
             "examples": [],
             "bypassed_constraint_id": bypassed_constraint_id,
+            "type": "behavioral_constraint",
+            "status_history": [{"status": "candidate", "changed_at": created_at}],
         }
 
     def find_matching_constraint(

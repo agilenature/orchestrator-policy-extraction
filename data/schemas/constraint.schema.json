@@ -71,6 +71,34 @@
     "bypassed_constraint_id": {
       "type": ["string", "null"],
       "description": "ID of an existing constraint that was bypassed (for escalation-inferred constraints)"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["behavioral_constraint", "architectural_decision"],
+      "description": "Category of this constraint"
+    },
+    "status_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["status", "changed_at"],
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["active", "candidate", "retired"]
+          },
+          "changed_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "description": "Chronological status change log for point-in-time lookups"
+    },
+    "supersedes": {
+      "type": ["string", "null"],
+      "description": "ID of a prior constraint this one supersedes (for architectural decisions)"
     }
   }
 }

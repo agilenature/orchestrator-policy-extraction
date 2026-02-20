@@ -110,6 +110,8 @@ class ConstraintExtractor:
         detection_hints = self._extract_detection_hints(message)
         constraint_id = self._make_constraint_id(text, scope_paths)
 
+        created_at = episode.get("timestamp", "")
+
         return {
             "constraint_id": constraint_id,
             "text": text,
@@ -117,13 +119,15 @@ class ConstraintExtractor:
             "scope": {"paths": scope_paths},
             "detection_hints": detection_hints,
             "source_episode_id": episode.get("episode_id", ""),
-            "created_at": episode.get("timestamp", ""),
+            "created_at": created_at,
             "examples": [
                 {
                     "episode_id": episode.get("episode_id", ""),
                     "violation_description": text,
                 }
             ],
+            "type": "behavioral_constraint",
+            "status_history": [{"status": "active", "changed_at": created_at}] if created_at else [],
         }
 
     def _normalize_text(self, message: str) -> str:

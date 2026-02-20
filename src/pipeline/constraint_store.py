@@ -16,6 +16,7 @@ Exports:
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from pathlib import Path
 
 import jsonschema
@@ -122,6 +123,105 @@ class ConstraintStore:
     def constraints(self) -> list[dict]:
         """Read-only copy of current constraints."""
         return list(self._constraints)
+
+    # --- Temporal status methods (Phase 10) ---
+
+    def get_status_at_time(self, constraint_id: str, session_time: str) -> str | None:
+        """Get the constraint's status at a specific point in time.
+
+        Looks up status_history and returns the status from the last entry
+        where changed_at <= session_time. Uses datetime comparison for
+        timezone safety (not string comparison).
+
+        Args:
+            constraint_id: ID of the constraint to look up.
+            session_time: ISO 8601 timestamp to evaluate at.
+
+        Returns:
+            Status string at that time, None if constraint didn't exist yet
+            or constraint_id not found.
+        """
+        if constraint_id not in self._id_index:
+            return None
+
+        constraint = self._constraints[self._id_index[constraint_id]]
+        status_history = constraint.get("status_history", [])
+
+        if not status_history:
+            # Fallback to current status field
+            return constraint.get("status")
+
+        # Parse the session_time
+        try:
+            target_dt = datetime.fromisoformat(session_time)
+        except (ValueError, TypeError):
+            logger.warning(
+                "Invalid session_time format: {}", session_time
+            )
+            return None
+
+        # Find the last entry where changed_at <= session_time
+        result_status = None
+        for entry in status_history:
+            try:
+                entry_dt = datetime.fromisoformat(entry["changed_at"])
+            except (ValueError, TypeError, KeyError):
+                continue
+            if entry_dt <= target_dt:
+                result_status = entry["status"]
+            else:
+                # status_history is chronological, so we can stop
+                break
+
+        return result_status
+
+    def add_status_history_entry(
+        self, constraint_id: str, status: str, changed_at: str
+    ) -> bool:
+        """Append a new entry to a constraint's status_history.
+
+        Args:
+            constraint_id: ID of the constraint to update.
+            status: New status value (active, candidate, retired).
+            changed_at: ISO 8601 timestamp of the status change.
+
+        Returns:
+            True if found and updated, False if constraint_id not found.
+        """
+        if constraint_id not in self._id_index:
+            return False
+
+        constraint = self._constraints[self._id_index[constraint_id]]
+        history = constraint.setdefault("status_history", [])
+        history.append({"status": status, "changed_at": changed_at})
+        return True
+
+    def get_by_type(self, constraint_type: str) -> list[dict]:
+        """Return constraints filtered by type field.
+
+        Args:
+            constraint_type: Type to filter by (e.g., "behavioral_constraint").
+
+        Returns:
+            List of constraint dicts matching the type.
+        """
+        return [
+            c for c in self._constraints
+            if c.get("type") == constraint_type
+        ]
+
+    def get_active_constraints(self) -> list[dict]:
+        """Return all constraints with status == 'active'.
+
+        Convenience method for the durability evaluator.
+
+        Returns:
+            List of active constraint dicts.
+        """
+        return [
+            c for c in self._constraints
+            if c.get("status", "active") == "active"
+        ]
 
     # --- Private helpers ---
 

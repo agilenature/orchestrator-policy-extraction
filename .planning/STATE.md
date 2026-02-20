@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 10 COMPLETE (Cross-Session Decision Durability) — Ready for Phase 11 (Project-Level Wisdom Layer)
+**Current focus:** Phase 11 IN PROGRESS (Project-Level Wisdom Layer) — Plan 01 complete, 3 remaining
 
 ## Current Position
 
-Phase: 10 of 13 (Cross-Session Decision Durability)
-Plan: 3 of 3 in current phase
-Status: Phase complete
-Last activity: 2026-02-20 -- Completed 10-03-PLAN.md (Pipeline Integration + CLI + Reporter). Verified 5/5 must-haves. Migrated 185 constraints.
+Phase: 11 of 13 (Project-Level Wisdom Layer)
+Plan: 1 of 4 in current phase
+Status: In progress
+Last activity: 2026-02-20 -- Completed 11-01-PLAN.md (Wisdom Models + WisdomStore + Schema DDL). 29 new tests, 672 total.
 
-Progress: [████████████████████████████] 100% (3/3 plans in phase 10)
-Overall:  [████████████████████████████████████████] 97% (28/28 plans, +phases 7-8 delivered)
+Progress: [███████░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans in phase 11)
+Overall:  [████████████████████████████████████████░] 97% (29/32 plans, +phases 7-8 delivered)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 28
-- Average duration: 5.2 min
-- Total execution time: 2.4 hours
+- Total plans completed: 29
+- Average duration: 5.3 min
+- Total execution time: 2.5 hours
 
 **By Phase:**
 
@@ -36,9 +36,10 @@ Overall:  [███████████████████████
 | 06-mission-control-integration | 4 | 15 min | 3.8 min |
 | 09-obstacle-escalation-detection | 5 | 29 min | 5.8 min |
 | 10-cross-session-decision-durability | 3 | 21 min | 7.0 min |
+| 11-project-level-wisdom-layer | 1 | 7 min | 7.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 8 min, 6 min, 7 min, 6 min, 8 min
+- Last 5 plans: 6 min, 7 min, 6 min, 8 min, 7 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -183,6 +184,13 @@ Recent decisions affecting current work:
 - Plan 10-03: PASS/FAIL gate on amnesia_rate: PASS if 0.0%, FAIL otherwise (zero tolerance)
 - Plan 10-03: avg_durability_score excludes constraints with < 3 sessions from average
 - Plan 10-03: 643 tests passing (616 baseline + 27 new)
+- Plan 11-01: WisdomEntity uses Any type for EnrichedRecommendation.recommendation to avoid circular import with rag/recommender.py
+- Plan 11-01: Wisdom ID: w- prefix + 16 hex chars from SHA-256(entity_type + title) -- deterministic and collision-resistant
+- Plan 11-01: search_by_scope returns entities with empty scope_paths as repo-wide matches alongside exact path matches
+- Plan 11-01: search_by_tags uses DuckDB list_has_any() for OR-semantics: any tag match is sufficient
+- Plan 11-01: WisdomStore._ensure_schema() creates table inline for standalone usage independent of schema.py
+- Plan 11-01: delete() is idempotent; update() raises ValueError on nonexistent (asymmetric by design)
+- Plan 11-01: 672 tests passing (643 baseline + 29 new)
 
 ### Pending Todos
 
@@ -303,5 +311,5 @@ Phase 10 delivered cross-session decision durability (all 3 plans, verified 5/5)
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 10 COMPLETE -- All 3 plans delivered and verified 5/5. Next phase: 11 (Project-Level Wisdom Layer).
-Resume file: .planning/phases/10-cross-session-decision-durability/10-03-SUMMARY.md
+Stopped at: Phase 11 Plan 01 COMPLETE -- Wisdom Models + WisdomStore + Schema DDL. Next: 11-02 (Wisdom Enricher).
+Resume file: .planning/phases/11-project-level-wisdom-layer/11-01-SUMMARY.md

@@ -381,6 +381,24 @@ def create_schema(conn: duckdb.DuckDBPyConnection) -> None:
     except Exception:
         pass  # Column already exists
 
+    # Phase 13: Policy error events table
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS policy_error_events (
+            error_id VARCHAR PRIMARY KEY,
+            session_id VARCHAR NOT NULL,
+            episode_id VARCHAR,
+            error_type VARCHAR NOT NULL CHECK (error_type IN ('suppressed', 'surfaced_and_blocked')),
+            constraint_id VARCHAR,
+            recommendation_mode VARCHAR,
+            recommendation_risk VARCHAR,
+            detected_at TIMESTAMPTZ DEFAULT current_timestamp
+        )
+    """)
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_policy_error_session "
+        "ON policy_error_events(session_id)"
+    )
+
 
 def drop_schema(conn: duckdb.DuckDBPyConnection) -> None:
     """Drop all pipeline tables (for testing).
@@ -391,6 +409,7 @@ def drop_schema(conn: duckdb.DuckDBPyConnection) -> None:
     Args:
         conn: DuckDB connection to drop tables from.
     """
+    conn.execute("DROP TABLE IF EXISTS policy_error_events")
     conn.execute("DROP TABLE IF EXISTS stability_outcomes")
     conn.execute("DROP TABLE IF EXISTS project_wisdom")
     conn.execute("DROP TABLE IF EXISTS amnesia_events")

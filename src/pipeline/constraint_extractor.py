@@ -253,14 +253,31 @@ class ConstraintExtractor:
 
         return hints
 
-    def _make_constraint_id(self, text: str, scope_paths: list[str]) -> str:
+    def _make_constraint_id(
+        self, text: str, scope_paths: list[str], source: str = "human_correction"
+    ) -> str:
         """Generate deterministic constraint ID.
 
-        SHA-256(lowercase_text + sorted_scope_paths) truncated to 16 hex chars.
-        Same text + same scope = same ID = dedup on re-run.
+        SHA-256(lowercase_text + sorted_scope_paths + source) truncated to
+        16 hex chars. Same text + same scope + same source = same ID = dedup
+        on re-run.
+
+        The source parameter was added in Phase 13 to distinguish constraints
+        from different origins. This intentionally produces different IDs from
+        the old format (without source), but existing constraints.json IDs are
+        NOT retroactively recomputed.
+
+        Args:
+            text: Normalized constraint text.
+            scope_paths: List of file path scopes.
+            source: Origin of the constraint (default 'human_correction').
+                Future sources include 'feedback_loop'.
+
+        Returns:
+            16-character hex string constraint ID.
         """
         scope_key = "|".join(sorted(scope_paths))
-        key = f"{text.lower().strip()}:{scope_key}"
+        key = f"{text.lower().strip()}:{scope_key}:{source}"
         return hashlib.sha256(key.encode()).hexdigest()[:16]
 
     @staticmethod

@@ -13,6 +13,7 @@ Exports:
     write_escalation_episodes: Write escalation episodes with escalate_* columns
     write_constraint_evals: Write constraint evaluation results with INSERT OR REPLACE
     write_amnesia_events: Write amnesia events with INSERT OR REPLACE
+    write_policy_error_events: Write policy error events with INSERT OR REPLACE
     read_events: Query events from DuckDB with optional filtering
     read_episodes_by_session: Read episodes for a session
     get_event_stats: Aggregate statistics about stored events
@@ -968,3 +969,44 @@ def write_amnesia_events(
 
     logger.info("Wrote {} amnesia events", len(amnesia_events))
     return {"written": len(amnesia_events)}
+
+
+def write_policy_error_events(
+    conn: duckdb.DuckDBPyConnection,
+    events: list,
+) -> dict[str, int]:
+    """Write policy error events to DuckDB with INSERT OR REPLACE.
+
+    Uses error_id primary key for idempotent storage. Re-running
+    with same data produces no duplicates.
+
+    Args:
+        conn: DuckDB connection with policy_error_events table.
+        events: List of PolicyErrorEvent instances.
+
+    Returns:
+        Stats dict: {written: N}
+    """
+    if not events:
+        return {"written": 0}
+
+    for event in events:
+        conn.execute(
+            "INSERT OR REPLACE INTO policy_error_events "
+            "(error_id, session_id, episode_id, error_type, constraint_id, "
+            "recommendation_mode, recommendation_risk, detected_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            [
+                event.error_id,
+                event.session_id,
+                event.episode_id,
+                event.error_type,
+                event.constraint_id,
+                event.recommendation_mode,
+                event.recommendation_risk,
+                event.detected_at,
+            ],
+        )
+
+    logger.info("Wrote {} policy error events", len(events))
+    return {"written": len(events)}

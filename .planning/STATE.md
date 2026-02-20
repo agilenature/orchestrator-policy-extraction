@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 11 IN PROGRESS (Project-Level Wisdom Layer) — Plan 03 complete, 1 remaining
+**Current focus:** Phase 11 COMPLETE (Project-Level Wisdom Layer) — All 4 plans delivered
 
 ## Current Position
 
 Phase: 11 of 13 (Project-Level Wisdom Layer)
-Plan: 3 of 4 in current phase
-Status: In progress
-Last activity: 2026-02-20 -- Completed 11-03-PLAN.md (WisdomIngestor + seed_wisdom.json). 5 new tests, 692 total.
+Plan: 4 of 4 in current phase
+Status: Phase complete
+Last activity: 2026-02-20 -- Completed 11-04-PLAN.md (CLI wisdom subcommands). 8 new tests, 700 total.
 
-Progress: [█████████████████████░░░░░░░░] 75% (3/4 plans in phase 11)
-Overall:  [██████████████████████████████████████████░] 97% (31/32 plans, +phases 7-8 delivered)
+Progress: [████████████████████████████] 100% (4/4 plans in phase 11)
+Overall:  [██████████████████████████████████████████████] 100% (32/32 plans, +phases 7-8 delivered)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 31
-- Average duration: 5.3 min
-- Total execution time: 2.7 hours
+- Total plans completed: 32
+- Average duration: 5.2 min
+- Total execution time: 2.8 hours
 
 **By Phase:**
 
@@ -36,10 +36,10 @@ Overall:  [███████████████████████
 | 06-mission-control-integration | 4 | 15 min | 3.8 min |
 | 09-obstacle-escalation-detection | 5 | 29 min | 5.8 min |
 | 10-cross-session-decision-durability | 3 | 21 min | 7.0 min |
-| 11-project-level-wisdom-layer | 3 | 21 min | 7.0 min |
+| 11-project-level-wisdom-layer | 4 | 25 min | 6.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 6 min, 8 min, 7 min, 9 min, 5 min
+- Last 5 plans: 8 min, 7 min, 9 min, 5 min, 4 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -203,6 +203,11 @@ Recent decisions affecting current work:
 - Plan 11-03: Invalid entries skipped with error messages (not raised), enabling partial ingestion
 - Plan 11-03: Upsert semantics for idempotent re-running of seed files
 - Plan 11-03: 692 tests passing (687 baseline + 5 new)
+- Plan 11-04: wisdom_group registered alongside existing extract/validate/train/audit groups
+- Plan 11-04: check-scope filters search_by_scope results to scope_decision entities only
+- Plan 11-04: list shows first 80 chars of description with ellipsis truncation
+- Plan 11-04: 8 tests instead of planned 5 for better coverage (list-after-ingest, filter-by-type, check-scope-with-match)
+- Plan 11-04: 700 tests passing (692 baseline + 8 new)
 
 ### Pending Todos
 
@@ -320,8 +325,19 @@ Phase 10 delivered cross-session decision durability (all 3 plans, verified 5/5)
 - **643 tests** passing (542 baseline + 101 new Phase 10 tests, zero regressions)
 - **Real data**: 1309 amnesia events detected across 167 sessions in data/ope.db; 96/166 constraints have durability scores
 
+## Phase 11 Completion Summary
+
+Phase 11 delivered the project-level wisdom layer (all 4 plans):
+- **Plan 01 COMPLETE**: WisdomEntity/WisdomRef/EnrichedRecommendation models, WisdomStore (8 CRUD+search methods), 29 tests
+- **Plan 02 COMPLETE**: WisdomRetriever (BM25 + RRF + dead end detection), Recommender enrichment integration, 15 tests
+- **Plan 03 COMPLETE**: WisdomIngestor (bulk JSON loader with upsert), data/seed_wisdom.json (17 entries), 5 tests
+- **Plan 04 COMPLETE**: CLI wisdom subcommands (ingest, check-scope, reindex, list), __main__.py registration, 8 tests
+- **700 tests** passing (643 baseline + 57 new Phase 11 tests, zero regressions)
+- **Full wisdom pipeline**: `python -m src.pipeline.cli wisdom ingest|check-scope|reindex|list`
+- **Key modules**: src/pipeline/wisdom/ (models.py, store.py, retriever.py, ingestor.py), src/pipeline/cli/wisdom.py
+
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 11 Plan 03 COMPLETE -- WisdomIngestor + seed_wisdom.json. Next: 11-04.
-Resume file: .planning/phases/11-project-level-wisdom-layer/11-03-SUMMARY.md
+Stopped at: Phase 11 COMPLETE -- All 4 plans delivered. Ready for Phase 12 (Governance).
+Resume file: .planning/phases/11-project-level-wisdom-layer/11-04-SUMMARY.md

@@ -233,10 +233,29 @@ Plans:
 - [x] 13-02-PLAN.md — PolicyViolationChecker + PolicyFeedbackExtractor [TDD] (Wave 2)
 - [x] 13-03-PLAN.md — Pipeline integration + ShadowReporter metric + CLI (Wave 3)
 
+### Phase 14: Live Session Governance Research
+
+**Goal**: Research and produce a complete architectural plan for a live governance layer that monitors active Claude Code sessions in real-time, enforces constraints before tools fire (via Claude Code hooks), coordinates between parallel sessions via a shared bus, and delivers constraint briefings at session start — transforming the pipeline from a post-hoc analyzer into a prospective governor.
+**Depends on**: Phase 13 (feedback loop complete; PolicyViolationChecker and constraint store ready for live use)
+**Requirements**: LIVE-01, LIVE-02, LIVE-03, LIVE-04, LIVE-05
+**Output type**: Research + architectural design documents (plans are design artifacts, not implementation)
+**Success Criteria** (what must be TRUE):
+  1. Complete specification of the Claude Code hooks architecture: PreToolUse, PostToolUse, SessionStart hook contracts, stdin/stdout JSON protocol, block/warn/allow decision format
+  2. Architectural design for a real-time JSONL stream processor that tails live session files, runs existing detectors (EscalationDetector, AmnesiaDetector, PolicyViolationChecker) on each event as it arrives, and emits governance signals within < 200ms
+  3. Inter-session coordination bus design: protocol, transport (local HTTP server vs Unix socket vs file-based), shared constraint state model, how parallel Claude Code sessions discover and signal each other
+  4. "Governing session" pattern design: a dedicated Claude Code session that monitors all other active sessions, holds the full constraint store, and can broadcast blocks or briefings across the bus
+  5. A concrete Phase 15 implementation plan derived from the research — broken into executable waves with specific file targets, API contracts, and test strategies
+**Plans:** Research plans producing design documents
+
+Plans:
+- [ ] 14-01-PLAN.md — Claude Code hooks deep dive + stream processor architecture (Wave 1)
+- [ ] 14-02-PLAN.md — Inter-session bus design + governing session pattern (Wave 1)
+- [ ] 14-03-PLAN.md — Phase 15 implementation blueprint (Wave 2, depends on 14-01, 14-02)
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 12 -> 13
+Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 12 -> 13 -> 14
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -253,3 +272,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 12 -> 13
 | 11. Project-Level Wisdom Layer | 6/6 | ✓ Complete | 2026-02-20 |
 | 12. Governance Protocol Integration | 4/4 | ✓ Complete | 2026-02-20 |
 | 13. Policy-to-Constraint Feedback Loop | 3/3 | ✓ Complete | 2026-02-20 |
+| 14. Live Session Governance Research | 0/3 | ⬜ Pending | — |

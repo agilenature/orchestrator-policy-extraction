@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 13 COMPLETE (Policy-to-Constraint Feedback Loop) -- All 3 plans delivered. Project complete.
+**Current focus:** Phase 14 (Live Session Governance Research) — Added to roadmap. Research phase: output is architectural design documents and Phase 15 implementation blueprint.
 
 ## Current Position
 
-Phase: 13 of 13 (Policy-to-Constraint Feedback Loop)
-Plan: 3 of 3 in current phase
-Status: Phase complete / Project complete
-Last activity: 2026-02-20 -- Completed 13-03-PLAN.md (pipeline integration, ShadowReporter policy_error_rate, CLI audit policy-errors). 889 tests passing.
+Phase: 14 of 14 (Live Session Governance Research)
+Plan: 0 of 3 in current phase
+Status: Planning
+Last activity: 2026-02-20 -- Phase 14 added to roadmap (LIVE-01 through LIVE-05 requirements). Self-analysis of 38 sessions complete (data/self.db). Governance anchor created.
 
 Progress: [██████████████████████████████] 100% (3/3 plans in phase 13)
 Overall:  [████████████████████████████████████████████████████████] 100% (41/41 plans total)

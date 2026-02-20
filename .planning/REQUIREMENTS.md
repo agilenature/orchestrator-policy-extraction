@@ -76,6 +76,14 @@ Deferred to future release after v1 validation proves episode quality and RAG ba
 - **ADV-02**: System experiments with retrieval approaches (BM25, embeddings, hybrid) to optimize RAG baseline recommendation quality
 - **ADV-03**: System provides DAgger correction loop (aggregate human corrections from shadow mode into training data) for continual learning
 
+### Live Session Governance
+
+- **LIVE-01**: System provides a Claude Code PreToolUse hook that intercepts proposed tool calls, checks them against active constraints via PolicyViolationChecker, and returns a block/warn/allow decision with reasoning within < 200ms
+- **LIVE-02**: System provides a SessionStart hook that delivers a constraint briefing at the start of each session — surfacing active constraints relevant to the current project scope and flagging those with low durability scores
+- **LIVE-03**: System provides a real-time JSONL stream processor that tails live session files, runs EscalationDetector and AmnesiaDetector on each event as it arrives, and emits governance signals without requiring a full batch pipeline run
+- **LIVE-04**: System provides an inter-session coordination bus: a lightweight local service (HTTP or Unix socket) through which multiple parallel Claude Code sessions share constraint state, escalation alerts, and governance decisions
+- **LIVE-05**: System supports a "governing session" pattern: a dedicated Claude Code instance that monitors all other active project sessions via the bus, maintains the authoritative constraint store, and can broadcast blocks or briefings to any active session
+
 ## Out of Scope
 
 Explicitly excluded to prevent scope creep.
@@ -87,7 +95,7 @@ Explicitly excluded to prevent scope creep.
 | Commit-only correlation as learning signal | Insufficient -- hides decisions, mistakes, corrections that are essential for policy learning. Useful only for validation layer. |
 | Executor-level tool call optimization | Separate concern -- this project trains orchestrator (mode/scope/gates), not executor (Read/Edit/Bash sequences) |
 | Cross-domain generalization | Narrow scope -- system learns from one user's orchestration patterns, not general-purpose task automation |
-| Stream processing architecture | Over-engineered -- batch pipeline sufficient for hundreds of sessions; stream adds unnecessary complexity |
+| Stream processing architecture (v1) | Over-engineered for v1 batch pipeline -- Phase 14 research will determine if lightweight tailing suffices for live governance without full stream infrastructure |
 | Custom ML framework | Premature -- scikit-learn + PyTorch + SB3 are standard and sufficient; avoid NIH syndrome |
 | Real-time deployment without shadow mode | Unsafe -- distribution shift in imitation learning is mathematically proven; shadow mode is non-negotiable |
 | Single unified ML model | Wrong architecture -- RAG baseline, preference model, and RL policy are distinct stages with different purposes |
@@ -121,10 +129,16 @@ Mapping requirements to roadmap phases. Updated during roadmap creation.
 | MC-02 | Phase 6: Mission Control Integration | Pending |
 | MC-03 | Phase 6: Mission Control Integration | Pending |
 | MC-04 | Phase 6: Mission Control Integration | Pending |
+| LIVE-01 | Phase 14: Live Session Governance Research | Pending |
+| LIVE-02 | Phase 14: Live Session Governance Research | Pending |
+| LIVE-03 | Phase 14: Live Session Governance Research | Pending |
+| LIVE-04 | Phase 14: Live Session Governance Research | Pending |
+| LIVE-05 | Phase 14: Live Session Governance Research | Pending |
 
 **Coverage:**
 - v1 requirements: 23 total
-- Mapped to phases: 23
+- Live governance requirements: 5 (LIVE-01 through LIVE-05)
+- Mapped to phases: 28
 - Unmapped: 0
 
 ---

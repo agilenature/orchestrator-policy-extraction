@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 11 COMPLETE (Project-Level Wisdom Layer) — All 4 plans delivered
+**Current focus:** Phase 11 gap closure (Project-Level Wisdom Layer) — Plans 01-04 + gap closure plans 05-06
 
 ## Current Position
 
 Phase: 11 of 13 (Project-Level Wisdom Layer)
-Plan: 4 of 4 in current phase
-Status: Phase complete
-Last activity: 2026-02-20 -- Completed 11-04-PLAN.md (CLI wisdom subcommands). 8 new tests, 700 total.
+Plan: 5 of 6 in current phase (gap closure)
+Status: In progress (gap closure)
+Last activity: 2026-02-20 -- Completed 11-05-PLAN.md (vector search gap closure). 7 new tests, 707 total.
 
-Progress: [████████████████████████████] 100% (4/4 plans in phase 11)
-Overall:  [██████████████████████████████████████████████] 100% (32/32 plans, +phases 7-8 delivered)
+Progress: [████████████████████████████] 83% (5/6 plans in phase 11, including gap closure)
+Overall:  [██████████████████████████████████████████████] 100% (33/34 plans, +phases 7-8 delivered)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 32
+- Total plans completed: 33
 - Average duration: 5.2 min
-- Total execution time: 2.8 hours
+- Total execution time: 2.9 hours
 
 **By Phase:**
 
@@ -36,10 +36,10 @@ Overall:  [███████████████████████
 | 06-mission-control-integration | 4 | 15 min | 3.8 min |
 | 09-obstacle-escalation-detection | 5 | 29 min | 5.8 min |
 | 10-cross-session-decision-durability | 3 | 21 min | 7.0 min |
-| 11-project-level-wisdom-layer | 4 | 25 min | 6.3 min |
+| 11-project-level-wisdom-layer | 5 | 30 min | 6.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 8 min, 7 min, 9 min, 5 min, 4 min
+- Last 5 plans: 7 min, 9 min, 5 min, 4 min, 5 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -208,6 +208,10 @@ Recent decisions affecting current work:
 - Plan 11-04: list shows first 80 chars of description with ellipsis truncation
 - Plan 11-04: 8 tests instead of planned 5 for better coverage (list-after-ingest, filter-by-type, check-scope-with-match)
 - Plan 11-04: 700 tests passing (692 baseline + 8 new)
+- Plan 11-05: EpisodeEmbedder imported via TYPE_CHECKING to keep lazy-load pattern (sentence-transformers is heavy)
+- Plan 11-05: Vector search uses DOUBLE[] cast matching project_wisdom.embedding column (not FLOAT[384])
+- Plan 11-05: Dead end vector threshold at 0.3 cosine similarity; dual BM25+vector agreement required when vector available
+- Plan 11-05: 707 tests passing (700 baseline + 7 new)
 
 ### Pending Todos
 
@@ -339,5 +343,5 @@ Phase 11 delivered the project-level wisdom layer (all 4 plans):
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 11 COMPLETE -- All 4 plans delivered. Ready for Phase 12 (Governance).
-Resume file: .planning/phases/11-project-level-wisdom-layer/11-04-SUMMARY.md
+Stopped at: Phase 11 gap closure -- Plan 05 complete (vector search). Plan 06 remaining.
+Resume file: .planning/phases/11-project-level-wisdom-layer/11-05-SUMMARY.md

@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 12 IN PROGRESS (Governance Protocol Integration) — Plan 01 complete, 3 remaining
+**Current focus:** Phase 12 IN PROGRESS (Governance Protocol Integration) — Plans 01-03 complete, 1 remaining
 
 ## Current Position
 
 Phase: 12 of 13 (Governance Protocol Integration)
-Plan: 1 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-20 -- Completed 12-01-PLAN.md (governance foundation: schema, config, models, DuckDB tables). 733 tests passing.
+Last activity: 2026-02-20 -- Completed 12-03-PLAN.md (stability runner: StabilityRunner, DuckDB persistence, episode flagging). 792 tests passing.
 
-Progress: [███████░░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans in phase 12)
-Overall:  [████████████████████████████████████████████████░] 97% (35/38 plans total)
+Progress: [█████████████████████░░░░░░░░░] 75% (3/4 plans in phase 12)
+Overall:  [█████████████████████████████████████████████████] 97% (37/38 plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 35
-- Average duration: 5.3 min
-- Total execution time: 3.0 hours
+- Total plans completed: 37
+- Average duration: 5.2 min
+- Total execution time: 3.1 hours
 
 **By Phase:**
 
@@ -38,8 +38,10 @@ Overall:  [███████████████████████
 | 10-cross-session-decision-durability | 3 | 21 min | 7.0 min |
 | 11-project-level-wisdom-layer | 6 | 35 min | 5.8 min |
 
+| 12-governance-protocol-integration | 3 | -- | -- |
+
 **Recent Trend:**
-- Last 5 plans: 9 min, 5 min, 4 min, 5 min, 5 min
+- Last 5 plans: 5 min, 4 min, 5 min, 5 min, 4 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -222,6 +224,11 @@ Recent decisions affecting current work:
 - Plan 12-01: stability_outcomes table uses CHECK constraint for status IN ('pass', 'fail', 'error')
 - Plan 12-01: Governance columns on episodes are nullable BOOLEAN/VARCHAR for backward compatibility
 - Plan 12-01: 733 tests passing (712 baseline + 21 new)
+- Plan 12-03: stdout/stderr truncated to 10000 chars to prevent DuckDB storage bloat
+- Plan 12-03: Git actor info cached once in StabilityRunner.__init__ (not per-check) for consistency
+- Plan 12-03: TimeoutExpired produces exit_code=-1 as sentinel value (not a real process exit)
+- Plan 12-03: flag_missing_validation/mark_validated accept optional conn parameter for flexible targeting
+- Plan 12-03: 792 tests passing (733 baseline + 45 from plan 12-02 + 14 new)
 
 ### Pending Todos
 
@@ -356,5 +363,5 @@ Phase 11 delivered the project-level wisdom layer (all 6 plans including gap clo
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 12 plan 01 complete (governance foundation). Continue with plan 12-02.
-Resume file: .planning/phases/12-governance-protocol-integration/12-02-PLAN.md
+Stopped at: Phase 12 plan 03 complete (stability runner). Continue with plan 12-04.
+Resume file: .planning/phases/12-governance-protocol-integration/12-04-PLAN.md

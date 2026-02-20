@@ -94,12 +94,19 @@ class Recommender:
     an action from approved episodes using weighted majority vote.
     Produces Recommendation with explainable provenance.
 
+    Optionally enriched with project wisdom via WisdomRetriever. When
+    wisdom_retriever is provided, recommend() returns EnrichedRecommendation
+    wrapping the base Recommendation with relevant wisdom references.
+    When wisdom_retriever is None, returns plain Recommendation (backward
+    compatible).
+
     Args:
         conn: DuckDB connection with episodes, embeddings, search text.
         embedder: EpisodeEmbedder for generating query embeddings.
         retriever: HybridRetriever for finding similar episodes.
         constraint_store: Optional ConstraintStore for danger detection.
         protected_paths: Optional list of protected path patterns.
+        wisdom_retriever: Optional WisdomRetriever for wisdom enrichment.
     """
 
     def __init__(
@@ -109,12 +116,14 @@ class Recommender:
         retriever,
         constraint_store=None,
         protected_paths: list[str] | None = None,
+        wisdom_retriever=None,
     ) -> None:
         self._conn = conn
         self._embedder = embedder
         self._retriever = retriever
         self._constraint_store = constraint_store
         self._protected_paths = protected_paths or []
+        self._wisdom_retriever = wisdom_retriever
 
     def recommend(
         self,
@@ -132,6 +141,10 @@ class Recommender:
         5. Select action via _select_action()
         6. Check danger via check_dangerous()
         7. Build and return Recommendation with provenance
+        8. If wisdom_retriever set, enrich with wisdom refs
+
+        When wisdom_retriever is provided, returns EnrichedRecommendation.
+        Otherwise returns plain Recommendation (backward compatible).
 
         Args:
             observation: Episode observation dict with nested fields.
@@ -139,7 +152,8 @@ class Recommender:
             exclude_episode_id: Episode ID to exclude (leave-one-out).
 
         Returns:
-            Recommendation with mode, risk, scope, gates, provenance.
+            Recommendation (or EnrichedRecommendation if wisdom_retriever set)
+            with mode, risk, scope, gates, provenance.
         """
         # 1. Build search text
         search_text = observation_to_text(observation, orchestrator_action)
@@ -153,13 +167,14 @@ class Recommender:
         )
 
         if not retrieved:
-            return Recommendation(
+            base_rec = Recommendation(
                 recommended_mode="Explore",
                 recommended_risk="medium",
                 confidence=0.0,
                 source_episodes=[],
                 reasoning="No similar episodes found in database",
             )
+            return self._maybe_enrich(base_rec, search_text, [])
 
         # 4. Fetch full episode data for retrieved IDs
         episode_ids = [r["episode_id"] for r in retrieved]
@@ -235,16 +250,61 @@ class Recommender:
             )
         reasoning = ". ".join(reasoning_parts)
 
-        return Recommendation(
+        # Extract scope_paths for wisdom retrieval
+        scope_paths = action.get("scope_paths", [])
+
+        base_rec = Recommendation(
             recommended_mode=action["mode"],
             recommended_risk=action["risk"],
-            recommended_scope_paths=action.get("scope_paths", []),
+            recommended_scope_paths=scope_paths,
             recommended_gates=action.get("gates", []),
             confidence=confidence,
             source_episodes=source_refs,
             reasoning=reasoning,
             is_dangerous=is_dangerous,
             danger_reasons=danger_reasons,
+        )
+
+        # 8. Enrich with wisdom if retriever available
+        return self._maybe_enrich(base_rec, search_text, scope_paths)
+
+    def _maybe_enrich(
+        self,
+        recommendation: Recommendation,
+        search_text: str,
+        scope_paths: list[str],
+    ) -> Recommendation:
+        """Optionally enrich a Recommendation with wisdom references.
+
+        If wisdom_retriever is set, wraps the Recommendation in an
+        EnrichedRecommendation with relevant wisdom references.
+        Otherwise returns the original Recommendation unchanged.
+
+        Args:
+            recommendation: Base recommendation to potentially enrich.
+            search_text: Query text for wisdom retrieval.
+            scope_paths: Scope paths for wisdom scope filtering.
+
+        Returns:
+            EnrichedRecommendation if wisdom_retriever set, else Recommendation.
+        """
+        if self._wisdom_retriever is None:
+            return recommendation
+
+        from src.pipeline.wisdom.models import EnrichedRecommendation
+
+        try:
+            wisdom_refs = self._wisdom_retriever.retrieve(
+                query=search_text, scope_paths=scope_paths
+            )
+        except Exception as e:
+            logger.warning("Wisdom retrieval failed: {}", e)
+            wisdom_refs = []
+
+        return EnrichedRecommendation(
+            recommendation=recommendation,
+            wisdom_refs=wisdom_refs,
+            has_dead_end_warning=any(r.is_dead_end_warning for r in wisdom_refs),
         )
 
     def _fetch_episodes(self, episode_ids: list[str]) -> list[dict]:

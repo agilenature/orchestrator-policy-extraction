@@ -9,6 +9,7 @@ Exports:
     WisdomRef: Lightweight reference to a wisdom entity with relevance score
     EnrichedRecommendation: Recommendation augmented with wisdom references
     WisdomStore: DuckDB-backed CRUD and search for wisdom entities
+    WisdomRetriever: Hybrid BM25 + optional vector search for wisdom entities
 """
 
 from src.pipeline.wisdom.models import (
@@ -16,11 +17,13 @@ from src.pipeline.wisdom.models import (
     WisdomEntity,
     WisdomRef,
 )
+from src.pipeline.wisdom.retriever import WisdomRetriever
 from src.pipeline.wisdom.store import WisdomStore
 
 __all__ = [
     "EnrichedRecommendation",
     "WisdomEntity",
     "WisdomRef",
+    "WisdomRetriever",
     "WisdomStore",
 ]

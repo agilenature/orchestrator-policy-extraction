@@ -158,7 +158,7 @@ Plans:
 - [ ] 09-02-PLAN.md — EscalationDetector [TDD] (Wave 2)
 - [ ] 09-03-PLAN.md — EscalationConstraintGenerator [TDD] (Wave 2)
 - [ ] 09-04-PLAN.md — Pipeline integration + shadow metrics + integration tests (Wave 3)
-- [ ] 09-05-PLAN.md — Gap closure: real session JSONL fixtures + fixture-loading tests (Wave 1)
+- [x] 09-05-PLAN.md — Gap closure: real session JSONL fixtures + fixture-loading tests (Wave 1)
 
 ### Phase 10: Cross-Session Decision Durability
 **Goal**: The system tracks which constraints were read, honored, and violated in each session. A decision durability index gives each constraint a survival score across sessions. Sessions that violate active constraints are flagged as amnesia events.
@@ -224,7 +224,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 12 -> 13
 | 6. Mission Control Integration | 4/4 | ✓ Complete | 2026-02-12 |
 | 7. Objectivism Project Knowledge Extraction | —/— | ✓ Complete | 2026-02-17 |
 | 8. Knowledge Architecture Conciliation | —/— | ✓ Complete | 2026-02-19 |
-| 9. Obstacle Escalation Detection | 0/4 | ⬜ Pending | — |
+| 9. Obstacle Escalation Detection | 5/5 | ✓ Complete | 2026-02-19 |
 | 10. Cross-Session Decision Durability | 0/TBD | ⬜ Pending | — |
 | 11. Project-Level Wisdom Layer | 0/TBD | ⬜ Pending | — |
 | 12. Governance Protocol Integration | 0/TBD | ⬜ Pending | — |

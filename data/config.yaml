@@ -202,6 +202,30 @@ episode_population:
   observation_context_events: 20
   observation_context_seconds: 300
 
+# Phase 9: Escalation detection
+escalation:
+  window_turns: 5
+  exempt_tools:
+    - Read
+    - Glob
+    - Grep
+    - WebFetch
+    - WebSearch
+    - Task
+  always_bypass_patterns:
+    - "rm "
+    - "rm -"
+    - chmod
+    - chown
+    - sudo
+    - "curl -X DELETE"
+    - "drop table"
+  bypass_eligible_tools:
+    - Write
+    - Edit
+    - Bash
+  detector_version: "1.0.0"
+
 # Orchestrator Mode Inference Rules (preserved from existing config)
 mode_inference:
   Explore:

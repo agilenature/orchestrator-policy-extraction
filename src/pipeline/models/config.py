@@ -155,6 +155,27 @@ class EpisodePopulationConfig(BaseModel):
     observation_context_seconds: int = 300
 
 
+class EscalationConfig(BaseModel):
+    """Escalation detection settings (Phase 9).
+
+    Controls the obstacle escalation detector that identifies when an
+    agent bypasses an authorization constraint via an alternative path
+    after being blocked.
+    """
+
+    window_turns: int = 5
+    exempt_tools: list[str] = Field(default_factory=lambda: [
+        "Read", "Glob", "Grep", "WebFetch", "WebSearch", "Task",
+    ])
+    always_bypass_patterns: list[str] = Field(default_factory=lambda: [
+        "rm ", "rm -", "chmod", "chown", "sudo", "curl -X DELETE", "drop table",
+    ])
+    bypass_eligible_tools: list[str] = Field(default_factory=lambda: [
+        "Write", "Edit", "Bash",
+    ])
+    detector_version: str = "1.0.0"
+
+
 class GitCommands(BaseModel):
     """Git command patterns for tagging."""
 
@@ -205,6 +226,9 @@ class PipelineConfig(BaseModel):
     tags: TagPatterns = Field(default_factory=TagPatterns)
     episode_population: EpisodePopulationConfig = Field(
         default_factory=EpisodePopulationConfig
+    )
+    escalation: EscalationConfig = Field(
+        default_factory=EscalationConfig
     )
 
     # Preserved from existing config (used by downstream components)

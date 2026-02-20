@@ -92,6 +92,9 @@ class ShadowReporter:
         # Danger categories breakdown
         danger_categories = self._compute_danger_categories(batch_id)
 
+        # Escalation metrics (from episodes table, not shadow_mode_results)
+        escalation_metrics = self._compute_escalation_metrics()
+
         return {
             "total_episodes": total,
             "total_sessions": sessions,
@@ -104,6 +107,7 @@ class ShadowReporter:
             "meets_threshold": mode_rate >= 0.70,
             "meets_session_minimum": sessions >= 50,
             "per_session": per_session,
+            "escalation": escalation_metrics,
         }
 
     def _compute_danger_categories(self, batch_id: str | None) -> dict:
@@ -145,6 +149,58 @@ class ShadowReporter:
                         categories[reason] = categories.get(reason, 0) + 1
 
         return categories
+
+    def _compute_escalation_metrics(self) -> dict:
+        """Compute escalation metrics from the episodes table.
+
+        Returns:
+            Dict with escalation_count_per_session, rejection_adherence_rate,
+            and unapproved_escalation_rate.
+        """
+        try:
+            row = self._conn.execute("""
+                SELECT
+                    COUNT(CASE WHEN mode = 'ESCALATE' THEN 1 END) as escalation_count,
+                    COUNT(DISTINCT session_id) as total_sessions,
+                    COUNT(*) as total_episodes,
+                    COUNT(CASE WHEN mode = 'ESCALATE' AND escalate_approval_status = 'UNAPPROVED' THEN 1 END) as unapproved_count
+                FROM episodes
+            """).fetchone()
+        except Exception:
+            return {
+                "escalation_count_per_session": None,
+                "rejection_adherence_rate": None,
+                "unapproved_escalation_rate": None,
+            }
+
+        esc_count = row[0] or 0
+        total_sessions = row[1] or 0
+        total_episodes = row[2] or 0
+        unapproved_count = row[3] or 0
+
+        # escalation_count_per_session: average escalations per session
+        if total_sessions > 0:
+            esc_per_session = esc_count / total_sessions
+        else:
+            esc_per_session = None
+
+        # rejection_adherence_rate: 1 - (escalation_count / total_episodes)
+        if total_episodes > 0:
+            adherence_rate = 1.0 - (esc_count / total_episodes)
+        else:
+            adherence_rate = None
+
+        # unapproved_escalation_rate: unapproved / total escalations
+        if esc_count > 0:
+            unapproved_rate = unapproved_count / esc_count
+        else:
+            unapproved_rate = 0.0
+
+        return {
+            "escalation_count_per_session": esc_per_session,
+            "rejection_adherence_rate": adherence_rate,
+            "unapproved_escalation_rate": unapproved_rate,
+        }
 
     def format_report(self, report: dict) -> str:
         """Format report dict as human-readable text for CLI output.
@@ -195,6 +251,34 @@ class ShadowReporter:
         if danger_cats:
             for cat, count in sorted(danger_cats.items()):
                 lines.append(f"    {cat}: {count}")
+
+        # Escalation metrics section
+        escalation = report.get("escalation", {})
+        if escalation:
+            lines.append("")
+            lines.append("Escalation Metrics:")
+
+            esc_per_session = escalation.get("escalation_count_per_session")
+            if esc_per_session is not None:
+                lines.append(f"  Escalation count per session: {esc_per_session:.2f}")
+            else:
+                lines.append("  Escalation count per session: N/A")
+
+            adherence_rate = escalation.get("rejection_adherence_rate")
+            if adherence_rate is not None:
+                lines.append(f"  Rejection adherence rate: {adherence_rate:.1%}")
+            else:
+                lines.append("  Rejection adherence rate: N/A")
+
+            unapproved_rate = escalation.get("unapproved_escalation_rate")
+            if unapproved_rate is not None:
+                gate_label = "PASS" if unapproved_rate == 0.0 else "FAIL"
+                lines.append(
+                    f"  Unapproved escalation rate: {unapproved_rate:.1%} "
+                    f"(target: 0.0%)  {gate_label}"
+                )
+            else:
+                lines.append("  Unapproved escalation rate: N/A")
 
         if per_session:
             lines.append("")

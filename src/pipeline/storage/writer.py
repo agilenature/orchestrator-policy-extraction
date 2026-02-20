@@ -11,6 +11,8 @@ Exports:
     write_segments: Write episode segments to DuckDB
     write_episodes: Write episodes to DuckDB with MERGE upsert
     write_escalation_episodes: Write escalation episodes with escalate_* columns
+    write_constraint_evals: Write constraint evaluation results with INSERT OR REPLACE
+    write_amnesia_events: Write amnesia events with INSERT OR REPLACE
     read_events: Query events from DuckDB with optional filtering
     read_episodes_by_session: Read episodes for a session
     get_event_stats: Aggregate statistics about stored events
@@ -886,3 +888,83 @@ def get_event_stats(
         "by_tag": by_tag,
         "duplicate_count": duplicate_count,
     }
+
+
+def write_constraint_evals(
+    conn: duckdb.DuckDBPyConnection,
+    eval_results: list,
+) -> dict[str, int]:
+    """Write constraint evaluation results to DuckDB with INSERT OR REPLACE.
+
+    Uses the composite primary key (session_id, constraint_id) for
+    idempotent storage. Re-running with same data produces no duplicates.
+
+    Args:
+        conn: DuckDB connection with session_constraint_eval table.
+        eval_results: List of ConstraintEvalResult instances.
+
+    Returns:
+        Stats dict: {written: N}
+    """
+    if not eval_results:
+        return {"written": 0}
+
+    for result in eval_results:
+        conn.execute(
+            """
+            INSERT OR REPLACE INTO session_constraint_eval
+            (session_id, constraint_id, eval_state, evidence_json, scope_matched, eval_ts)
+            VALUES (?, ?, ?, ?, ?, current_timestamp)
+            """,
+            [
+                result.session_id,
+                result.constraint_id,
+                result.eval_state,
+                json.dumps(result.evidence),
+                result.scope_matched,
+            ],
+        )
+
+    logger.info("Wrote {} constraint evaluations", len(eval_results))
+    return {"written": len(eval_results)}
+
+
+def write_amnesia_events(
+    conn: duckdb.DuckDBPyConnection,
+    amnesia_events: list,
+) -> dict[str, int]:
+    """Write amnesia events to DuckDB with INSERT OR REPLACE.
+
+    Uses amnesia_id primary key for idempotent storage. Re-running
+    with same data produces no duplicates.
+
+    Args:
+        conn: DuckDB connection with amnesia_events table.
+        amnesia_events: List of AmnesiaEvent instances.
+
+    Returns:
+        Stats dict: {written: N}
+    """
+    if not amnesia_events:
+        return {"written": 0}
+
+    for event in amnesia_events:
+        conn.execute(
+            """
+            INSERT OR REPLACE INTO amnesia_events
+            (amnesia_id, session_id, constraint_id, constraint_type, severity, evidence_json, detected_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            [
+                event.amnesia_id,
+                event.session_id,
+                event.constraint_id,
+                event.constraint_type,
+                event.severity,
+                json.dumps(event.evidence),
+                event.detected_at,
+            ],
+        )
+
+    logger.info("Wrote {} amnesia events", len(amnesia_events))
+    return {"written": len(amnesia_events)}

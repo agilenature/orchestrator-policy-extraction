@@ -15,10 +15,15 @@ Exports:
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from loguru import logger
 
 from src.pipeline.wisdom.models import WisdomEntity, WisdomRef
 from src.pipeline.wisdom.store import WisdomStore
+
+if TYPE_CHECKING:
+    from src.pipeline.rag.embedder import EpisodeEmbedder
 
 
 class WisdomRetriever:
@@ -35,13 +40,21 @@ class WisdomRetriever:
     Args:
         store: WisdomStore instance (same-package access to _conn).
         top_k: Number of results to return (default 3).
+        embedder: Optional EpisodeEmbedder for vector search. When None,
+            falls back to BM25-only retrieval.
     """
 
-    def __init__(self, store: WisdomStore, top_k: int = 3) -> None:
+    def __init__(
+        self,
+        store: WisdomStore,
+        top_k: int = 3,
+        embedder: EpisodeEmbedder | None = None,
+    ) -> None:
         self._store = store
         self._conn = store._conn
         self._top_k = top_k
         self._fts_built = False
+        self._embedder = embedder
 
     def rebuild_index(self) -> None:
         """Rebuild the FTS index on project_wisdom table.
@@ -125,6 +138,7 @@ class WisdomRetriever:
         fused_ids = [wid for wid, _ in fused]
         entities_by_id: dict[str, WisdomEntity] = {}
         bm25_scores: dict[str, float] = {wid: score for wid, score in bm25_results}
+        vector_scores: dict[str, float] = {wid: score for wid, score in vector_results}
 
         for wid in fused_ids:
             entity = self._store.get(wid)
@@ -145,9 +159,12 @@ class WisdomRetriever:
                 if overlap > 0:
                     relevance *= 1.5  # 50% boost for scope match
 
-            # Dead end detection
+            # Dead end detection (pass vector_score for dual agreement)
             is_dead_end = self._is_dead_end_warning(
-                entity, bm25_scores.get(wid, 0.0), dead_end_threshold
+                entity,
+                bm25_scores.get(wid, 0.0),
+                dead_end_threshold,
+                vector_score=vector_scores.get(wid),  # None if not in vector results
             )
 
             refs.append(
@@ -198,18 +215,23 @@ class WisdomRetriever:
     def _vector_search(self, query: str) -> list[tuple[str, float]]:
         """Search wisdom entities using cosine similarity on embeddings.
 
-        Falls back to empty results if no embeddings are present in the
-        table. Does not generate query embeddings -- uses a simple text
-        match fallback if no embedding infrastructure is available.
+        Generates a query embedding via EpisodeEmbedder.embed_text() and
+        computes array_cosine_similarity against stored DOUBLE[] embeddings.
+        Falls back to empty results if no embedder is wired or no embeddings
+        are present in the table.
 
         Args:
-            query: Text query (used for embedding lookup if available).
+            query: Text query to embed and search against.
 
         Returns:
             List of (wisdom_id, similarity) tuples sorted descending.
-            Empty list if no embeddings present.
+            Empty list if no embedder wired or no embeddings present.
         """
-        # Check if any embeddings exist
+        # If no embedder wired in, fall back to empty (BM25-only)
+        if self._embedder is None:
+            return []
+
+        # Check if any embeddings exist in the table
         try:
             has_embeddings = self._conn.execute(
                 "SELECT COUNT(*) FROM project_wisdom WHERE embedding IS NOT NULL"
@@ -219,11 +241,30 @@ class WisdomRetriever:
         except Exception:
             return []
 
-        # Without an embedding model wired in, we cannot generate a query
-        # embedding to compare against stored embeddings. Return empty
-        # and rely on BM25-only results. Future plans may wire in an
-        # embedder for wisdom vector search.
-        return []
+        # Generate query embedding
+        try:
+            query_embedding = self._embedder.embed_text(query)
+        except Exception as e:
+            logger.warning("Failed to generate query embedding: {}", e)
+            return []
+
+        # Cosine similarity search against stored embeddings
+        try:
+            rows = self._conn.execute(
+                """
+                SELECT wisdom_id,
+                       array_cosine_similarity(embedding, ?::DOUBLE[]) AS sim
+                FROM project_wisdom
+                WHERE embedding IS NOT NULL
+                ORDER BY sim DESC
+                LIMIT ?
+                """,
+                [query_embedding, self._top_k * 2],
+            ).fetchall()
+            return rows
+        except Exception as e:
+            logger.warning("Vector search failed: {}", e)
+            return []
 
     def _rrf_fuse(
         self,
@@ -258,18 +299,21 @@ class WisdomRetriever:
         entity: WisdomEntity,
         bm25_score: float,
         threshold: float,
+        vector_score: float | None = None,
     ) -> bool:
         """Determine if a wisdom entity should be flagged as a dead end warning.
 
-        Requires entity_type == 'dead_end' AND BM25 score meeting threshold.
-        The dual agreement filter (BM25 + vector) reduces false positives.
-        When no vector search is available, requires higher BM25 confidence
-        (threshold * 1.5 for keyword-only mode).
+        Requires entity_type == 'dead_end' AND sufficient relevance signal.
+        When vector_score is available, uses dual agreement: both BM25 and
+        vector must pass their respective thresholds. When vector_score is
+        None (BM25-only mode), uses BM25 threshold alone.
 
         Args:
             entity: The wisdom entity to check.
             bm25_score: BM25 relevance score for this entity.
-            threshold: Score threshold for flagging (default 0.6).
+            threshold: BM25 score threshold for flagging (default 0.6).
+            vector_score: Optional cosine similarity score from vector search.
+                None when vector search is not available.
 
         Returns:
             True if entity should be flagged as a dead end warning.
@@ -280,8 +324,16 @@ class WisdomRetriever:
         # BM25 scores from DuckDB FTS are negative (lower = better match).
         # A score of -0.8 is a stronger match than -0.2.
         # We use the absolute value for threshold comparison.
-        abs_score = abs(bm25_score)
-        return abs_score >= threshold
+        abs_bm25 = abs(bm25_score)
+        bm25_pass = abs_bm25 >= threshold
+
+        if vector_score is not None:
+            # Dual agreement: both BM25 and vector must agree
+            vector_pass = vector_score >= 0.3  # cosine sim threshold for dead end
+            return bm25_pass and vector_pass
+        else:
+            # BM25-only fallback (no vector search available)
+            return bm25_pass
 
     @staticmethod
     def _scope_overlap(

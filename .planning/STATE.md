@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 10 In Progress (Cross-Session Decision Durability) — Plan 02 complete, evaluation engine built
+**Current focus:** Phase 10 In Progress (Cross-Session Decision Durability) — Plan 03 complete, pipeline integration + CLI + reporter wired
 
 ## Current Position
 
 Phase: 10 of 12 (Cross-Session Decision Durability)
-Plan: 2 of 5 in current phase
+Plan: 3 of 5 in current phase
 Status: In progress
-Last activity: 2026-02-20 -- Completed 10-02-PLAN.md (Durability Evaluator Engine)
+Last activity: 2026-02-20 -- Completed 10-03-PLAN.md (Pipeline Integration + CLI)
 
-Progress: [██████████░░░░░░░░░░░░░░░░░░] 40% (2/5 plans in phase 10)
-Overall:  [████████████████████████████████████████░] 97% (27/30 plans, +phases 7-8 delivered)
+Progress: [██████████████░░░░░░░░░░░░░░] 60% (3/5 plans in phase 10)
+Overall:  [████████████████████████████████████████░] 97% (28/30 plans, +phases 7-8 delivered)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 27
+- Total plans completed: 28
 - Average duration: 5.2 min
-- Total execution time: 2.3 hours
+- Total execution time: 2.4 hours
 
 **By Phase:**
 
@@ -35,10 +35,10 @@ Overall:  [███████████████████████
 | 05-training-infrastructure | 3 | 21 min | 7.0 min |
 | 06-mission-control-integration | 4 | 15 min | 3.8 min |
 | 09-obstacle-escalation-detection | 5 | 29 min | 5.8 min |
-| 10-cross-session-decision-durability | 2 | 13 min | 6.5 min |
+| 10-cross-session-decision-durability | 3 | 21 min | 7.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min, 8 min, 6 min, 7 min, 6 min
+- Last 5 plans: 8 min, 6 min, 7 min, 6 min, 8 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -165,6 +165,13 @@ Recent decisions affecting current work:
 - Plan 10-02: One match per event is sufficient (break after first hint match to avoid redundant evidence)
 - Plan 10-02: AmnesiaDetector is stateless; detected_at uses current UTC at detection time
 - Plan 10-02: 616 tests passing (557 baseline + 59 new)
+- Plan 10-03: Step 14 placed after escalation detection (Step 13), before stats computation (now Step 15)
+- Plan 10-03: CLI audit session writes eval results to DB during audit (not read-only)
+- Plan 10-03: Exit code convention: 0=clean, 1=error, 2=amnesia detected
+- Plan 10-03: ShadowReporter amnesia_rate = sessions_with_amnesia / audited_sessions (left join SQL)
+- Plan 10-03: PASS/FAIL gate on amnesia_rate: PASS if 0.0%, FAIL otherwise (zero tolerance)
+- Plan 10-03: avg_durability_score excludes constraints with < 3 sessions from average
+- Plan 10-03: 643 tests passing (616 baseline + 27 new)
 
 ### Pending Todos
 
@@ -275,5 +282,5 @@ Phase 9 delivered obstacle escalation detection (all 5 plans, including gap clos
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 10, Plan 02 COMPLETE -- Evaluation engine built (scope extractor, evaluator, amnesia, index, writers). Next: Plan 03 (Pipeline Integration + CLI).
-Resume file: .planning/phases/10-cross-session-decision-durability/10-02-SUMMARY.md
+Stopped at: Phase 10, Plan 03 COMPLETE -- Pipeline Step 14 + CLI audit commands + ShadowReporter amnesia metrics wired. Next: Plan 04 (if exists).
+Resume file: .planning/phases/10-cross-session-decision-durability/10-03-SUMMARY.md

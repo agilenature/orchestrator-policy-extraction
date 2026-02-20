@@ -3,6 +3,7 @@
 Provides subcommands under `audit`:
 - session: Audit session constraint compliance, detect amnesia events
 - durability: Show durability scores per constraint
+- policy-errors: Report policy error rate with PASS/FAIL gate
 
 Exports:
     audit_group: Click group for audit subcommands
@@ -264,6 +265,76 @@ def audit_durability(
                     f"{score_str:<20}"
                 )
 
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+
+@audit_group.command(name="policy-errors")
+@click.option("--json", "output_json", is_flag=True, help="Output as JSON.")
+@click.option("--db", default="data/ope.db", help="DuckDB database path.")
+def audit_policy_errors(
+    output_json: bool,
+    db: str,
+) -> None:
+    """Report policy error rate with PASS/FAIL gate.
+
+    Computes policy error rate as total_errors / total_attempted where
+    total_attempted = evaluated_count + suppressed_count. The denominator
+    includes suppressed recommendations that never entered shadow_mode_results.
+
+    Exit codes:
+      0 - Clean (error rate < 5% or no data)
+      1 - Runtime error
+      2 - Error rate >= 5%
+    """
+    _setup_logging()
+
+    try:
+        from src.pipeline.shadow.reporter import ShadowReporter
+
+        conn = get_connection(db)
+        create_schema(conn)
+
+        reporter = ShadowReporter(conn)
+        metrics = reporter._compute_policy_error_metrics()
+
+        conn.close()
+
+        if output_json:
+            click.echo(json.dumps(metrics, indent=2))
+        else:
+            rate = metrics.get("policy_error_rate")
+            total_errors = metrics.get("total_errors", 0)
+            suppressed = metrics.get("suppressed", 0)
+            blocked = metrics.get("surfaced_and_blocked", 0)
+            attempted = metrics.get("total_attempted", 0)
+            meets = metrics.get("meets_threshold")
+
+            click.echo("Policy Error Report")
+            click.echo("===================")
+
+            if rate is not None:
+                gate_label = "PASS" if meets else "FAIL"
+                click.echo(f"Error rate:      {rate:.1%} (target: <5%)  {gate_label}")
+                click.echo(f"Total errors:    {total_errors}")
+                click.echo(f"  Suppressed:    {suppressed}")
+                click.echo(f"  Blocked:       {blocked}")
+                click.echo(f"Total attempted: {attempted} (evaluated + suppressed)")
+            else:
+                click.echo("Error rate:      N/A (no data)")
+
+        # Exit codes
+        meets = metrics.get("meets_threshold")
+        if meets is None:
+            sys.exit(0)  # No data = clean
+        elif meets:
+            sys.exit(0)
+        else:
+            sys.exit(2)
+
+    except SystemExit:
+        raise
     except Exception as e:
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)

@@ -1,7 +1,14 @@
 """Shadow mode reporter for computing and formatting metrics.
 
 Queries shadow_mode_results table to compute aggregate agreement metrics,
-per-session breakdowns, danger counts, and PASS/FAIL threshold indicators.
+per-session breakdowns, danger counts, PASS/FAIL threshold indicators,
+and policy error rate metrics.
+
+The policy_error_rate denominator is total_recommendations_attempted =
+COUNT(*) FROM shadow_mode_results + COUNT(*) FROM policy_error_events
+WHERE error_type='suppressed'. Suppressed recommendations never enter
+shadow_mode_results (they are skipped before evaluation), so the
+denominator must include them to avoid undercounting.
 
 Exports:
     ShadowReporter: Compute and format shadow mode metrics from stored results
@@ -98,6 +105,9 @@ class ShadowReporter:
         # Amnesia and durability metrics (Phase 10)
         amnesia_metrics = self._compute_amnesia_metrics()
 
+        # Policy error metrics (Phase 13)
+        policy_errors = self._compute_policy_error_metrics()
+
         return {
             "total_episodes": total,
             "total_sessions": sessions,
@@ -112,6 +122,7 @@ class ShadowReporter:
             "per_session": per_session,
             "escalation": escalation_metrics,
             "amnesia": amnesia_metrics,
+            "policy_errors": policy_errors,
         }
 
     def _compute_danger_categories(self, batch_id: str | None) -> dict:
@@ -254,6 +265,83 @@ class ShadowReporter:
             "avg_durability_score": avg_durability,
         }
 
+    def _compute_policy_error_metrics(self) -> dict:
+        """Compute policy error rate metrics from DuckDB tables.
+
+        CRITICAL denominator formula:
+        - evaluated_count = COUNT(*) FROM shadow_mode_results
+        - suppressed = COUNT(*) FROM policy_error_events WHERE error_type='suppressed'
+        - total_attempted = evaluated_count + suppressed
+        - total_errors = COUNT(*) FROM policy_error_events
+        - rate = total_errors / total_attempted
+
+        The denominator MUST include suppressed recommendations because they
+        never enter shadow_mode_results (suppressed before evaluation).
+
+        Returns:
+            Dict with total_errors, suppressed, surfaced_and_blocked,
+            total_attempted, policy_error_rate, meets_threshold.
+        """
+        try:
+            evaluated_count = self._conn.execute(
+                "SELECT COUNT(*) FROM shadow_mode_results"
+            ).fetchone()[0] or 0
+        except Exception:
+            return {
+                "total_errors": None,
+                "suppressed": None,
+                "surfaced_and_blocked": None,
+                "total_attempted": None,
+                "policy_error_rate": None,
+                "meets_threshold": None,
+            }
+
+        try:
+            error_row = self._conn.execute("""
+                SELECT
+                    COUNT(*) as total_errors,
+                    SUM(CASE WHEN error_type = 'suppressed' THEN 1 ELSE 0 END) as suppressed,
+                    SUM(CASE WHEN error_type = 'surfaced_and_blocked' THEN 1 ELSE 0 END) as blocked
+                FROM policy_error_events
+            """).fetchone()
+        except Exception:
+            return {
+                "total_errors": None,
+                "suppressed": None,
+                "surfaced_and_blocked": None,
+                "total_attempted": None,
+                "policy_error_rate": None,
+                "meets_threshold": None,
+            }
+
+        total_errors = int(error_row[0] or 0)
+        suppressed = int(error_row[1] or 0)
+        surfaced_and_blocked = int(error_row[2] or 0)
+
+        # Denominator includes suppressed (they are NOT in shadow_mode_results)
+        total_attempted = evaluated_count + suppressed
+
+        if total_attempted == 0:
+            return {
+                "total_errors": 0,
+                "suppressed": 0,
+                "surfaced_and_blocked": 0,
+                "total_attempted": 0,
+                "policy_error_rate": None,
+                "meets_threshold": None,
+            }
+
+        rate = total_errors / total_attempted
+
+        return {
+            "total_errors": total_errors,
+            "suppressed": suppressed,
+            "surfaced_and_blocked": surfaced_and_blocked,
+            "total_attempted": total_attempted,
+            "policy_error_rate": rate,
+            "meets_threshold": rate < 0.05,
+        }
+
     def format_report(self, report: dict) -> str:
         """Format report dict as human-readable text for CLI output.
 
@@ -356,6 +444,36 @@ class ShadowReporter:
                 )
             else:
                 lines.append("  Avg durability score: N/A")
+
+        # Policy Error Metrics section (Phase 13)
+        policy_errors = report.get("policy_errors", {})
+        if policy_errors:
+            lines.append("")
+            lines.append("Policy Error Metrics:")
+
+            pe_rate = policy_errors.get("policy_error_rate")
+            pe_total = policy_errors.get("total_errors", 0)
+            pe_suppressed = policy_errors.get("suppressed", 0)
+            pe_blocked = policy_errors.get("surfaced_and_blocked", 0)
+            pe_attempted = policy_errors.get("total_attempted", 0)
+            pe_meets = policy_errors.get("meets_threshold")
+
+            if pe_rate is not None:
+                pe_gate = "PASS" if pe_meets else "FAIL"
+                lines.append(
+                    f"  Policy error rate: {pe_rate:.1%} "
+                    f"(target: <5%)  {pe_gate}"
+                )
+                lines.append(
+                    f"  Total errors: {pe_total} "
+                    f"(suppressed: {pe_suppressed}, blocked: {pe_blocked})"
+                )
+                lines.append(
+                    f"  Total attempted: {pe_attempted} "
+                    f"(evaluated + suppressed)"
+                )
+            else:
+                lines.append("  Policy error rate: N/A")
 
         if per_session:
             lines.append("")

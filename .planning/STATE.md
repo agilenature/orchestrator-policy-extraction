@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 9 COMPLETE (including gap closure plan 05) — Ready for Phase 10 (Decision Durability)
+**Current focus:** Phase 10 In Progress (Cross-Session Decision Durability) — Plan 01 complete, foundation laid
 
 ## Current Position
 
-Phase: 9 of 12 (Obstacle Escalation Detection)
-Plan: 5 of 5 in current phase (plan 05 = gap closure)
-Status: Phase complete (including gap closure)
-Last activity: 2026-02-20 -- Completed 09-05-PLAN.md (Real Session Fixture Extraction)
+Phase: 10 of 12 (Cross-Session Decision Durability)
+Plan: 1 of 5 in current phase
+Status: In progress
+Last activity: 2026-02-20 -- Completed 10-01-PLAN.md (Foundation: Schema + Migration + Tables + Config)
 
-Progress: [████████████████████████████] 100% (5/5 plans in phase 9)
-Overall:  [████████████████████████████████████████] 96% (25/25 plans, +phases 7-8 delivered)
+Progress: [█████░░░░░░░░░░░░░░░░░░░░░░░] 20% (1/5 plans in phase 10)
+Overall:  [████████████████████████████████████████░] 97% (26/30 plans, +phases 7-8 delivered)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 25
-- Average duration: 5.1 min
-- Total execution time: 2.1 hours
+- Total plans completed: 26
+- Average duration: 5.2 min
+- Total execution time: 2.2 hours
 
 **By Phase:**
 
@@ -35,9 +35,10 @@ Overall:  [███████████████████████
 | 05-training-infrastructure | 3 | 21 min | 7.0 min |
 | 06-mission-control-integration | 4 | 15 min | 3.8 min |
 | 09-obstacle-escalation-detection | 5 | 29 min | 5.8 min |
+| 10-cross-session-decision-durability | 1 | 7 min | 7.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 3 min, 5 min, 5 min, 8 min, 6 min
+- Last 5 plans: 5 min, 5 min, 8 min, 6 min, 7 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -152,6 +153,12 @@ Recent decisions affecting current work:
 - Plan 09-05: JSONL comment lines (# prefix) used for fixture provenance headers
 - Plan 09-05: tool_result events from exempt tools (Read) are non-exempt because they lack tool_name in payload
 - Plan 09-05: Window_turns must be tuned per real session; only 1 of 4 positive fixtures works with default window_turns=5
+- Plan 10-01: status_history uses datetime.fromisoformat() comparison (not string) for timezone safety
+- Plan 10-01: Empty status_history falls back to current status field (backward-compatible)
+- Plan 10-01: get_active_constraints() treats missing status as active (behavioral default)
+- Plan 10-01: Shared scopes_overlap() in utils.py treats EITHER empty list as repo-wide (differs from validation/layers.py)
+- Plan 10-01: DurabilityConfig defaults: min_sessions_for_score=3, evidence_excerpt_max_chars=500
+- Plan 10-01: 557 tests passing (542 baseline + 15 new)
 
 ### Pending Todos
 
@@ -262,5 +269,5 @@ Phase 9 delivered obstacle escalation detection (all 5 plans, including gap clos
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 9 COMPLETE (including gap closure plan 05) -- All 5 plans delivered. Next phase: 10 (Decision Durability) or 11 (Wisdom Layer).
-Resume file: .planning/phases/09-obstacle-escalation-detection/09-05-SUMMARY.md
+Stopped at: Phase 10, Plan 01 COMPLETE -- Foundation delivered (schema, migration, tables, config). Next: Plan 02 (Durability Evaluator).
+Resume file: .planning/phases/10-cross-session-decision-durability/10-01-SUMMARY.md

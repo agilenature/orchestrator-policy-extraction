@@ -10,19 +10,19 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 ## Current Position
 
 Phase: 9 of 12 (Obstacle Escalation Detection)
-Plan: 1 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: In Progress
-Last activity: 2026-02-19 -- Completed 09-01-PLAN.md (data model foundation)
+Last activity: 2026-02-20 -- Completed 09-03-PLAN.md (escalation constraint generator)
 
-Progress: [█░░░░░░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans in phase 9)
-Overall:  [████████████████████████████████████░░░] 88% (21/24 plans, +phases 7-8 delivered)
+Progress: [███████████████████░░░░░░░░░] 75% (3/4 plans in phase 9)
+Overall:  [█████████████████████████████████████░░] 92% (23/24 plans, +phases 7-8 delivered)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 21
+- Total plans completed: 23
 - Average duration: 5.0 min
-- Total execution time: 1.8 hours
+- Total execution time: 1.9 hours
 
 **By Phase:**
 
@@ -34,10 +34,10 @@ Overall:  [███████████████████████
 | 04-validation-quality | 2 | 11 min | 5.5 min |
 | 05-training-infrastructure | 3 | 21 min | 7.0 min |
 | 06-mission-control-integration | 4 | 15 min | 3.8 min |
-| 09-obstacle-escalation-detection | 1 | 5 min | 5.0 min |
+| 09-obstacle-escalation-detection | 3 | 15 min | 5.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min, 3 min, 4 min, 3 min, 5 min
+- Last 5 plans: 3 min, 4 min, 3 min, 5 min, 5 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -134,6 +134,10 @@ Recent decisions affecting current work:
 - Plan 09-01: Idempotent ALTER TABLE with try/except for DuckDB escalation column additions
 - Plan 09-01: Constraint status enum: active, candidate, retired (lifecycle for human vs inferred constraints)
 - Plan 09-01: EscalationCandidate.block_event_tag validated to only allow O_GATE or O_CORR
+- Plan 09-03: Operation type inferred from command regex patterns with tool_name fallback (Write->write, Edit->write, default->execute)
+- Plan 09-03: find_matching_constraint requires 2+ hint overlap OR tool_name + path prefix for robust matching
+- Plan 09-03: bypassed_constraint_id added to constraint.schema.json as optional string|null (Rule 3 auto-fix)
+- Plan 09-03: Generator is stateless; caller handles ConstraintStore.add() in pipeline integration
 
 ### Pending Todos
 
@@ -230,6 +234,6 @@ Phase 8 delivered the synthesis and new roadmap (conversation-driven, no formal 
 
 ## Session Continuity
 
-Last session: 2026-02-19
-Stopped at: Phase 9, Plan 01 COMPLETE -- Data model foundation delivered. Next: 09-02-PLAN.md (Escalation Detector).
-Resume file: .planning/phases/09-obstacle-escalation-detection/09-01-SUMMARY.md
+Last session: 2026-02-20
+Stopped at: Phase 9, Plan 03 COMPLETE -- Constraint generator delivered. Next: 09-04-PLAN.md (Pipeline Integration).
+Resume file: .planning/phases/09-obstacle-escalation-detection/09-03-SUMMARY.md

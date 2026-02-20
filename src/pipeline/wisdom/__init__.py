@@ -10,8 +10,11 @@ Exports:
     EnrichedRecommendation: Recommendation augmented with wisdom references
     WisdomStore: DuckDB-backed CRUD and search for wisdom entities
     WisdomRetriever: Hybrid BM25 + optional vector search for wisdom entities
+    WisdomIngestor: Bulk JSON loader for wisdom entries
+    IngestResult: Outcome model for ingestion operations
 """
 
+from src.pipeline.wisdom.ingestor import IngestResult, WisdomIngestor
 from src.pipeline.wisdom.models import (
     EnrichedRecommendation,
     WisdomEntity,
@@ -22,7 +25,9 @@ from src.pipeline.wisdom.store import WisdomStore
 
 __all__ = [
     "EnrichedRecommendation",
+    "IngestResult",
     "WisdomEntity",
+    "WisdomIngestor",
     "WisdomRef",
     "WisdomRetriever",
     "WisdomStore",

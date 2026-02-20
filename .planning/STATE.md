@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 12 IN PROGRESS (Governance Protocol Integration) — Plans 01-03 complete, 1 remaining
+**Current focus:** Phase 12 COMPLETE (Governance Protocol Integration) — All 4 plans delivered. Phase 13 pending planning.
 
 ## Current Position
 
 Phase: 12 of 13 (Governance Protocol Integration)
-Plan: 3 of 4 in current phase
-Status: In progress
-Last activity: 2026-02-20 -- Completed 12-03-PLAN.md (stability runner: StabilityRunner, DuckDB persistence, episode flagging). 792 tests passing.
+Plan: 4 of 4 in current phase
+Status: Phase complete
+Last activity: 2026-02-20 -- Completed 12-04-PLAN.md (govern CLI group, integration tests). 822 tests passing.
 
-Progress: [█████████████████████░░░░░░░░░] 75% (3/4 plans in phase 12)
-Overall:  [█████████████████████████████████████████████████] 97% (37/38 plans total)
+Progress: [████████████████████████████████] 100% (4/4 plans in phase 12)
+Overall:  [████████████████████████████████████████████████████] 100% (38/38 plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 37
+- Total plans completed: 38
 - Average duration: 5.2 min
-- Total execution time: 3.1 hours
+- Total execution time: 3.25 hours
 
 **By Phase:**
 
@@ -38,10 +38,10 @@ Overall:  [███████████████████████
 | 10-cross-session-decision-durability | 3 | 21 min | 7.0 min |
 | 11-project-level-wisdom-layer | 6 | 35 min | 5.8 min |
 
-| 12-governance-protocol-integration | 3 | -- | -- |
+| 12-governance-protocol-integration | 4 | ~30 min | 7.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min, 4 min, 5 min, 5 min, 4 min
+- Last 5 plans: 4 min, 5 min, 5 min, 4 min, 9 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -229,6 +229,11 @@ Recent decisions affecting current work:
 - Plan 12-03: TimeoutExpired produces exit_code=-1 as sentinel value (not a real process exit)
 - Plan 12-03: flag_missing_validation/mark_validated accept optional conn parameter for flexible targeting
 - Plan 12-03: 792 tests passing (733 baseline + 45 from plan 12-02 + 14 new)
+- Plan 12-04: govern CLI group registered in __main__.py following wisdom.py pattern (lazy imports, _setup_logging)
+- Plan 12-04: Reuse wisdom_store._conn for bulk episode flagging to avoid DuckDB two-writer IOException
+- Plan 12-04: Exit codes: 0=clean, 1=runtime-error, 2=failure/violation (consistent with audit CLI)
+- Plan 12-04: CliRunner() without mix_stderr (not supported in installed Click version)
+- Plan 12-04: 822 tests passing (792 baseline + 30 new)
 
 ### Pending Todos
 
@@ -360,8 +365,21 @@ Phase 11 delivered the project-level wisdom layer (all 6 plans including gap clo
 - **Key modules**: src/pipeline/wisdom/ (models.py, store.py, retriever.py, ingestor.py), src/pipeline/cli/wisdom.py
 - **All verification gaps closed**: Gap 1 (vector search) and Gap 2 (check-scope validation) both addressed
 
+## Phase 12 Completion Summary
+
+Phase 12 delivered governance protocol integration (all 4 plans):
+- **Plan 01 COMPLETE**: GovernanceConfig/StabilityCheckDef models, WisdomEntity.metadata field, DuckDB stability_outcomes table, episodes governance columns, 21 new tests
+- **Plan 02 COMPLETE**: GovDocParser (H2/H3 keyword classification), GovDocIngestor (dual-store sequential writes, forbidden severity heuristic, co-occurrence linkage), objectivism_premortem.md fixture, 45 new tests
+- **Plan 03 COMPLETE**: StabilityRunner (subprocess execution, DuckDB persistence, episode flagging), flag_missing_validation/mark_validated, 14 new tests
+- **Plan 04 COMPLETE**: govern CLI group (ingest + check-stability), __main__.py registration, 10 CLI tests + 20 integration tests
+- **GOVERN-01**: `python -m src.pipeline.cli govern ingest <file>` ingests pre-mortem/DECISIONS.md
+- **GOVERN-02**: `python -m src.pipeline.cli govern check-stability` runs registered commands
+- **822 tests** passing (712 baseline from Phase 11 + 110 new Phase 12 tests)
+- **Key modules**: src/pipeline/governance/ (parser.py, ingestor.py, stability.py), src/pipeline/cli/govern.py
+- **Reference data**: objectivism_premortem.md produces 11 dead_end wisdom + 15 behavioral constraints
+
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 12 plan 03 complete (stability runner). Continue with plan 12-04.
-Resume file: .planning/phases/12-governance-protocol-integration/12-04-PLAN.md
+Stopped at: Phase 12 complete (all 4 plans). Phase 13 needs planning via /gsd:plan-phase.
+Resume file: .planning/ROADMAP.md (Phase 13: Policy-to-Constraint Feedback Loop)

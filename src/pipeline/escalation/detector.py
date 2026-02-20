@@ -19,7 +19,7 @@ Exports:
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from src.pipeline.escalation.models import EscalationCandidate
 from src.pipeline.models.config import PipelineConfig

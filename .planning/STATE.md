@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 10 In Progress (Cross-Session Decision Durability) — Plan 01 complete, foundation laid
+**Current focus:** Phase 10 In Progress (Cross-Session Decision Durability) — Plan 02 complete, evaluation engine built
 
 ## Current Position
 
 Phase: 10 of 12 (Cross-Session Decision Durability)
-Plan: 1 of 5 in current phase
+Plan: 2 of 5 in current phase
 Status: In progress
-Last activity: 2026-02-20 -- Completed 10-01-PLAN.md (Foundation: Schema + Migration + Tables + Config)
+Last activity: 2026-02-20 -- Completed 10-02-PLAN.md (Durability Evaluator Engine)
 
-Progress: [█████░░░░░░░░░░░░░░░░░░░░░░░] 20% (1/5 plans in phase 10)
-Overall:  [████████████████████████████████████████░] 97% (26/30 plans, +phases 7-8 delivered)
+Progress: [██████████░░░░░░░░░░░░░░░░░░] 40% (2/5 plans in phase 10)
+Overall:  [████████████████████████████████████████░] 97% (27/30 plans, +phases 7-8 delivered)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 26
+- Total plans completed: 27
 - Average duration: 5.2 min
-- Total execution time: 2.2 hours
+- Total execution time: 2.3 hours
 
 **By Phase:**
 
@@ -35,10 +35,10 @@ Overall:  [███████████████████████
 | 05-training-infrastructure | 3 | 21 min | 7.0 min |
 | 06-mission-control-integration | 4 | 15 min | 3.8 min |
 | 09-obstacle-escalation-detection | 5 | 29 min | 5.8 min |
-| 10-cross-session-decision-durability | 1 | 7 min | 7.0 min |
+| 10-cross-session-decision-durability | 2 | 13 min | 6.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min, 5 min, 8 min, 6 min, 7 min
+- Last 5 plans: 5 min, 8 min, 6 min, 7 min, 6 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -159,6 +159,12 @@ Recent decisions affecting current work:
 - Plan 10-01: Shared scopes_overlap() in utils.py treats EITHER empty list as repo-wide (differs from validation/layers.py)
 - Plan 10-01: DurabilityConfig defaults: min_sessions_for_score=3, evidence_excerpt_max_chars=500
 - Plan 10-01: 557 tests passing (542 baseline + 15 new)
+- Plan 10-02: Evaluator operates on raw constraint dicts (no ConstraintStore dependency) for pipeline+CLI flexibility
+- Plan 10-02: Detection hints scan uses case-insensitive substring containment (re.escape + re.IGNORECASE), matching Phase 9
+- Plan 10-02: Pre-compile hint patterns once per constraint (not per event) per research pitfall
+- Plan 10-02: One match per event is sufficient (break after first hint match to avoid redundant evidence)
+- Plan 10-02: AmnesiaDetector is stateless; detected_at uses current UTC at detection time
+- Plan 10-02: 616 tests passing (557 baseline + 59 new)
 
 ### Pending Todos
 
@@ -269,5 +275,5 @@ Phase 9 delivered obstacle escalation detection (all 5 plans, including gap clos
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 10, Plan 01 COMPLETE -- Foundation delivered (schema, migration, tables, config). Next: Plan 02 (Durability Evaluator).
-Resume file: .planning/phases/10-cross-session-decision-durability/10-01-SUMMARY.md
+Stopped at: Phase 10, Plan 02 COMPLETE -- Evaluation engine built (scope extractor, evaluator, amnesia, index, writers). Next: Plan 03 (Pipeline Integration + CLI).
+Resume file: .planning/phases/10-cross-session-decision-durability/10-02-SUMMARY.md

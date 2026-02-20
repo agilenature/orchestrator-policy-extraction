@@ -5,24 +5,24 @@
 See: .planning/PROJECT.md (updated 2026-02-10)
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 12 COMPLETE (Governance Protocol Integration) — All 4 plans delivered. Phase 13 pending planning.
+**Current focus:** Phase 13 IN PROGRESS (Policy-to-Constraint Feedback Loop) — Plan 01 complete, 2 remaining.
 
 ## Current Position
 
-Phase: 12 of 13 (Governance Protocol Integration)
-Plan: 4 of 4 in current phase
-Status: Phase complete
-Last activity: 2026-02-20 -- Completed 12-04-PLAN.md (govern CLI group, integration tests). 822 tests passing.
+Phase: 13 of 13 (Policy-to-Constraint Feedback Loop)
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-02-20 -- Completed 13-01-PLAN.md (feedback data models, schema, writer, constraint ID source). 845 tests passing.
 
-Progress: [████████████████████████████████] 100% (4/4 plans in phase 12)
-Overall:  [████████████████████████████████████████████████████] 100% (38/38 plans total)
+Progress: [██████████░░░░░░░░░░░░░░░░░░░░░░] 33% (1/3 plans in phase 13)
+Overall:  [████████████████████████████████████████████████████░░░] 95% (39/41 plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 38
-- Average duration: 5.2 min
-- Total execution time: 3.25 hours
+- Total plans completed: 39
+- Average duration: 5.1 min
+- Total execution time: 3.32 hours
 
 **By Phase:**
 
@@ -39,9 +39,10 @@ Overall:  [███████████████████████
 | 11-project-level-wisdom-layer | 6 | 35 min | 5.8 min |
 
 | 12-governance-protocol-integration | 4 | ~30 min | 7.5 min |
+| 13-policy-to-constraint-feedback-loop | 1 | 4 min | 4.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min, 5 min, 5 min, 4 min, 9 min
+- Last 5 plans: 5 min, 5 min, 4 min, 9 min, 4 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -234,6 +235,11 @@ Recent decisions affecting current work:
 - Plan 12-04: Exit codes: 0=clean, 1=runtime-error, 2=failure/violation (consistent with audit CLI)
 - Plan 12-04: CliRunner() without mix_stderr (not supported in installed Click version)
 - Plan 12-04: 822 tests passing (792 baseline + 30 new)
+- Plan 13-01: Single PolicyErrorEvent model for both domain and storage (no separate PolicyError)
+- Plan 13-01: Forward-only ID break: _make_constraint_id appends `:source`, old constraints keep old IDs
+- Plan 13-01: Pipe separator kept in ConstraintExtractor per locked decision; JSON separator for PolicyFeedbackExtractor in Plan 02
+- Plan 13-01: PolicyFeedbackConfig defaults: promote_after_sessions=3, error_rate_target=0.05, rolling_window_sessions=100
+- Plan 13-01: 845 tests passing (822 baseline + 23 new)
 
 ### Pending Todos
 
@@ -381,5 +387,5 @@ Phase 12 delivered governance protocol integration (all 4 plans):
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 12 complete (all 4 plans). Phase 13 needs planning via /gsd:plan-phase.
-Resume file: .planning/ROADMAP.md (Phase 13: Policy-to-Constraint Feedback Loop)
+Stopped at: Phase 13 Plan 01 complete (feedback data models). Plan 02 next (policy checker + feedback extractor).
+Resume file: .planning/phases/13-policy-to-constraint-feedback-loop/13-02-PLAN.md

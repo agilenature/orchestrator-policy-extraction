@@ -199,6 +199,18 @@ class GovernanceConfig(BaseModel):
     stability_checks: list[StabilityCheckDef] = Field(default_factory=list)
 
 
+class PolicyFeedbackConfig(BaseModel):
+    """Policy-to-constraint feedback loop settings (Phase 13).
+
+    Controls how policy errors are aggregated and when candidate
+    constraints are promoted to active status.
+    """
+
+    promote_after_sessions: int = 3
+    error_rate_target: float = 0.05
+    rolling_window_sessions: int = 100
+
+
 class GitCommands(BaseModel):
     """Git command patterns for tagging."""
 
@@ -258,6 +270,9 @@ class PipelineConfig(BaseModel):
     )
     governance: GovernanceConfig = Field(
         default_factory=GovernanceConfig
+    )
+    feedback: PolicyFeedbackConfig = Field(
+        default_factory=PolicyFeedbackConfig
     )
 
     # Preserved from existing config (used by downstream components)

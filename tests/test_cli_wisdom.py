@@ -27,6 +27,51 @@ def runner() -> CliRunner:
 
 
 @pytest.fixture
+def empty_constraints_json(tmp_path: Path) -> Path:
+    """Create a temporary empty constraints JSON file."""
+    path = tmp_path / "empty_constraints.json"
+    path.write_text("[]")
+    return path
+
+
+@pytest.fixture
+def constraints_json(tmp_path: Path) -> Path:
+    """Create a temporary constraints JSON file with test constraints."""
+    constraints = [
+        {
+            "constraint_id": "c-test-001",
+            "text": "CLI commands must use click groups for organization",
+            "severity": "requires_approval",
+            "scope": {"paths": ["src/pipeline/cli/"]},
+            "status": "active",
+            "detection_hints": ["click.group"],
+            "status_history": [],
+        },
+        {
+            "constraint_id": "c-test-002",
+            "text": "Never use pyarrow for Parquet export operations",
+            "severity": "forbidden",
+            "scope": {"paths": []},
+            "status": "active",
+            "detection_hints": ["pyarrow"],
+            "status_history": [],
+        },
+        {
+            "constraint_id": "c-test-003",
+            "text": "Logging must go to stderr not stdout",
+            "severity": "warning",
+            "scope": {"paths": ["src/"]},
+            "status": "active",
+            "detection_hints": ["print("],
+            "status_history": [],
+        },
+    ]
+    path = tmp_path / "constraints.json"
+    path.write_text(json.dumps(constraints))
+    return path
+
+
+@pytest.fixture
 def sample_json(tmp_path: Path) -> Path:
     """Create a temporary JSON file with valid wisdom entries."""
     entries = [
@@ -162,6 +207,126 @@ def test_wisdom_check_scope_with_match(
             "wisdom", "check-scope", "src/pipeline/cli/",
             "--db", db,
             "--constraints", str(empty_constraints),
+        ],
+    )
+    assert result.exit_code == 0, f"Exit code: {result.exit_code}, Output: {result.output}"
+    assert "No violations found" in result.output
+
+
+# ---------------------------------------------------------------------------
+# check-scope exit code and violation detection tests
+# ---------------------------------------------------------------------------
+
+
+def test_check_scope_exit_0_no_violations(
+    runner: CliRunner, tmp_path: Path, sample_json: Path, empty_constraints_json: Path
+) -> None:
+    """Check-scope exits 0 when scope decisions exist but no constraint violations."""
+    db = str(tmp_path / "exit0.db")
+    runner.invoke(cli, ["wisdom", "ingest", str(sample_json), "--db", db])
+
+    result = runner.invoke(
+        cli,
+        [
+            "wisdom", "check-scope", "src/pipeline/cli/",
+            "--db", db,
+            "--constraints", str(empty_constraints_json),
+        ],
+    )
+    assert result.exit_code == 0, f"Exit code: {result.exit_code}, Output: {result.output}"
+    assert "No violations found" in result.output
+
+
+def test_check_scope_exit_1_violation_found(
+    runner: CliRunner, tmp_path: Path, sample_json: Path, constraints_json: Path
+) -> None:
+    """Check-scope exits 1 when at least one scope decision has a matching constraint violation.
+
+    The sample_json scope_decision "CLI uses click groups" (scope: src/pipeline/cli/)
+    should match constraint c-test-001 whose text contains "click" and "groups"
+    (2+ title words > 3 chars) with severity "requires_approval" and overlapping scope.
+    """
+    db = str(tmp_path / "exit1.db")
+    runner.invoke(cli, ["wisdom", "ingest", str(sample_json), "--db", db])
+
+    result = runner.invoke(
+        cli,
+        [
+            "wisdom", "check-scope", "src/pipeline/cli/",
+            "--db", db,
+            "--constraints", str(constraints_json),
+        ],
+    )
+    assert result.exit_code == 1, f"Exit code: {result.exit_code}, Output: {result.output}"
+    assert "violation" in result.output.lower()
+
+
+def test_check_scope_exit_2_runtime_error(
+    runner: CliRunner, tmp_path: Path
+) -> None:
+    """Check-scope exits 2 on runtime errors (e.g., bad database path)."""
+    result = runner.invoke(
+        cli,
+        [
+            "wisdom", "check-scope", "src/",
+            "--db", "/nonexistent/path/bad.db",
+            "--constraints", str(tmp_path / "nonexistent.json"),
+        ],
+    )
+    assert result.exit_code == 2, f"Exit code: {result.exit_code}, Output: {result.output}"
+    assert "Error" in result.output or "error" in result.output.lower()
+
+
+def test_check_scope_no_decisions_exit_0(
+    runner: CliRunner, tmp_path: Path, empty_constraints_json: Path
+) -> None:
+    """Check-scope exits 0 with message when no scope decisions match the query."""
+    db = str(tmp_path / "no_decisions.db")
+
+    result = runner.invoke(
+        cli,
+        [
+            "wisdom", "check-scope", "nonexistent/path/",
+            "--db", db,
+            "--constraints", str(empty_constraints_json),
+        ],
+    )
+    assert result.exit_code == 0, f"Exit code: {result.exit_code}, Output: {result.output}"
+    assert "No scope decisions found" in result.output
+
+
+def test_check_scope_constraint_scope_mismatch_no_violation(
+    runner: CliRunner, tmp_path: Path, sample_json: Path
+) -> None:
+    """Check-scope exits 0 when constraint text matches but scope paths do not overlap.
+
+    The constraint text matches the scope_decision title words but its
+    scope.paths points to a completely different directory, so no violation.
+    """
+    # Constraint text matches "click" + "groups" but scope is different
+    mismatched_constraints = [
+        {
+            "constraint_id": "c-mismatch-001",
+            "text": "CLI commands must use click groups for organization",
+            "severity": "requires_approval",
+            "scope": {"paths": ["src/completely/different/path/"]},
+            "status": "active",
+            "detection_hints": ["click.group"],
+            "status_history": [],
+        },
+    ]
+    constraints_path = tmp_path / "mismatch_constraints.json"
+    constraints_path.write_text(json.dumps(mismatched_constraints))
+
+    db = str(tmp_path / "mismatch.db")
+    runner.invoke(cli, ["wisdom", "ingest", str(sample_json), "--db", db])
+
+    result = runner.invoke(
+        cli,
+        [
+            "wisdom", "check-scope", "src/pipeline/cli/",
+            "--db", db,
+            "--constraints", str(constraints_path),
         ],
     )
     assert result.exit_code == 0, f"Exit code: {result.exit_code}, Output: {result.output}"

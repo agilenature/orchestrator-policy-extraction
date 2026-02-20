@@ -187,13 +187,15 @@ Plans:
   3. Scope decision enforcement: `python -m src.pipeline.cli wisdom check-scope` validates completion state
   4. Dead end detection: recommendations include dead-end warnings when context matches known failures
   5. The four objectivism analysis documents are converted into 15+ wisdom entries
-**Plans:** 4 plans in 3 waves
+**Plans:** 6 plans in 4 waves
 
 Plans:
-- [ ] 11-01-PLAN.md — Wisdom models + WisdomStore + schema DDL (Wave 1)
-- [ ] 11-02-PLAN.md — WisdomRetriever + Recommender integration (Wave 2)
-- [ ] 11-03-PLAN.md — WisdomIngestor + seed_wisdom.json extraction (Wave 2)
-- [ ] 11-04-PLAN.md — CLI wisdom subcommands + check-scope (Wave 3)
+- [x] 11-01-PLAN.md — Wisdom models + WisdomStore + schema DDL (Wave 1)
+- [x] 11-02-PLAN.md — WisdomRetriever + Recommender integration (Wave 2)
+- [x] 11-03-PLAN.md — WisdomIngestor + seed_wisdom.json extraction (Wave 2)
+- [x] 11-04-PLAN.md — CLI wisdom subcommands + check-scope (Wave 3)
+- [ ] 11-05-PLAN.md — Gap closure: wire EpisodeEmbedder into WisdomRetriever vector search (Wave 4)
+- [ ] 11-06-PLAN.md — Gap closure: check-scope validation with 0/1/2 exit codes (Wave 4)
 
 ### Phase 12: Governance Protocol Integration
 **Goal**: The pipeline ingests governance documents (pre-mortem files, DECISIONS.md) as structured constraint and wisdom sources. Stability check scripts run as episode outcome validators. Sessions performing bulk operations without a stability check are flagged.
@@ -237,6 +239,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 12 -> 13
 | 8. Knowledge Architecture Conciliation | —/— | ✓ Complete | 2026-02-19 |
 | 9. Obstacle Escalation Detection | 5/5 | ✓ Complete | 2026-02-19 |
 | 10. Cross-Session Decision Durability | 3/3 | ✓ Complete | 2026-02-20 |
-| 11. Project-Level Wisdom Layer | 0/4 | ⬜ Pending | — |
+| 11. Project-Level Wisdom Layer | 4/6 | Gap Closure | — |
 | 12. Governance Protocol Integration | 0/TBD | ⬜ Pending | — |
 | 13. Policy-to-Constraint Feedback Loop | 0/TBD | ⬜ Pending | — |

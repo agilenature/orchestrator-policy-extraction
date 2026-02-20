@@ -14,6 +14,13 @@ Covers:
 - EnrichedRecommendation dead end warning flag
 - EnrichedRecommendation no warning when no dead ends
 - retrieve() with empty/blank query returns empty
+- Vector search with wired EpisodeEmbedder
+- Vector search empty fallback without embedder
+- Vector search empty fallback when no embeddings in table
+- Dual dead end detection: BM25+vector agreement
+- Dual dead end detection: BM25-only fallback
+- Dual dead end detection: BM25 pass + vector fail = not flagged
+- Dual dead end detection: non-dead-end entity always False
 """
 
 from __future__ import annotations
@@ -413,3 +420,147 @@ class TestRecommenderWithWisdom:
 
         assert isinstance(result, EnrichedRecommendation)
         assert result.has_dead_end_warning is False
+
+
+# ---------------------------------------------------------------------------
+# Fixtures: vector search
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def mock_embedder() -> MagicMock:
+    """Mock EpisodeEmbedder that returns deterministic 384-dim embeddings."""
+    embedder = MagicMock()
+    # Normalized unit vector: all equal components
+    embedder.embed_text.return_value = [1.0 / 384**0.5] * 384
+    return embedder
+
+
+@pytest.fixture
+def store_with_embeddings(db_path: Path) -> WisdomStore:
+    """Store with entities that have embedding vectors."""
+    store = WisdomStore(db_path)
+    base_vec = [1.0 / 384**0.5] * 384
+    dead_end_vec = [0.9 / 384**0.5] * 384
+
+    entities = [
+        WisdomEntity.create(
+            "breakthrough",
+            "DuckDB array columns handle Python lists",
+            "VARCHAR[] columns accept Python lists directly without conversion",
+            context_tags=["duckdb", "schema"],
+            scope_paths=["src/pipeline/storage/"],
+            confidence=0.95,
+            embedding=base_vec,
+        ),
+        WisdomEntity.create(
+            "dead_end",
+            "jsonwebtoken in Edge runtime fails",
+            "CommonJS import of jsonwebtoken fails in Edge runtime; use jose instead",
+            context_tags=["auth", "edge"],
+            scope_paths=["src/auth/"],
+            confidence=0.9,
+            embedding=dead_end_vec,
+        ),
+    ]
+    for e in entities:
+        store.add(e)
+    return store
+
+
+# ---------------------------------------------------------------------------
+# WisdomRetriever: vector search
+# ---------------------------------------------------------------------------
+
+
+class TestVectorSearch:
+    """Tests for vector search via EpisodeEmbedder integration."""
+
+    def test_vector_search_returns_results_when_embedder_wired(
+        self, store_with_embeddings: WisdomStore, mock_embedder: MagicMock
+    ) -> None:
+        """Vector search returns results when embedder is wired and embeddings exist."""
+        r = WisdomRetriever(store_with_embeddings, top_k=3, embedder=mock_embedder)
+        r.rebuild_index()
+        results = r.retrieve("DuckDB array columns")
+        assert len(results) > 0
+        # The embedder should have been called to generate query embedding
+        mock_embedder.embed_text.assert_called()
+
+    def test_vector_search_empty_when_no_embedder(
+        self, store_with_embeddings: WisdomStore
+    ) -> None:
+        """Retriever WITHOUT embedder still works (BM25-only mode)."""
+        r = WisdomRetriever(store_with_embeddings, top_k=3)
+        r.rebuild_index()
+        results = r.retrieve("DuckDB array columns")
+        # Should return BM25-only results (still finds entities by text)
+        assert len(results) > 0
+
+    def test_vector_search_empty_when_no_embeddings_in_table(
+        self, populated_store: WisdomStore, mock_embedder: MagicMock
+    ) -> None:
+        """Retriever with embedder on store WITHOUT embeddings works fine."""
+        r = WisdomRetriever(populated_store, top_k=3, embedder=mock_embedder)
+        r.rebuild_index()
+        results = r.retrieve("DuckDB array columns")
+        # Should return BM25-only results (no embeddings to search)
+        assert len(results) > 0
+
+
+# ---------------------------------------------------------------------------
+# WisdomRetriever: dual dead end detection
+# ---------------------------------------------------------------------------
+
+
+class TestDualDeadEndDetection:
+    """Tests for dual BM25+vector agreement in dead end detection."""
+
+    def test_dead_end_dual_agreement_both_signals(self) -> None:
+        """Dead end flagged when both BM25 and vector pass thresholds."""
+        entity = WisdomEntity.create(
+            "dead_end",
+            "test dead end",
+            "This is a dead end approach",
+        )
+        result = WisdomRetriever._is_dead_end_warning(
+            entity, bm25_score=-0.8, threshold=0.6, vector_score=0.5
+        )
+        assert result is True
+
+    def test_dead_end_bm25_only_no_vector(self) -> None:
+        """Dead end flagged based on BM25 alone when vector_score is None."""
+        entity = WisdomEntity.create(
+            "dead_end",
+            "test dead end",
+            "This is a dead end approach",
+        )
+        result = WisdomRetriever._is_dead_end_warning(
+            entity, bm25_score=-0.8, threshold=0.6, vector_score=None
+        )
+        assert result is True
+
+    def test_dead_end_bm25_pass_vector_fail(self) -> None:
+        """Dead end NOT flagged when BM25 passes but vector fails threshold."""
+        entity = WisdomEntity.create(
+            "dead_end",
+            "test dead end",
+            "This is a dead end approach",
+        )
+        result = WisdomRetriever._is_dead_end_warning(
+            entity, bm25_score=-0.8, threshold=0.6, vector_score=0.1
+        )
+        assert result is False
+
+    def test_dead_end_non_dead_end_entity_always_false(self) -> None:
+        """Non-dead-end entity is never flagged regardless of scores."""
+        entity = WisdomEntity.create(
+            "breakthrough",
+            "test breakthrough",
+            "This is a breakthrough discovery",
+        )
+        # Even with high scores, non-dead-end should not be flagged
+        result = WisdomRetriever._is_dead_end_warning(
+            entity, bm25_score=-0.9, threshold=0.6, vector_score=0.9
+        )
+        assert result is False

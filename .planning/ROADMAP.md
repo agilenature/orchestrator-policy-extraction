@@ -151,7 +151,13 @@ Plans:
   3. Escalation episodes without APPROVE reaction generate `forbidden` constraints automatically
   4. Shadow mode reports escalation rate per session (target: 0 unauthorized escalations)
   5. 30 test cases cover escalation detection (confirmed positive examples from objectivism sessions)
-**Plans:** TBD — to be planned via /gsd:plan-phase
+**Plans:** 4 plans in 3 waves
+
+Plans:
+- [ ] 09-01-PLAN.md — Models, config, schema foundation (Wave 1)
+- [ ] 09-02-PLAN.md — EscalationDetector [TDD] (Wave 2)
+- [ ] 09-03-PLAN.md — EscalationConstraintGenerator [TDD] (Wave 2)
+- [ ] 09-04-PLAN.md — Pipeline integration + shadow metrics + integration tests (Wave 3)
 
 ### Phase 10: Cross-Session Decision Durability
 **Goal**: The system tracks which constraints were read, honored, and violated in each session. A decision durability index gives each constraint a survival score across sessions. Sessions that violate active constraints are flagged as amnesia events.
@@ -217,7 +223,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 12 -> 13
 | 6. Mission Control Integration | 4/4 | ✓ Complete | 2026-02-12 |
 | 7. Objectivism Project Knowledge Extraction | —/— | ✓ Complete | 2026-02-17 |
 | 8. Knowledge Architecture Conciliation | —/— | ✓ Complete | 2026-02-19 |
-| 9. Obstacle Escalation Detection | 0/TBD | ⬜ Pending | — |
+| 9. Obstacle Escalation Detection | 0/4 | ⬜ Pending | — |
 | 10. Cross-Session Decision Durability | 0/TBD | ⬜ Pending | — |
 | 11. Project-Level Wisdom Layer | 0/TBD | ⬜ Pending | — |
 | 12. Governance Protocol Integration | 0/TBD | ⬜ Pending | — |

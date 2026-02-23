@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 13.3 (Identification Transparency Layer) — In progress. Plan 01 complete: data foundation (models, schema, pool builder, sampler). Phase 13.1 complete: 6 CCDs deposited to MEMORY.md. Phase 13.2 complete: 2 CCDs deposited (decision-boundary-externalization, causal-chain-completeness). Phase 13.3 is the Identification Transparency Layer: Agent B two-layer validation architecture (Agent B classification judge + Harness out-of-band oracle) resolving bootstrap-circularity and identity-firewall violations.
+**Current focus:** Phase 13.3 (Identification Transparency Layer) — In progress. Plans 01-02 complete: data foundation + review CLI command. Phase 13.1 complete: 6 CCDs deposited to MEMORY.md. Phase 13.2 complete: 2 CCDs deposited (decision-boundary-externalization, causal-chain-completeness). Phase 13.3 is the Identification Transparency Layer: Agent B two-layer validation architecture (Agent B classification judge + Harness out-of-band oracle) resolving bootstrap-circularity and identity-firewall violations.
 
 ## Current Position
 
 Phase: 13.3 (Identification Transparency Layer)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-23 -- Completed 13.3-01-PLAN.md (Schema + IdentificationPoint Model + Pool Builder). Created review module with models, DDL (identification_reviews, memory_candidates, layer_coverage_snapshots), PoolBuilder for 35 identification points across 8 layers, BalancedLayerSampler. 49 tests passing.
+Last activity: 2026-02-23 -- Completed 13.3-02-PLAN.md (Agent B review next CLI command). Added presenter, VerdictCollector, ReviewWriter, CLI review group. 80 tests passing in review module.
 
-Progress: [████████░░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans in phase 13.3)
-Overall:  [█████████████████████████████████████████████████░░░░░░░] 93% (42/45 plans total)
+Progress: [████████████████░░░░░░░░░░░░░░] 50% (2/4 plans in phase 13.3)
+Overall:  [██████████████████████████████████████████████████░░░░░░] 96% (43/45 plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 42
+- Total plans completed: 43
 - Average duration: 5.2 min
-- Total execution time: 3.74 hours
+- Total execution time: 3.84 hours
 
 **By Phase:**
 
@@ -41,10 +41,10 @@ Overall:  [███████████████████████
 
 | 12-governance-protocol-integration | 4 | ~30 min | 7.5 min |
 | 13-policy-to-constraint-feedback-loop | 3 | 19 min | 6.3 min |
-| 13.3-identification-transparency | 1 | 10 min | 10.0 min |
+| 13.3-identification-transparency | 2 | 16 min | 8.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 9 min, 4 min, 7 min, 8 min, 10 min
+- Last 5 plans: 4 min, 7 min, 8 min, 10 min, 6 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -262,6 +262,12 @@ Recent decisions affecting current work:
 - Plan 13.3-01: memory_candidates status enum: pending, validated, suspended, rejected, split_required
 - Plan 13.3-01: BalancedLayerSampler uses coverage-based priority (lowest reviewed/available ratio selected first)
 - Plan 13.3-01: 49 tests passing for review module (models, schema, pool builder, sampler)
+- Plan 13.3-02: VerdictCollector.input_fn injectable for test isolation (default=input, mock in tests)
+- Plan 13.3-02: ReviewWriter has no update()/delete() methods -- append-only contract at API level
+- Plan 13.3-02: CLI --constraints option added for test isolation from real filesystem data
+- Plan 13.3-02: duckdb.ConstraintException (not IntegrityError) is the correct exception for UNIQUE violations
+- Plan 13.3-02: session_id left as None -- extension point for Phase 14+ session tracking
+- Plan 13.3-02: 80 tests passing for review module (49 baseline + 31 new)
 
 ### Pending Todos
 
@@ -419,5 +425,5 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Phase 13.3 Plan 01 complete. Data foundation for identification review system built.
-Resume file: .planning/phases/13.3-identification-transparency/13.3-02-PLAN.md
+Stopped at: Phase 13.3 Plan 02 complete. Agent B review next CLI command operational.
+Resume file: .planning/phases/13.3-identification-transparency/13.3-03-PLAN.md

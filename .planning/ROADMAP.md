@@ -412,12 +412,12 @@ Plans:
 - PREMISE block format: `PREMISE: [claim] | VALIDATED_BY: [evidence or UNVALIDATED] | FOIL: [confusable] | [distinguishing property] | SCOPE: [validity context]`
 - Staleness rule: re-validate if any observable state that the claim depends on could have changed since VALIDATED_BY was obtained.
 
-**Plans:** 3 plans in 2 waves
+**Plans:** 3 plans in 3 waves
 
 Plans:
 - [ ] 14.1-01-PLAN.md — Premise module: models + parser + schema DDL + PremiseRegistry CRUD + episode causal links (Wave 1)
-- [ ] 14.1-02-PLAN.md — PAG PreToolUse hook: transcript scanner + staging writer + PREMISE block extraction + UNVALIDATED/staining warnings (Wave 1)
-- [ ] 14.1-03-PLAN.md — Foil instantiation + staining pipeline + staging ingestion + runner integration (Wave 2, depends on 01+02)
+- [ ] 14.1-02-PLAN.md — PAG PreToolUse hook: transcript scanner + staging writer + PREMISE block extraction + UNVALIDATED/staining/foil/Ad Ignorantiam warnings (Wave 2, depends on 01)
+- [ ] 14.1-03-PLAN.md — Foil instantiation + staining pipeline + staging ingestion + BtQ detection + runner integration (Wave 3, depends on 01+02)
 
 ---
 
@@ -507,7 +507,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 13.2. Cross-Session Causal Chain Analysis [INSERTED] | —/— | ✓ Complete | 2026-02-22 |
 | 13.3. Identification Transparency Layer [INSERTED] | 4/4 | ✓ Complete | 2026-02-23 |
 | 14. Live Session Governance Research | 0/3 | ⬜ Pending | — |
-| 14.1. Premise Registry + Premise-Assertion Gate [INSERTED] | 0/3 | ⬜ Pending (unblocked: prerequisite ✓ 2026-02-23) | — |
+| 14.1. Premise Registry + Premise-Assertion Gate [INSERTED] | 3/3 | ✓ Complete | 2026-02-23 |
 | 15. DDF Detection Substrate (human + AI) | —/— | ⬜ Pending | — |
 | 16. Sacred Fire Intelligence System | —/— | ⬜ Pending | — |
 | 17. Candidate Assessment System | —/— | ⬜ Pending | — |

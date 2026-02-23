@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 14.1 (Premise Registry + Premise-Assertion Gate) — In progress. Plan 01 complete: premise_registry DuckDB table with 20 columns, PremiseRecord/ParsedPremise models, PREMISE block regex parser, PremiseRegistry CRUD, episodes.parent_episode_id causal links with backfill. 64 premise tests passing, 1094 total tests passing (excluding pre-existing segmenter issue).
+**Current focus:** Phase 14.1 (Premise Registry + Premise-Assertion Gate) — In progress. Plans 01-02 complete: premise_registry DuckDB table, PremiseRecord/ParsedPremise models, PREMISE block regex parser, PremiseRegistry CRUD, episodes.parent_episode_id causal links, PAG PreToolUse hook with transcript scanner, JSONL staging, stained premise detection, foil instantiation warnings, Ad Ignorantiam detection. 124 premise/hook tests passing, 1154 total tests passing (excluding pre-existing segmenter issue).
 
 ## Current Position
 
 Phase: 14.1 (Premise Registry + Premise-Assertion Gate)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-02-23 -- Completed 14.1-01-PLAN.md (Premise Registry Data Layer). 64 premise tests, 1094 total tests passing. premise_registry table + PremiseRegistry CRUD + parent_episode_id causal links operational.
+Last activity: 2026-02-23 -- Completed 14.1-02-PLAN.md (PAG PreToolUse Hook). 60 new tests (30 transcript/staging + 30 hook), 1154 total tests passing. PAG hook operational with backward transcript scanner, JSONL staging, staining check, foil lookup, Ad Ignorantiam detection.
 
-Progress: [██████████░░░░░░░░░░░░░░░░░░░░] 33% (1/3 plans in phase 14.1)
-Overall:  [█████████████████████████████████████████████████████████░░░] 96% (46/48 plans total)
+Progress: [████████████████████░░░░░░░░░░] 67% (2/3 plans in phase 14.1)
+Overall:  [██████████████████████████████████████████████████████████░░] 98% (47/48 plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 46
-- Average duration: 5.4 min
-- Total execution time: 4.30 hours
+- Total plans completed: 47
+- Average duration: 5.5 min
+- Total execution time: 4.48 hours
 
 **By Phase:**
 
@@ -42,11 +42,11 @@ Overall:  [███████████████████████
 | 12-governance-protocol-integration | 4 | ~30 min | 7.5 min |
 | 13-policy-to-constraint-feedback-loop | 3 | 19 min | 6.3 min |
 | 13.3-identification-transparency | 4 | 31 min | 7.8 min |
-| 14.1-premise-registry-premise-assertion-gate | 1 | 13 min | 13.0 min |
+| 14.1-premise-registry-premise-assertion-gate | 2 | 24 min | 12.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 10 min, 6 min, 8 min, 7 min, 13 min
-- Trend: slight increase (Phase 14.1 data layer is larger scope)
+- Last 5 plans: 6 min, 8 min, 7 min, 13 min, 11 min
+- Trend: consistent (Phase 14.1 plans at 11-13 min due to DuckDB + hook complexity)
 
 *Updated after each plan completion*
 
@@ -286,6 +286,11 @@ Recent decisions affecting current work:
 - Plan 14.1-01: write_episodes() MERGE includes parent_episode_id in staging table, SELECT, UPDATE SET, and INSERT
 - Plan 14.1-01: 64 premise tests (12 models, 22 parser, 20 registry, 10 schema)
 - Plan 14.1-01: 1094 total tests passing (excluding pre-existing segmenter X_ASK end-trigger change)
+- Plan 14.1-02: JSONL staging file (not DuckDB) for hook writes to avoid two-writer conflict
+- Plan 14.1-02: Hook always exits 0 (fail-open) -- Phase 14.1 never blocks tool calls
+- Plan 14.1-02: Ad Ignorantiam exempt for UNVALIDATED premises (already declare unknown status)
+- Plan 14.1-02: High-risk paths: schema.py, constraints.json, settings.json, models/ directory
+- Plan 14.1-02: 60 new tests (18 transcript, 12 staging, 30 hook), 1154 total tests passing
 
 ### Pending Todos
 
@@ -297,7 +302,7 @@ Four components required for real-time premise validation. Architecture: three t
 |---|-----------|--------|--------------|
 | 1 | **Episode causal links** — `parent_episode_id` on `episodes` table, linking each episode to the prior episode whose outcome became its observation. LAG window backfill SQL for existing episodes. runner.py sets parent_episode_id in population loop. writer.py MERGE propagates it. | ✓ **Complete** — 2026-02-23 (Plan 14.1-01) | Phase 14.1-01 |
 | 2 | **Premise Registry table** — `premise_registry` in `data/ope.db`. 20-column schema with PremiseRecord model, PremiseRegistry CRUD, PREMISE block parser, create_schema() integration. 64 tests. | ✓ **Complete** — 2026-02-23 (Plan 14.1-01) | Phase 14.1-01 |
-| 3 | **PAG hook** (Premise-Assertion Gate) — PreToolUse hook extension. Reads PREMISE blocks from AI output at write-class tool calls; emits PROJECTION_WARNING when foil_path_outcomes non-empty; blocks UNVALIDATED high-risk mutations. Blocked by: Phase 14 hook infrastructure. | ⬜ Pending | Phase 14.1-02 |
+| 3 | **PAG hook** (Premise-Assertion Gate) — PreToolUse hook extension. Reads PREMISE blocks from AI output at write-class tool calls; emits PROJECTION_WARNING when foil_path_outcomes non-empty; warns UNVALIDATED high-risk mutations. Stained premise check + foil lookup + Ad Ignorantiam detection. Always exits 0 (fail-open). | ✓ **Complete** — 2026-02-23 (Plan 14.1-02) | Phase 14.1-02 |
 | 4 | **CLAUDE.md premise declaration rule** — Global forcing function. Defines write-class vs. validation-class distinction, PREMISE block format, FOIL_VERIFIED format, staleness rule. Prerequisite for items 2 and 3. | ✓ **Complete** — 2026-02-23. Located at `~/.claude/CLAUDE.md` | — |
 
 ### Blockers/Concerns
@@ -452,8 +457,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Phase 14.1 Plan 01 complete. premise_registry data layer operational. Next: Plan 02 (PAG PreToolUse hook).
-Resume file: .planning/phases/14.1-premise-registry-premise-assertion-gate/14.1-02-PLAN.md
+Stopped at: Phase 14.1 Plan 02 complete. PAG PreToolUse hook operational. Next: Plan 03 (foil instantiation + staining pipeline integration).
+Resume file: .planning/phases/14.1-premise-registry-premise-assertion-gate/14.1-03-PLAN.md
 
 ## Phase 13.3 Completion Summary
 

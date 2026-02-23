@@ -48,6 +48,14 @@ Requirements for initial system capable of extracting episodes from historical d
 - [ ] **MC-03**: System provides review widget in Mission Control for labeling reactions (approve/correct/redirect/block/question) with optional constraint extraction workflow
 - [ ] **MC-04**: System stores episodes in Mission Control's SQLite database (episodes, episode_events, constraints, approvals, commit_links tables) for dashboard integration
 
+### Identification Transparency
+
+- [ ] **IDTRANS-01**: System maintains an append-only `identification_reviews` DuckDB table recording human verdicts (accept/reject) against pipeline classification acts, with UNIQUE constraint on `identification_instance_id` enforcing at-most-once-per-instance semantics across all 35 identification points in 8 pipeline layers
+- [ ] **IDTRANS-02**: System provides a `PoolBuilder` that sources `IdentificationPoint` instances per classification act type (35 total: 2×L1, 5×L2, 6×L3, 7×L4, 5×L5, 3×L6, 4×L7, 3×L8) from existing DuckDB tables, each carrying all five externalization properties (trigger, observation state, action taken, downstream impact, provenance pointer)
+- [ ] **IDTRANS-03**: System provides a `review next` CLI command that presents one unreviewed identification instance in five-field format, collects verdict + optional opinion, writes one append-only row to `identification_reviews`, and routes rejected verdicts with opinions to named spec-correction candidates in `memory_candidates` via `VerdictRouter`
+- [ ] **IDTRANS-04**: System provides trust accumulation for classification rules: accepted verdicts increment accept_count per (pipeline_component, point_id) pair, producing trust_level (unverified / provisional / established) in `identification_rule_trust` table with established threshold at ≥10 accepts and 0 rejects
+- [ ] **IDTRANS-05**: System provides an out-of-band oracle Harness that enforces four structural invariants (at-most-once-verdict, layer-coverage-monotonic, specification-closure, delta-retrieval) against durable artifacts without AI session state, plus N-version consistency check between `memory_candidates` accepted entries and MEMORY.md, reporting violations at exit code 2
+
 ## v2 Requirements
 
 Deferred to future release after v1 validation proves episode quality and RAG baseline effectiveness.
@@ -106,29 +114,34 @@ Mapping requirements to roadmap phases. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| EXTRACT-01 | Phase 1: Event Stream Foundation | Pending |
-| EXTRACT-02 | Phase 1: Event Stream Foundation | Pending |
-| EXTRACT-03 | Phase 1: Event Stream Foundation | Pending |
-| EXTRACT-04 | Phase 2: Episode Population & Storage | Pending |
-| EXTRACT-05 | Phase 2: Episode Population & Storage | Pending |
-| EXTRACT-06 | Phase 3: Constraint Management | Pending |
-| DATA-01 | Phase 2: Episode Population & Storage | Pending |
-| DATA-02 | Phase 2: Episode Population & Storage | Pending |
-| DATA-03 | Phase 1: Event Stream Foundation | Pending |
-| DATA-04 | Phase 2: Episode Population & Storage | Pending |
-| CONST-01 | Phase 3: Constraint Management | Pending |
-| CONST-02 | Phase 3: Constraint Management | Pending |
-| CONST-03 | Phase 3: Constraint Management | Pending |
-| CONST-04 | Phase 3: Constraint Management | Pending |
-| VALID-01 | Phase 4: Validation & Quality | Pending |
-| VALID-02 | Phase 4: Validation & Quality | Pending |
-| VALID-03 | Phase 4: Validation & Quality | Pending |
-| TRAIN-01 | Phase 5: Training Infrastructure | Pending |
-| TRAIN-02 | Phase 5: Training Infrastructure | Pending |
-| MC-01 | Phase 6: Mission Control Integration | Pending |
-| MC-02 | Phase 6: Mission Control Integration | Pending |
-| MC-03 | Phase 6: Mission Control Integration | Pending |
-| MC-04 | Phase 6: Mission Control Integration | Pending |
+| EXTRACT-01 | Phase 1: Event Stream Foundation | ✓ Complete |
+| EXTRACT-02 | Phase 1: Event Stream Foundation | ✓ Complete |
+| EXTRACT-03 | Phase 1: Event Stream Foundation | ✓ Complete |
+| EXTRACT-04 | Phase 2: Episode Population & Storage | ✓ Complete |
+| EXTRACT-05 | Phase 2: Episode Population & Storage | ✓ Complete |
+| EXTRACT-06 | Phase 3: Constraint Management | ✓ Complete |
+| DATA-01 | Phase 2: Episode Population & Storage | ✓ Complete |
+| DATA-02 | Phase 2: Episode Population & Storage | ✓ Complete |
+| DATA-03 | Phase 1: Event Stream Foundation | ✓ Complete |
+| DATA-04 | Phase 2: Episode Population & Storage | ✓ Complete |
+| CONST-01 | Phase 3: Constraint Management | ✓ Complete |
+| CONST-02 | Phase 3: Constraint Management | ✓ Complete |
+| CONST-03 | Phase 3: Constraint Management | ✓ Complete |
+| CONST-04 | Phase 3: Constraint Management | ✓ Complete |
+| VALID-01 | Phase 4: Validation & Quality | ✓ Complete |
+| VALID-02 | Phase 4: Validation & Quality | ✓ Complete |
+| VALID-03 | Phase 4: Validation & Quality | ✓ Complete |
+| TRAIN-01 | Phase 5: Training Infrastructure | ✓ Complete |
+| TRAIN-02 | Phase 5: Training Infrastructure | ✓ Complete |
+| MC-01 | Phase 6: Mission Control Integration | ✓ Complete |
+| MC-02 | Phase 6: Mission Control Integration | ✓ Complete |
+| MC-03 | Phase 6: Mission Control Integration | ✓ Complete |
+| MC-04 | Phase 6: Mission Control Integration | ✓ Complete |
+| IDTRANS-01 | Phase 13.3: Identification Transparency | Pending |
+| IDTRANS-02 | Phase 13.3: Identification Transparency | Pending |
+| IDTRANS-03 | Phase 13.3: Identification Transparency | Pending |
+| IDTRANS-04 | Phase 13.3: Identification Transparency | Pending |
+| IDTRANS-05 | Phase 13.3: Identification Transparency | Pending |
 | LIVE-01 | Phase 14: Live Session Governance Research | Pending |
 | LIVE-02 | Phase 14: Live Session Governance Research | Pending |
 | LIVE-03 | Phase 14: Live Session Governance Research | Pending |
@@ -136,11 +149,12 @@ Mapping requirements to roadmap phases. Updated during roadmap creation.
 | LIVE-05 | Phase 14: Live Session Governance Research | Pending |
 
 **Coverage:**
-- v1 requirements: 23 total
-- Live governance requirements: 5 (LIVE-01 through LIVE-05)
-- Mapped to phases: 28
+- v1 requirements: 23 total (Phases 1–6, all complete)
+- Identification transparency requirements: 5 (IDTRANS-01 through IDTRANS-05, Phase 13.3)
+- Live governance requirements: 5 (LIVE-01 through LIVE-05, Phase 14)
+- Mapped to phases: 33
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-10*
-*Last updated: 2026-02-10 after roadmap creation (traceability populated)*
+*Last updated: 2026-02-22 — added IDTRANS-01 through IDTRANS-05 for Phase 13.3; updated traceability statuses to reflect Phases 1–13 completion*

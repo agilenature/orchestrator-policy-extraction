@@ -233,29 +233,222 @@ Plans:
 - [x] 13-02-PLAN.md — PolicyViolationChecker + PolicyFeedbackExtractor [TDD] (Wave 2)
 - [x] 13-03-PLAN.md — Pipeline integration + ShadowReporter metric + CLI (Wave 3)
 
+### Phase 13.1: Cross-Domain Axis Extraction from the Modernizing Tool [INSERTED]
+
+**Goal**: Extract cross-domain conceptual common denominators (CCDs) by analyzing the modernizing tool's architecture documentation. Every CCD deposited must pass the bidirectional enrichment test: the `scope_rule` fires in at least one OPE context AND one modernizing tool context without modification. Observations that don't deposit are instrumentation noise.
+**Depends on**: Phase 13 (feedback loop complete)
+**Output type**: Analysis document + memory_candidates deposits (no implementation)
+**Success Criteria** (what must be TRUE):
+  1. Six cross-domain CCDs validated against bidirectional enrichment test: ground-truth-pointer, epistemological-layer-hierarchy, snippet-not-chunk, identity-firewall, closed-loop-to-specification, reconstruction-not-accumulation
+  2. Each CCD documents: (a) definition, (b) modernizing tool instance with specific artifact references, (c) OPE instance, (d) gap revealed in OPE, (e) enrichment back to modernizing tool
+  3. All six CCDs deposited to MEMORY.md in `(ccd_axis | scope_rule | flood_example)` format
+  4. Three concrete OPE design changes identified for Phase 15: memory_candidates schema extension (differential, verdict, perception_pointer), MEMORY.md layer discipline (Layer 1 only), specification feedback loop
+**Analysis document:** `.planning/phases/13.1-cross-domain-axis-extraction/13.1-ANALYSIS.md`
+**Plans:** Conversation-driven analysis (no formal PLAN.md files)
+**Completed:** 2026-02-22
+
+### Phase 13.2: Cross-Session Causal Chain Analysis [INSERTED]
+
+**Goal**: Map the modernizing tool's pipeline as a causal chain of decision nodes and transitions. Identify which decisions are epistemologically complete (all 5 externalization properties present) and which transitions require push-linking vs. pull reconstruction. Deposit two cross-domain CCDs to MEMORY.md: `decision-boundary-externalization` and `causal-chain-completeness`.
+**Depends on**: Phase 13.1 (cross-domain axis extraction complete)
+**Output type**: Analysis document + memory_candidates deposits (no implementation)
+**Success Criteria** (what must be TRUE):
+  1. Full causal chain map: 12 decision nodes (D1–D12), 9 transitions, 3 chain breaks identified
+  2. Epistemological completeness audit: every node scored against 5 properties; D10 (write-back) confirmed as 0/5 — entirely opaque
+  3. Four push-required transitions identified: T1 (slice decomposition), T2 (decomposition→Engine 1), T7 (gate→canary), T8 (failure→write-back)
+  4. CausalLinkV1 schema specified: link_id, parent_decision_id, child_decision_id, transition_trigger, propagated_constraints, observation_snapshot, captured_at
+  5. Two CCDs deposited to MEMORY.md: `decision-boundary-externalization` and `causal-chain-completeness`
+**Analysis document:** `.planning/phases/13.2-causal-chain-analysis/DECISION_CAPTURE_CONSTRAINTS.md`
+**Plans:** Conversation-driven analysis (no formal PLAN.md files)
+**Completed:** 2026-02-22
+
+---
+
+### Phase 13.3: Identification Transparency Layer [INSERTED]
+
+**Goal**: Every classification act the pipeline has already performed — all 35 identification points across 8 layers — becomes human-reviewable through a single CLI command: `python -m src.pipeline.cli review next`. Each invocation surfaces one identification instance in a five-property externalization format (trigger, observation state, action taken, downstream impact, provenance), collects a verdict + optional opinion, and writes the result to an `identification_reviews` DuckDB table. Accepted verdicts accumulate as trust evidence for classification rules. Rejected verdicts with opinions name the specific pipeline component whose heuristic was wrong — becoming the input to a subsequent spec-correction pass, closing the loop from identification-opacity → closed-loop-to-specification.
+
+The architecture is two-layer, not one. **Agent B** (classification judge) and **the Harness** (out-of-band invariant enforcer) are structurally distinct: Agent B answers "is this label correct given the raw data?" against MEMORY.md CCDs; the Harness answers "did the system maintain structural correctness?" against durable artifacts with no AI session state required. This resolves the bootstrap circularity: the Harness is the independent trust anchor.
+**Depends on**: Phase 13 (policy feedback loop complete); Phase 13.1 (opacity problem identified); Phase 13.2 (causal chain completeness CCD deposited)
+**Requirements**: IDTRANS-01 (identification pool — all 35 points loadable), IDTRANS-02 (review next CLI command), IDTRANS-03 (balanced layer sampler), IDTRANS-04 (rejected verdict routing to named spec-correction target), IDTRANS-05 (accepted verdict trust accumulation)
+**Success Criteria** (what must be TRUE):
+  1. `identification_reviews` DuckDB table exists with all five externalization properties per row: `trigger` (what prompted this classification), `observation_state` (the raw input the classifier saw), `action_taken` (the label assigned), `outcome` (accept/reject verdict), `provenance_pointer` (session_id, event_id, episode_id, source_file + line range)
+  2. `python -m src.pipeline.cli review next` runs without error: samples one identification instance from the balanced pool, presents it in the five-field format (IDENTIFICATION POINT / RAW DATA / DECISION MADE / DOWNSTREAM IMPACT / PROVENANCE), collects verdict + optional opinion interactively, and writes one row to `identification_reviews`
+  3. All 35 identification points (8 layers, enumerated below) are represented in the pool — each sourced from a real pipeline artifact with a traceable provenance pointer; no identification point category is empty
+  4. Layer coverage is measurably balanced: the sampler draws uniformly across all 8 layers so no single layer accounts for more than 20% of presented instances when N >= 40 reviews exist
+  5. At least N >= 35 identification reviews have been written (enough to visit all identification points at least once), with at least 1 reviewed instance per layer (8 minimum)
+  6. Verdict distribution is observable: % accepted, % rejected; at least one rejected verdict per layer is present in the dataset after the layer-coverage milestone is reached
+  7. At least one rejected verdict with non-empty opinion has produced a named spec-correction candidate — a record in `memory_candidates` (or `identification_review_log`) that identifies the specific pipeline component and heuristic that produced the wrong classification, so the fix target is unambiguous
+  8. Accepted verdicts accumulate as trust evidence: each accepted verdict increments a `trust_score` field on the corresponding classification rule record; a rule with >= 10 accepted verdicts and 0 rejections carries `trust_level = established`
+
+**The 35 Identification Points (8 Layers):**
+
+*Layer 1 — Event filtering and actor assignment (2 points)*
+- L1-1: Record meaningfulness — is this JSONL record a meaningful event or noise to be filtered?
+- L1-2: Actor assignment — is the actor `orchestrator`, `tool`, `human`, or `environment`?
+
+*Layer 2 — Tagging (5 points)*
+- L2-1: Primary label — which of O_DIR / O_GATE / O_CORR / T_TEST / T_RISKY / T_GIT_COMMIT / X_PROPOSE / X_ASK / O_ESC / O_AXS / NOISE applies?
+- L2-2: Confidence score — how confident is the tagger in the primary label (0.0–1.0)?
+- L2-3: Secondary labels — which additional tags apply to this event?
+- L2-4: Mode inference — SUPERVISED / SEMI_SUPERVISED / AUTONOMOUS / ESCALATE for this event
+- L2-5: Risk assessment — LOW / MEDIUM / HIGH risk level for this action
+
+*Layer 3 — Segmentation (6 points)*
+- L3-1: Episode start — does this event open a new episode (start trigger)?
+- L3-2: Episode close — does this event close the current episode (end trigger)?
+- L3-3: Timeout expiry — is this boundary caused by 30-minute timeout rather than a trigger event?
+- L3-4: Episode supersede — does this start trigger supersede a currently open episode?
+- L3-5: Outcome determination — success / failure / committed / partial / unclear
+- L3-6: Complexity — simple / complex episode classification
+
+*Layer 4 — Episode population (7 points)*
+- L4-1: Observation extraction — what is the observation text (context before the decision)?
+- L4-2: Action extraction — what is the orchestrator action (mode, scope, gates, constraints)?
+- L4-3: Outcome extraction — what happened after this decision?
+- L4-4: Reaction label — approve / correct / redirect / block / question / none
+- L4-5: Reaction confidence — confidence in the reaction label (0.0–1.0)
+- L4-6: Episode mode — SUPERVISED / SEMI_SUPERVISED / AUTONOMOUS / ESCALATE for this episode
+- L4-7: Risk level — LOW / MEDIUM / HIGH for this episode
+
+*Layer 5 — Constraint extraction (5 points)*
+- L5-1: Constraint presence — does this episode contain an extractable constraint?
+- L5-2: Constraint text — what is the constraint text?
+- L5-3: Scope assignment — file-level / module-level / repo-wide
+- L5-4: Severity assignment — warning / requires_approval / forbidden
+- L5-5: Duplicate detection — is this constraint a duplicate of an existing one?
+
+*Layer 6 — Constraint evaluation (3 points)*
+- L6-1: Constraint honored — did this session honor this constraint (yes / no / not applicable)?
+- L6-2: Evidence extraction — what evidence supports the honor/violation determination?
+- L6-3: Amnesia detection — is this a known active constraint that the session forgot?
+
+*Layer 7 — Escalation detection (4 points)*
+- L7-1: Block event — was there a blocked path in this episode?
+- L7-2: Bypass event — was there an alternative path that bypassed authorization?
+- L7-3: Valid escalation sequence — does blocked → bypass constitute a valid O_ESC sequence?
+- L7-4: Constraint bypassed — which specific constraint was bypassed?
+
+*Layer 8 — Policy feedback (3 points)*
+- L8-1: Suppression — was this policy recommendation suppressed (conflicted with active constraint)?
+- L8-2: Surface decision — was this recommendation surfaced-and-blocked rather than silently suppressed?
+- L8-3: Duplicate detection — is this policy-generated constraint a duplicate of a human-sourced one?
+
+**Wave Breakdown:**
+- **Wave 1 (Terminal — Agent B collection):** `identification_reviews` schema with append-only enforcement; CCD format schema constraint on `memory_candidates`; IdentificationPoint model (35 points taxonomy); pool builder sourcing from real pipeline DuckDB artifacts; balanced layer sampler; `review next` CLI (sample → present five-field format → collect verdict+opinion → write)
+- **Wave 2 (Terminal — routing + accumulation):** Rejected verdict with opinion → `memory_candidates` spec-correction candidate naming the specific pipeline component and heuristic; accepted verdict → trust_score increment per classification rule; trust_level='established' at >= 10 accepts + 0 rejects
+- **Wave 3 (Harness — out-of-band oracle):** HarnessRunner enforcing 4 invariants (at-most-once verdict, layer coverage monotonicity, specification closure, delta-retrieval); metamorphic testing (same instance → equivalent verdict across sessions); N-version consistency (accepted memory_candidates entries have MEMORY.md counterparts); `review harness` CLI subcommand
+
+**Plans:** 4 plans in 3 waves
+
+Plans:
+- [ ] 13.3-01-PLAN.md — identification_reviews schema (append-only) + IdentificationPoint model + pool builder + balanced sampler + CCD format constraint (Wave 1)
+- [ ] 13.3-02-PLAN.md — Agent B: `review next` CLI command — sample, present, collect, write [TDD] (Wave 1)
+- [ ] 13.3-03-PLAN.md — rejected verdict routing → memory_candidates spec-correction candidate + trust accumulation per classification rule (Wave 2)
+- [ ] 13.3-04-PLAN.md — Harness: 4 invariants + append-only enforcement + metamorphic testing + N-version consistency + `review harness` CLI (Wave 3)
+
+---
+
 ### Phase 14: Live Session Governance Research
 
-**Goal**: Research and produce a complete architectural plan for a live governance layer that monitors active Claude Code sessions in real-time, enforces constraints before tools fire (via Claude Code hooks), coordinates between parallel sessions via a shared bus, and delivers constraint briefings at session start — transforming the pipeline from a post-hoc analyzer into a prospective governor.
+**Goal**: Research and produce a complete architectural plan for a live governance layer that monitors active Claude Code sessions in real-time, enforces constraints before tools fire (via Claude Code hooks), coordinates between parallel sessions via a shared bus, and delivers constraint briefings at session start — transforming the pipeline from a post-hoc analyzer into a prospective governor. Includes research into real-time DDF (Discovery Detection Framework) event detection, enabling the system to act as an epistemological co-pilot: detecting conceptual breakthroughs as they occur, prompting the human to name new axes before they drift back into implicit knowledge, and capturing insights into the wisdom layer before they are lost.
 **Depends on**: Phase 13 (feedback loop complete; PolicyViolationChecker and constraint store ready for live use)
-**Requirements**: LIVE-01, LIVE-02, LIVE-03, LIVE-04, LIVE-05
+**Requirements**: LIVE-01, LIVE-02, LIVE-03, LIVE-04, LIVE-05, LIVE-06 (DDF co-pilot)
 **Output type**: Research + architectural design documents (plans are design artifacts, not implementation)
 **Success Criteria** (what must be TRUE):
   1. Complete specification of the Claude Code hooks architecture: PreToolUse, PostToolUse, SessionStart hook contracts, stdin/stdout JSON protocol, block/warn/allow decision format
-  2. Architectural design for a real-time JSONL stream processor that tails live session files, runs existing detectors (EscalationDetector, AmnesiaDetector, PolicyViolationChecker) on each event as it arrives, and emits governance signals within < 200ms
+  2. Architectural design for a real-time JSONL stream processor that tails live session files, runs detectors incrementally, and emits governance signals within < 200ms. Detectors are classified by boundary_dependency: EscalationDetector and PolicyViolationChecker are event_level (fire immediately per event); AmnesiaDetector is episode_level (deferred until CONFIRMED_END — a confirmed episode boundary, signaled by a subsequent start-trigger or 30-min TTL). The stream processor maintains a TENTATIVE_END / CONFIRMED_END state machine per session: end-triggers produce TENTATIVE_END; the next start-trigger or TTL produces CONFIRMED_END; a continuation event produces REOPENED. Episode_level signals buffer during TENTATIVE_END and flush on CONFIRMED_END. Only CONFIRMED_END episodes are written to DuckDB as training data.
   3. Inter-session coordination bus design: protocol, transport (local HTTP server vs Unix socket vs file-based), shared constraint state model, how parallel Claude Code sessions discover and signal each other
   4. "Governing session" pattern design: a dedicated Claude Code session that monitors all other active sessions, holds the full constraint store, and can broadcast blocks or briefings across the bus
-  5. A concrete Phase 15 implementation plan derived from the research — broken into executable waves with specific file targets, API contracts, and test strategies
-**Plans:** 3 plans in 2 waves
+  5. DDF co-pilot architecture: when O_AXS (Axis Shift) is detected in a live session, the system (a) prompts the human to name the new axis, (b) triggers a Concretization Flood prompt, (c) drafts a candidate wisdom entity in CCD-quality format (axis + scope rule + one flood example) for immediate review and save — combating Prose Principle Lag before insights drift back into implicit knowledge. Three co-pilot intervention types are designed (from Binswanger logical architecture + Moroney Memory Affect System integration): (1) O_AXS Intervention — fires post-naming, prompts formal axis naming and Concretization Flood; (2) Fringe Intervention — fires on negative vague phenomenological language ("something feels off about...", "this doesn't sit right..."), prompts naming before awareness drifts back to Basement (Fringe Drift = insight loss with no JSONL trace); (3) Affect Spike Intervention — fires on positive valence shift before naming (sudden certainty increase, enthusiasm spike, acceleration of statement length — the affective Aha! moment when a Value Node activates), prompts "what just clicked for you?" to capture the positive breakthrough before it drifts. The Affect Spike Intervention is the symmetric positive counterpart to the Fringe Intervention: both fire pre-naming, both combat Drift, both deposit to memory_candidates on successful capture. The wisdom entity draft is offered as a MEMORY.md-candidate entry: structured as (CCD axis | scope rule | flood example) — the format that makes the AI retrieve by axis rather than by surface similarity
+  6. A concrete Phase 15 implementation plan derived from the research — broken into executable waves with specific file targets, API contracts, and test strategies
+  7. **Constraint CCD architecture decision documented:** constraint data models specify `ccd_axis` and `epistemological_origin` fields; the SessionStart briefing format groups by CCD axis (algebraic, one principle covering N instances) rather than listing flat concretes — this is the architectural inflection from arithmetic to algebraic governance that enables exponential rather than linear compounding of the system's intelligence (see 14-CONTEXT.md)
+  8. **Policy Automatization Detector designed:** the governing session daemon includes a specification for tracking per-constraint activation/violation rates; constraints whose violation rate drops to near-zero over N sessions are graduated from the enforcement Desktop to the wisdom Library — the Desktop-clearing mechanism that frees governance capacity for higher-order principles as the system matures
+**Design brief:** `14-CONTEXT.md` — Binswanger exponential intelligence framework as architectural foundation (Crow/Desktop, Automatization, Trunk Indexing, Suspension Bridge)
+**Plans:** 5 plans in 3 waves
 
 Plans:
-- [ ] 14-01-PLAN.md — Hook contracts (LIVE-01, LIVE-02) + stream processor architecture (LIVE-03) (Wave 1)
-- [ ] 14-02-PLAN.md — Inter-session bus design (LIVE-04) + governing session pattern (LIVE-05) (Wave 1)
-- [ ] 14-03-PLAN.md — Phase 15 implementation blueprint (Wave 2, depends on 14-01, 14-02)
+- [ ] 14-01-PLAN.md — Hook contracts (LIVE-01, LIVE-02) + stream processor architecture (LIVE-03) + CCD constraint architecture decision (Wave 1)
+- [ ] 14-02-PLAN.md — Inter-session bus design (LIVE-04) + governing session pattern (LIVE-05) + DDF co-pilot architecture (LIVE-06) + Policy Automatization Detector design (Wave 1)
+- [ ] 14-03-PLAN.md — Executive spike: real-time DDF detection on UserPromptSubmit hook + Flame Events dashboard panel (Wave 2, depends on 14-01, 14-02; uses https://github.com/ncr5012/executive as hook substrate; tests: is per-prompt detection fast enough to intervene before Claude responds?)
+- [ ] 14-04-PLAN.md — OpenClaw bus spike: inter-session bus selection + OPE pipeline as post-task memory layer (Wave 2, parallel to 14-03; governing orchestrator runs `python -m src.pipeline.cli extract` on completed worker JSONL files, FlameEvents extracted in batch; tests: does full-session context produce richer DDF signal than per-prompt detection?)
+  **Session file capture requires NO special mechanism** — Claude Code already writes every session to disk in real time:
+  - Full transcripts: `~/.claude/projects/<encoded-project-path>/<session-id>.jsonl` (encoded path = `/` replaced with `-`, prefixed)
+  - Sub-agent transcripts: `~/.claude/projects/<encoded-path>/agent-<agentId>.jsonl`
+  - Global index: `~/.claude/history.jsonl` (lightweight: timestamps, prompt text, project path, session ID)
+  - Also available: `~/.claude/todos/<session-id>-*.json`, `~/.claude/plans/`, `~/.claude/file-history/`
+  The orchestrator tracks the session ID when spawning a worker; after the worker exits, it reads the known path directly. `python -m src.pipeline.cli extract` already consumes these exact files — the entire OPE pipeline IS the post-task memory ingestion layer. Sub-agent JSONL files are also available for ingestion (relevant when workers spawn their own sub-agents).
+  Bus selection is the remaining spike question — three candidate families evaluated against the governing-session pattern:
+  A) **Chat-with-API** (Mattermost/Rocket.Chat self-hosted): human-readable channel monitoring, REST API for orchestrator/worker posting, good if humans want to watch agent coordination in real-time
+  B) **Lightweight message broker** (NATS or Redis Streams): pure machine-to-machine, subjects like `openclaw.tasks` / `openclaw.results` / `openclaw.status.<worker_id>`, zero chat overhead, Redis trivial to add (Docker); recommended if OPE pipeline is the only consumer of worker output
+  C) **Tiny local HTTP bus** (FastAPI + SQLite): `POST /tasks`, `GET /tasks/next`, `POST /results`; zero new dependencies beyond what OPE already has, full control over schema, swappable internals later; sweet spot for a hackable single-machine spike
+  Spike recommendation: start with **C** (local HTTP bus) for zero-dependency validation, with the bus interface abstracted so A or B can be swapped in for production without changing the Claude Code session scripts
+- [ ] 14-05-PLAN.md — Phase 15 + 16 implementation blueprint (Wave 3, informed by both spike results: real-time vs. batch detection trade-offs, bus selection decision)
+
+### Phase 15: DDF Detection Substrate
+
+**Goal**: Implement the DDF as a deposit substrate for the AI's concept store. The detection machinery — `flame_events`, `ai_flame_events`, co-pilot interventions — is instrumental: it exists to trigger write-on-detect deposits to `memory_candidates`. Every session produces candidate entries from both human and AI reasoning; the IntelligenceProfile is the measurement surface; `memory_candidates` is the terminal output. The AI has no Raven cost function and therefore no selection pressure to file by essentials — this phase borrows the human's selection pressure (Values → Crow → axis identification) to build the AI's filing system. This is the deposit substrate that Phases 16-18 extend.
+**Depends on**: Phase 14 (live session infrastructure; O_AXS detection architecture designed)
+**Requirements**: DDF-01 (FlameEvent detection — human and AI), DDF-02 (IntelligenceProfile substrate), DDF-03 (Floating Abstraction detection), DDF-04 (Spiral Tracking), DDF-05 (Constraint epistemological origin)
+**Success Criteria** (what must be TRUE):
+  1. `O_AXS` is a valid episode mode produced by the tagger when it detects an Axis Shift — instruction granularity drops sharply AND a new unifying concept is introduced
+  2. `flame_events` DuckDB table records every DDF marker detection (Levels 0-7) for the **human**: session_id, human_id, prompt_number, marker_level, marker_type, evidence excerpt, quality_score, axis_identified, flood_confirmed, subject='human'
+  3. `ai_flame_events` DuckDB table records DDF markers detected in the **AI's own reasoning**: when the AI spontaneously introduces a new CCD (Level 2), performs causal isolation rather than symptom-matching (Level 3), or generates a Concretization Flood without human prompting (Level 6) — same schema as flame_events with subject='ai'. The AI is not only an observer of human cognition; its own reasoning patterns produce candidates for self-modification — ai_flame_events feed the same `memory_candidates` pipeline as human FlameEvents, and Phase 15 implements the write-on-detect deposit (not Phase 16)
+  4. Basic `IntelligenceProfile` per-human aggregate from flame_events: flame_frequency, avg_marker_level, spiral_depth, generalization_radius, flood_rate
+  5. Floating abstraction detection: `GeneralizationRadius` metric — constraints firing only on original hint patterns vs. novel contexts; stagnation flagged
+  6. Spiral tracking: constraints with ascending scope_paths auto-promoted to `project_wisdom` for review
+  7. Every constraint has `epistemological_origin` field: `reactive` | `principled` | `inductive`
+  8. `python -m src.pipeline.cli intelligence profile <human_id>` displays basic multi-dimensional gauge; `intelligence profile --ai` shows the AI's own marker profile across sessions
+**Plans:** ~4 plans in 3 waves (to be specified after Phase 14 blueprint)
+
+### Phase 16: Sacred Fire Intelligence System
+
+**Goal**: Build the second-order intelligence layer on top of Phase 15's detection substrate. This phase measures the *quality of the transport system* that produces FlameEvents — for both human and AI — and closes the review-and-export loop that Phase 15's write-on-detect mechanism opened. The MEMORY.md pipeline is the concrete mechanism by which the AI self-modifies across sessions: each validated CCD-format entry changes what it can retrieve in the next session, replacing surface-proximity retrieval with axis-guided retrieval. The AI self-modifies through this pipeline — detection is instrumental, the MEMORY.md deposit is the terminal act.
+**Depends on**: Phase 15 (FlameEvent substrate in place; ai_flame_events operational; epistemological origin on constraints)
+**Requirements**: DDF-06 (TransportEfficiency — human and AI), DDF-07 (MEMORY.md auto-generation and closed loop), DDF-08 (Fringe Drift rate), DDF-09 (Level 0 Trunk Identification with downstream validation)
+**Success Criteria** (what must be TRUE):
+  1. **TransportEfficiency composite** computed per session for **both human and AI**: `raven_depth × crow_efficiency × (1/transport_speed) × trunk_quality`. For the human, these four sub-metrics are derived from FlameEvent patterns. For the AI, they are derived from ai_flame_events — measuring whether the AI retrieves from the right conceptual node, compresses well, transitions quickly from vague to named, and identifies genuine fundamentals rather than superficial similarities. The AI has a TransportEfficiency score that changes as MEMORY.md quality improves — this is the direct measure of the AI's self-improvement
+  2. **Level 0 (Trunk Identification)** fully implemented as a detection type for both subjects — fires when the human (or AI) rejects superficial similarity retrieval and names the causal fundamental. Downstream validation (N sessions later) determines trunk_quality: did the named trunk actually explain the most derivative facts?
+  3. **Fringe Drift rate** computed per session — proportion of detected Fringe signals that failed to produce a named concept within N prompts. Human Fringe signals are detected by the Phase 14 co-pilot; AI Fringe signals are detected when the AI produces hedged, vague reasoning before arriving at a named principle
+  4. **`memory_candidates` DuckDB table** — auto-drafted from every Level 6 FlameEvent (human or AI) with `flood_confirmed = true` and `epistemological_origin` in ('principled', 'inductive'). Entry format: `(ccd_axis | scope_rule | flood_example | subject | session_id | origin | confidence)`. This is the pipeline through which both human insights AND the AI's own conceptual breakthroughs become permanent upgrades to the AI's retrieval system
+  5. **MEMORY.md review CLI** — `python -m src.pipeline.cli intelligence memory-review` lists pending candidates from both human and AI sessions; human accepts/rejects/edits; accepted entries exported in structured CCD format to MEMORY.md. The MEMORY.md is explicitly the AI's concept store: each accepted entry is a new filing key that gives the AI axis-guided retrieval for all future sessions on this project
+  6. **The closed loop is operational and bidirectional**: Human session → FlameEvents → Level 6 Floods → memory_candidates → review → MEMORY.md upgrade → AI retrieves by axis next session → AI reasons at higher DDF level → human reaches higher DDF levels → richer FlameEvents → better memory_candidates. The AI improves itself not by retraining but by accumulating a better concept store
+  7. **AI TransportEfficiency trend** is tracked across sessions — before MEMORY.md entries are accepted vs. after. The delta is the empirical measure of how much each CCD-quality entry improves the AI's retrieval quality. This makes the MEMORY.md pipeline's value falsifiable and measurable
+  8. **IntelligenceProfile CLI extended** — `profile <human_id>` shows full TransportEfficiency breakdown; `profile --ai` shows AI's own TransportEfficiency trend, pending memory_candidates count, and accepted entries that produced measurable improvement
+**Plans:** ~4 plans in 3 waves (to be specified after Phase 15)
+
+### Phase 17: Candidate Assessment System
+
+**Goal**: Use the full IntelligenceProfile (Phase 15 FlameEvents + Phase 16 TransportEfficiency) to assess the epistemological quality of candidates for collaborating with AI. The AI participates as a calibrated collaborator — not a passive tool. Because the AI's own IntelligenceProfile is now known and its TransportEfficiency is measured, the assessment captures the human-AI system quality, not just the human in isolation. A scenario generator produces calibrated pile problems. An Assessment Report profiles how the candidate thinks *with* AI at every DDF level. **Phase 17 is also — and primarily — the highest-fidelity mechanism for generating novel axis-level insights that upgrade the AI itself**: forcing the AI to reason at DDF Levels 5–7 under calibrated challenge produces ai_flame_events at a density and depth that routine sessions cannot generate — every assessment session is simultaneously an AI self-improvement session, depositing candidates into memory_candidates that are qualitatively richer than those from ordinary work.
+**Depends on**: Phase 16 (TransportEfficiency and MEMORY.md pipeline complete; AI's own IntelligenceProfile operational)
+**Requirements**: ASSESS-01 (scenario generator), ASSESS-02 (live candidate session), ASSESS-03 (assessment report)
+**Success Criteria** (what must be TRUE):
+  1. Scenario generator pulls from the wisdom/episode database to construct pile problems calibrated by DDF level: Level 1-2 (one abstraction unlocks solution), Level 3-4 (fundamental identification required across 5+ symptoms), Level 5-7 (AI's framing must be rejected and reoriented from a contradiction the candidate must notice themselves)
+  2. Candidate sessions run in isolated Claude Code environments with live DDF detection via Phase 14/15 infrastructure; the AI enters the session with its current IntelligenceProfile loaded — it is a known, calibrated collaborator, not a black box
+  3. Assessment Report produced at session end: FlameEvent timeline with evidence quotes, level distribution (Levels 0-7 including Trunk Identifications), axis quality scores, flood rate, spiral evidence within session, `TransportEfficiency` score with all four sub-scores, Fringe Drift rate, AI contribution profile (at what DDF level did the AI reason during this session — was it following or leading?), comparison against IntelligenceProfile population baseline
+  4. Scenario bank seeded from OPE project's own historical dead ends and breakthroughs — the system assesses against challenges it has genuinely lived
+  5. Transparency: candidate knows they are in an AI-assisted coding session being assessed for epistemological quality — how they think *with* AI. The assessment rewards intellectual independence from AI suggestions (Level 5 requires rejecting the AI's framing). Candidates who adopt AI vocabulary without forming their own CCDs score at Level 1-2 regardless of output quality
+**Plans:** ~4 plans in 3 waves (to be specified after Phase 16)
+
+### Phase 18: Bridge-Warden Structural Integrity Detection
+
+**Goal**: Implement the Suspension Bridge dimension of the DDF — detecting not whether the human or AI is ascending to abstraction (Phase 15) but whether the knowledge structure being built is structurally sound. The human dimension measures structural reasoning quality. The AI dimension is the self-correction mechanism: floating cables detected in the AI's own reasoning become correction candidates in the `memory_candidates` pipeline, actively changing what the AI will assert in the next session — not just flagging the weakness but closing the loop on it. Together with Phases 15-16, this produces a three-dimensional picture: Ignition (upward) × Integrity (downward) × Transport (the mechanism connecting them).
+**Depends on**: Phase 16 (Sacred Fire Intelligence complete; TransportEfficiency and MEMORY.md pipeline in place)
+**Theory basis**: Binswanger's Suspension Bridge analogy (Chapter 6, *How We Know*); CTT Op-8 (Top-Down Tension)
+**Requirements**: BRIDGE-01 (StructuralEvent detection — human and AI), BRIDGE-02 (StructuralIntegrityScore), BRIDGE-03 (CTT Op-8 validation), BRIDGE-04 (three-dimensional profile)
+**Success Criteria** (what must be TRUE):
+  1. `structural_events` DuckDB table records all four signal types per session (Gravity Check, Main Cable, Dependency Sequencing, Spiral Reinforcement) with evidence, prompt_number, structural_role, and subject ('human' or 'ai')
+  2. **AI structural detection**: the AI's own responses are assessed for structural integrity — does the AI's Main Cable principle pass Op-8 (is it load-bearing, does it constrain instances, is it independently detectable)? When the AI produces a floating cable, it is flagged as an AI-level amnesia precursor — a principle the AI is carrying that will fail in novel situations
+  3. CTT Op-8 (Top-Down Tension) implemented as a validation layer: every Main Cable detection (human or AI) triggers Op-8. The AI's principles that fail Op-8 are returned to the MEMORY.md pipeline as candidates for correction — the AI's own structural weaknesses become inputs to its self-improvement loop
+  4. `StructuralIntegrityScore` computed per session for both human and AI — ratio of grounded abstractions, load-bearing principles, respected hierarchical sequences, and spiral reinforcement events
+  5. **Three-dimensional IntelligenceProfile**: Ignition axis (Phase 15 FlameEvents) × Transport axis (Phase 16 TransportEfficiency) × Integrity axis (Phase 18 StructuralEvents) — the complete characterization of how a human-AI system thinks together
+  6. Phase 17 assessment scenarios extended with structural integrity dimension: candidates assessed not just for CCD identification (upward) but for whether they ground abstractions, string load-bearing principles, and respect dependencies (downward) — and whether they notice when the AI's principles are floating cables
+**Plans:** ~4 plans in 3 waves (to be specified after Phase 17)
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 12 -> 13 -> 14
+Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.3 -> 14 -> 15 -> 16 -> 17 -> 18
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -272,4 +465,11 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 12 -> 13 -> 14
 | 11. Project-Level Wisdom Layer | 6/6 | ✓ Complete | 2026-02-20 |
 | 12. Governance Protocol Integration | 4/4 | ✓ Complete | 2026-02-20 |
 | 13. Policy-to-Constraint Feedback Loop | 3/3 | ✓ Complete | 2026-02-20 |
+| 13.1. Cross-Domain Axis Extraction [INSERTED] | —/— | ✓ Complete | 2026-02-22 |
+| 13.2. Cross-Session Causal Chain Analysis [INSERTED] | —/— | ✓ Complete | 2026-02-22 |
+| 13.3. Identification Transparency Layer [INSERTED] | 0/4 | ⬜ Pending | — |
 | 14. Live Session Governance Research | 0/3 | ⬜ Pending | — |
+| 15. DDF Detection Substrate (human + AI) | —/— | ⬜ Pending | — |
+| 16. Sacred Fire Intelligence System | —/— | ⬜ Pending | — |
+| 17. Candidate Assessment System | —/— | ⬜ Pending | — |
+| 18. Bridge-Warden Structural Integrity Detection | —/— | ⬜ Pending | — |

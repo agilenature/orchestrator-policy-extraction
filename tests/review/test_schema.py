@@ -5,6 +5,7 @@ Verifies:
 - Inserting duplicate identification_instance_id raises error
 - CCD format constraint on memory_candidates rejects empty fields
 - layer_coverage_snapshots table creation
+- identification_rule_trust table creation and constraints
 """
 
 from __future__ import annotations
@@ -16,6 +17,7 @@ import pytest
 
 from src.pipeline.review.schema import (
     IDENTIFICATION_REVIEWS_DDL,
+    IDENTIFICATION_RULE_TRUST_DDL,
     LAYER_COVERAGE_SNAPSHOTS_DDL,
     MEMORY_CANDIDATES_DDL,
     create_review_schema,
@@ -228,10 +230,56 @@ class TestLayerCoverageSnapshots:
         assert count == 1
 
 
+class TestIdentificationRuleTrust:
+    """identification_rule_trust table DDL and constraints."""
+
+    def test_table_created(self, conn: duckdb.DuckDBPyConnection):
+        tables = conn.execute("SHOW TABLES").fetchall()
+        table_names = [t[0] for t in tables]
+        assert "identification_rule_trust" in table_names
+
+    def test_valid_insert(self, conn: duckdb.DuckDBPyConnection):
+        conn.execute(
+            """
+            INSERT INTO identification_rule_trust
+            (rule_id, pipeline_component, point_id, accept_count, reject_count, trust_level)
+            VALUES ('r1', 'EventTagger', 'L2-1', 5, 0, 'unverified')
+            """
+        )
+        count = conn.execute(
+            "SELECT COUNT(*) FROM identification_rule_trust"
+        ).fetchone()[0]
+        assert count == 1
+
+    def test_trust_level_check_constraint(self, conn: duckdb.DuckDBPyConnection):
+        """Invalid trust_level values are rejected."""
+        with pytest.raises(duckdb.ConstraintException):
+            conn.execute(
+                """
+                INSERT INTO identification_rule_trust
+                (rule_id, pipeline_component, point_id, trust_level)
+                VALUES ('r2', 'Comp', 'L1-1', 'invalid')
+                """
+            )
+
+    def test_default_trust_level_unverified(self, conn: duckdb.DuckDBPyConnection):
+        conn.execute(
+            """
+            INSERT INTO identification_rule_trust
+            (rule_id, pipeline_component, point_id)
+            VALUES ('r3', 'Comp', 'L1-1')
+            """
+        )
+        row = conn.execute(
+            "SELECT trust_level FROM identification_rule_trust WHERE rule_id='r3'"
+        ).fetchone()
+        assert row[0] == "unverified"
+
+
 class TestCreateReviewSchema:
     """create_review_schema() helper function."""
 
-    def test_creates_all_three_tables(self):
+    def test_creates_all_four_tables(self):
         c = duckdb.connect(":memory:")
         create_review_schema(c)
         tables = c.execute("SHOW TABLES").fetchall()
@@ -239,6 +287,7 @@ class TestCreateReviewSchema:
         assert "identification_reviews" in table_names
         assert "memory_candidates" in table_names
         assert "layer_coverage_snapshots" in table_names
+        assert "identification_rule_trust" in table_names
         c.close()
 
     def test_idempotent(self):
@@ -246,5 +295,5 @@ class TestCreateReviewSchema:
         create_review_schema(c)
         create_review_schema(c)  # Second call should not error
         tables = c.execute("SHOW TABLES").fetchall()
-        assert len(tables) == 3
+        assert len(tables) == 4
         c.close()

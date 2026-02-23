@@ -4,6 +4,7 @@ Defines DDL for:
 - identification_reviews: append-only table storing Agent B verdicts
 - memory_candidates: new table for spec-correction candidates with CCD format constraint
 - layer_coverage_snapshots: harness invariant tracking table
+- identification_rule_trust: per-classification-rule trust accumulation
 
 The identification_reviews table enforces at-most-once semantics via
 UNIQUE constraint on identification_instance_id. Append-only behavior
@@ -14,10 +15,15 @@ entries must have non-empty ccd_axis, scope_rule, and flood_example
 fields -- making the trusted minimal core (is_valid_ccd) a schema
 invariant rather than a convention.
 
+The identification_rule_trust table tracks accepted/rejected verdict
+counts per (pipeline_component, point_id) pair, computing a trust_level
+(established/provisional/unverified) from accumulated evidence.
+
 Exports:
     IDENTIFICATION_REVIEWS_DDL
     MEMORY_CANDIDATES_DDL
     LAYER_COVERAGE_SNAPSHOTS_DDL
+    IDENTIFICATION_RULE_TRUST_DDL
     create_review_schema: Apply all DDL to a connection
 """
 
@@ -79,6 +85,20 @@ CREATE TABLE IF NOT EXISTS layer_coverage_snapshots (
 """
 
 
+IDENTIFICATION_RULE_TRUST_DDL = """
+CREATE TABLE IF NOT EXISTS identification_rule_trust (
+    rule_id            VARCHAR PRIMARY KEY,
+    pipeline_component VARCHAR NOT NULL,
+    point_id           VARCHAR NOT NULL,
+    accept_count       INTEGER NOT NULL DEFAULT 0,
+    reject_count       INTEGER NOT NULL DEFAULT 0,
+    trust_level        VARCHAR NOT NULL DEFAULT 'unverified'
+                       CHECK (trust_level IN ('established', 'provisional', 'unverified')),
+    last_updated       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+"""
+
+
 def create_review_schema(conn: duckdb.DuckDBPyConnection) -> None:
     """Apply all review system DDL to the given connection.
 
@@ -90,3 +110,4 @@ def create_review_schema(conn: duckdb.DuckDBPyConnection) -> None:
     conn.execute(IDENTIFICATION_REVIEWS_DDL)
     conn.execute(MEMORY_CANDIDATES_DDL)
     conn.execute(LAYER_COVERAGE_SNAPSHOTS_DDL)
+    conn.execute(IDENTIFICATION_RULE_TRUST_DDL)

@@ -2,9 +2,13 @@
 
 Provides the ``review`` group with:
 - next: Present one unreviewed identification instance and collect a verdict
+- route: Route unrouted rejected verdicts to spec-correction candidates
+- trust: Show per-classification-rule trust levels
 
 This is the Agent B terminal command -- the mechanism through which
-the human reviews pipeline classification acts.
+the human reviews pipeline classification acts. The ``route`` and
+``trust`` subcommands close the loop from identification opacity to
+closed-loop-to-specification.
 
 Exports:
     review_group: Click group for review subcommands
@@ -96,6 +100,162 @@ def review_next(db: str, constraints: str):
                 "spec-correction targets."
             )
 
+        conn.close()
+
+    except SystemExit:
+        raise
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+
+@review_group.command(name="route")
+@click.option("--db", default="data/ope.db", help="DuckDB path")
+def review_route(db: str):
+    """Route all unrouted rejected verdicts to spec-correction candidates.
+
+    Queries identification_reviews for rejected verdicts with non-empty
+    opinions that have not yet been routed to memory_candidates. For each
+    unrouted rejection, writes a CCD-format spec-correction candidate.
+
+    Idempotent: running twice produces no duplicates.
+    """
+    _setup_logging()
+    try:
+        import duckdb
+
+        from src.pipeline.review.models import (
+            IdentificationLayer,
+            IdentificationReview,
+            ReviewVerdict,
+        )
+        from src.pipeline.review.router import VerdictRouter
+        from src.pipeline.review.schema import create_review_schema
+
+        conn = duckdb.connect(db)
+        create_review_schema(conn)
+
+        # Find unrouted rejected verdicts with opinions
+        rows = conn.execute(
+            """
+            SELECT
+                review_id, identification_instance_id, layer, point_id,
+                pipeline_component, trigger_text, observation_state,
+                action_taken, downstream_impact, provenance_pointer,
+                verdict, opinion, reviewed_at, session_id
+            FROM identification_reviews
+            WHERE verdict = 'reject'
+              AND opinion IS NOT NULL
+              AND LENGTH(TRIM(opinion)) > 0
+              AND identification_instance_id NOT IN (
+                  SELECT source_instance_id
+                  FROM memory_candidates
+                  WHERE source_instance_id IS NOT NULL
+              )
+            """
+        ).fetchall()
+
+        if not rows:
+            click.echo("No unrouted rejected verdicts found.")
+            conn.close()
+            return
+
+        router = VerdictRouter(conn)
+        routed_count = 0
+
+        for row in rows:
+            (
+                review_id, inst_id, layer, point_id, component,
+                trigger_text, obs_state, action, impact, provenance,
+                verdict, opinion, reviewed_at, session_id,
+            ) = row
+
+            review = IdentificationReview(
+                review_id=review_id,
+                identification_instance_id=inst_id,
+                layer=IdentificationLayer(layer),
+                point_id=point_id,
+                pipeline_component=component,
+                trigger=trigger_text,
+                observation_state=obs_state,
+                action_taken=action,
+                downstream_impact=impact,
+                provenance_pointer=provenance,
+                verdict=ReviewVerdict(verdict),
+                opinion=opinion,
+                reviewed_at=(
+                    reviewed_at.isoformat()
+                    if hasattr(reviewed_at, "isoformat")
+                    else str(reviewed_at)
+                ),
+                session_id=session_id,
+            )
+
+            candidate_id = router.route(review)
+            if candidate_id:
+                routed_count += 1
+
+        click.echo(
+            f"Routed {routed_count} rejected verdict(s) to spec-correction candidates."
+        )
+        conn.close()
+
+    except SystemExit:
+        raise
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+
+@review_group.command(name="trust")
+@click.option("--db", default="data/ope.db", help="DuckDB path")
+@click.option(
+    "--component",
+    default=None,
+    help="Filter by pipeline component.",
+)
+def review_trust(db: str, component: str):
+    """Show trust levels per classification rule.
+
+    Displays a table of pipeline_component, point_id, accepts,
+    rejects, and trust_level for all tracked classification rules.
+    Optionally filter by --component.
+    """
+    _setup_logging()
+    try:
+        import duckdb
+
+        from src.pipeline.review.schema import create_review_schema
+        from src.pipeline.review.trust import TrustAccumulator
+
+        conn = duckdb.connect(db)
+        create_review_schema(conn)
+
+        acc = TrustAccumulator(conn)
+        rules = acc.get_all(pipeline_component=component)
+
+        if not rules:
+            click.echo("No trust data found.")
+            conn.close()
+            return
+
+        # Header
+        click.echo(
+            f"{'Component':<30} {'Point':<10} {'Accepts':>8} "
+            f"{'Rejects':>8} {'Trust Level':<15}"
+        )
+        click.echo("-" * 75)
+
+        for rule in rules:
+            click.echo(
+                f"{rule['pipeline_component']:<30} "
+                f"{rule['point_id']:<10} "
+                f"{rule['accepts']:>8} "
+                f"{rule['rejects']:>8} "
+                f"{rule['trust_level']:<15}"
+            )
+
+        click.echo(f"\n{len(rules)} rule(s) tracked.")
         conn.close()
 
     except SystemExit:

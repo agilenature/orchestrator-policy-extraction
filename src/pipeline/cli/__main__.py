@@ -18,6 +18,8 @@ Usage:
     python -m src.pipeline.cli govern ingest <path> [options]
     python -m src.pipeline.cli govern check-stability [options]
     python -m src.pipeline.cli review next [options]
+    python -m src.pipeline.cli review route [options]
+    python -m src.pipeline.cli review trust [options]
 """
 
 import click

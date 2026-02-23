@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 13.3 (Identification Transparency Layer) — In progress. Plans 01-02 complete: data foundation + review CLI command. Phase 13.1 complete: 6 CCDs deposited to MEMORY.md. Phase 13.2 complete: 2 CCDs deposited (decision-boundary-externalization, causal-chain-completeness). Phase 13.3 is the Identification Transparency Layer: Agent B two-layer validation architecture (Agent B classification judge + Harness out-of-band oracle) resolving bootstrap-circularity and identity-firewall violations.
+**Current focus:** Phase 13.3 (Identification Transparency Layer) — In progress. Plans 01-03 complete: data foundation + review CLI + verdict routing/trust accumulation. Phase 13.1 complete: 6 CCDs deposited to MEMORY.md. Phase 13.2 complete: 2 CCDs deposited (decision-boundary-externalization, causal-chain-completeness). Phase 13.3 is the Identification Transparency Layer: Agent B two-layer validation architecture (Agent B classification judge + Harness out-of-band oracle) resolving bootstrap-circularity and identity-firewall violations.
 
 ## Current Position
 
 Phase: 13.3 (Identification Transparency Layer)
-Plan: 2 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-23 -- Completed 13.3-02-PLAN.md (Agent B review next CLI command). Added presenter, VerdictCollector, ReviewWriter, CLI review group. 80 tests passing in review module.
+Last activity: 2026-02-23 -- Completed 13.3-03-PLAN.md (Rejected verdict routing + trust accumulation). Added VerdictRouter, TrustAccumulator, CLI route/trust commands. 134 tests passing in review module.
 
-Progress: [████████████████░░░░░░░░░░░░░░] 50% (2/4 plans in phase 13.3)
-Overall:  [██████████████████████████████████████████████████░░░░░░] 96% (43/45 plans total)
+Progress: [████████████████████████░░░░░░] 75% (3/4 plans in phase 13.3)
+Overall:  [██████████████████████████████████████████████████████░░] 98% (44/45 plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 43
-- Average duration: 5.2 min
-- Total execution time: 3.84 hours
+- Total plans completed: 44
+- Average duration: 5.3 min
+- Total execution time: 3.97 hours
 
 **By Phase:**
 
@@ -41,10 +41,10 @@ Overall:  [███████████████████████
 
 | 12-governance-protocol-integration | 4 | ~30 min | 7.5 min |
 | 13-policy-to-constraint-feedback-loop | 3 | 19 min | 6.3 min |
-| 13.3-identification-transparency | 2 | 16 min | 8.0 min |
+| 13.3-identification-transparency | 3 | 24 min | 8.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min, 7 min, 8 min, 10 min, 6 min
+- Last 5 plans: 7 min, 8 min, 10 min, 6 min, 8 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -268,6 +268,11 @@ Recent decisions affecting current work:
 - Plan 13.3-02: duckdb.ConstraintException (not IntegrityError) is the correct exception for UNIQUE violations
 - Plan 13.3-02: session_id left as None -- extension point for Phase 14+ session tracking
 - Plan 13.3-02: 80 tests passing for review module (49 baseline + 31 new)
+- Plan 13.3-03: Adapted plan schema to match existing memory_candidates (id not candidate_id, status not verdict, no epistemological_origin)
+- Plan 13.3-03: Rejected verdicts without opinion still record in TrustAccumulator (reject_count increments)
+- Plan 13.3-03: ON CONFLICT DO NOTHING (DuckDB syntax) for idempotent routing, not INSERT OR IGNORE (SQLite)
+- Plan 13.3-03: Trust level degrades on rejects (established->provisional at 10 accepts + 1 reject)
+- Plan 13.3-03: 134 tests passing for review module (80 baseline + 54 new)
 
 ### Pending Todos
 
@@ -425,5 +430,5 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Phase 13.3 Plan 02 complete. Agent B review next CLI command operational.
-Resume file: .planning/phases/13.3-identification-transparency/13.3-03-PLAN.md
+Stopped at: Phase 13.3 Plan 03 complete. Verdict routing + trust accumulation operational.
+Resume file: .planning/phases/13.3-identification-transparency/13.3-04-PLAN.md

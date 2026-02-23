@@ -3,26 +3,27 @@
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-02-10)
+**Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 14 (Live Session Governance Research) — Added to roadmap. Research phase: output is architectural design documents and Phase 15 implementation blueprint.
+**Current focus:** Phase 13.3 (Identification Transparency Layer) — In progress. Plan 01 complete: data foundation (models, schema, pool builder, sampler). Phase 13.1 complete: 6 CCDs deposited to MEMORY.md. Phase 13.2 complete: 2 CCDs deposited (decision-boundary-externalization, causal-chain-completeness). Phase 13.3 is the Identification Transparency Layer: Agent B two-layer validation architecture (Agent B classification judge + Harness out-of-band oracle) resolving bootstrap-circularity and identity-firewall violations.
 
 ## Current Position
 
-Phase: 14 of 14 (Live Session Governance Research)
-Plan: 0 of 3 in current phase
-Status: Planning
-Last activity: 2026-02-20 -- Phase 14 added to roadmap (LIVE-01 through LIVE-05 requirements). Self-analysis of 38 sessions complete (data/self.db). Governance anchor created.
+Phase: 13.3 (Identification Transparency Layer)
+Plan: 1 of 4 in current phase
+Status: In progress
+Last activity: 2026-02-23 -- Completed 13.3-01-PLAN.md (Schema + IdentificationPoint Model + Pool Builder). Created review module with models, DDL (identification_reviews, memory_candidates, layer_coverage_snapshots), PoolBuilder for 35 identification points across 8 layers, BalancedLayerSampler. 49 tests passing.
 
-Progress: [██████████████████████████████] 100% (3/3 plans in phase 13)
-Overall:  [████████████████████████████████████████████████████████] 100% (41/41 plans total)
+Progress: [████████░░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans in phase 13.3)
+Overall:  [█████████████████████████████████████████████████░░░░░░░] 93% (42/45 plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 41
-- Average duration: 5.1 min
-- Total execution time: 3.57 hours
+- Total plans completed: 42
+- Average duration: 5.2 min
+- Total execution time: 3.74 hours
 
 **By Phase:**
 
@@ -40,9 +41,10 @@ Overall:  [███████████████████████
 
 | 12-governance-protocol-integration | 4 | ~30 min | 7.5 min |
 | 13-policy-to-constraint-feedback-loop | 3 | 19 min | 6.3 min |
+| 13.3-identification-transparency | 1 | 10 min | 10.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min, 9 min, 4 min, 7 min, 8 min
+- Last 5 plans: 9 min, 4 min, 7 min, 8 min, 10 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -253,6 +255,13 @@ Recent decisions affecting current work:
 - Plan 13-03: Policy error rate denominator = evaluated + suppressed (includes suppressed in denominator)
 - Plan 13-03: CLI exit code 2 for rate >= 5%, 0 for clean or no data
 - Plan 13-03: 889 tests passing (873 baseline + 16 new)
+- Plan 13.3-01: identification_reviews UNIQUE on identification_instance_id enforces at-most-once verdicts at DB level
+- Plan 13.3-01: memory_candidates table created (not ALTER TABLE) with CCD format CHECK constraints (non-empty ccd_axis, scope_rule, flood_example)
+- Plan 13.3-01: Pool builder reads L5 from data/constraints.json, L7 from episodes table escalation columns (adapted from plan's nonexistent tables)
+- Plan 13.3-01: Instance IDs use composite natural key: {source_table}:{primary_key}:{point_type}
+- Plan 13.3-01: memory_candidates status enum: pending, validated, suspended, rejected, split_required
+- Plan 13.3-01: BalancedLayerSampler uses coverage-based priority (lowest reviewed/available ratio selected first)
+- Plan 13.3-01: 49 tests passing for review module (models, schema, pool builder, sampler)
 
 ### Pending Todos
 
@@ -409,6 +418,6 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 
 ## Session Continuity
 
-Last session: 2026-02-20
-Stopped at: Phase 13 Plan 03 complete. Project complete (41/41 plans across 13 phases).
-Resume file: N/A (project complete)
+Last session: 2026-02-23
+Stopped at: Phase 13.3 Plan 01 complete. Data foundation for identification review system built.
+Resume file: .planning/phases/13.3-identification-transparency/13.3-02-PLAN.md

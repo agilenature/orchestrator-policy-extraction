@@ -385,6 +385,42 @@ Plans:
   Spike recommendation: start with **C** (local HTTP bus) for zero-dependency validation, with the bus interface abstracted so A or B can be swapped in for production without changing the Claude Code session scripts
 - [ ] 14-05-PLAN.md — Phase 15 + 16 implementation blueprint (Wave 3, informed by both spike results: real-time vs. batch detection trade-offs, bus selection decision)
 
+---
+
+### Phase 14.1: Premise Registry + Premise-Assertion Gate [INSERTED]
+
+**Goal**: Build the introspective layer that validates premise correctness at write-class tool call boundaries. The CLAUDE.md declaration protocol (prerequisite created 2026-02-23 at `~/.claude/CLAUDE.md`) makes AI premises explicit; the Premise Registry stores and tracks them; the PAG hook validates them before mutation. This closes the architectural gap between retrospective analysis (existing OPE pipeline, Phases 1–13) and real-time premise validation. Three temporal modes in one system: retrospective (past→present), introspective (present→present), projective (present→future via foil instantiation).
+
+**Architecture overview:**
+- **Retrospective** (existing OPE, Phases 1–13): Post-hoc. Extracts constraints, wisdom, escalation patterns from completed sessions.
+- **Introspective** (this phase): Real-time. Validates explicit PREMISE declarations against observable state at the write-class tool call boundary.
+- **Projective** (this phase): Predictive. Instantiates historical foil episodes — when a PREMISE declares a FOIL, the Registry looks up past sessions where the foil was active and estimates the first action-divergence node (where foil path and claim path diverge into different tool calls).
+
+**Depends on**: Phase 14 (PreToolUse hook contracts and infrastructure specified); CLAUDE.md Premise Declaration Protocol (✓ Complete 2026-02-23, `~/.claude/CLAUDE.md`)
+**Requirements**: PREMISE-01 (Registry table + CRUD), PREMISE-02 (PAG hook validation at write boundary), PREMISE-03 (foil instantiation + divergence detection), PREMISE-04 (staining from Layer 5 retrospective invalidation), PREMISE-05 (episode causal links), PREMISE-06 (derivation integrity — Begging the Question + Ad Ignorantiam detection)
+
+**Success Criteria** (what must be TRUE):
+1. `premise_registry` DuckDB table in `data/ope.db` with schema: (premise_id, claim, validated_by, validation_context, foil, distinguishing_prop, staleness_counter, staining_record, ground_truth_pointer, project_scope, session_id, foil_path_outcomes, divergence_patterns, parent_episode_links, **derivation_depth** INTEGER, **validation_calls_before_claim** INTEGER, **derivation_chain** JSONB). `derivation_depth=0` = circular reasoning (Begging the Question: Premise ID reappears in its own conclusion chain). `validation_calls_before_claim=0` on a positive factual PREMISE = Appeal to Ignorance (Ad Ignorantiam / RQR=0).
+2. PreToolUse hook extension reads PREMISE blocks from AI output at write-class tool calls (Edit, Write, Bash mutations); emits block signal when UNVALIDATED premise detected on high-risk mutation; emits PROJECTION_WARNING with foil_path_outcomes when foil has historical outcomes
+3. Foil instantiation query: given FOIL field, retrieves historical episodes where foil premise was active, identifies first action-divergence node — the earliest point where predicted tool calls under claim vs. foil differ — and returns as PROJECTION_WARNING with evidence
+4. Staining pipeline: when OPE Layer 5 (AmnesiaDetector, PolicyViolationChecker) retrospectively invalidates a premise, the Registry marks it stained with a ground_truth_pointer to the invalidation episode; stained premises trigger PROJECTION_WARNING on next write-class use regardless of current VALIDATED_BY
+5. Episode causal links: `episodes` table extended with `parent_episode_id` (nullable VARCHAR) linking each episode to the prior episode whose outcome became its observation — enabling backward causal traversal across the full episode graph (closes `causal-chain-completeness` CCD gap)
+
+**Key decisions already made (prerequisite):**
+- Write-class tool calls: Edit, Write, Bash (with mutations). Require explicit PREMISE declaration before execution.
+- Validation-class tool calls: Read, Grep, Glob, WebFetch. Produce evidence; never require PREMISE blocks.
+- PREMISE block format: `PREMISE: [claim] | VALIDATED_BY: [evidence or UNVALIDATED] | FOIL: [confusable] | [distinguishing property] | SCOPE: [validity context]`
+- Staleness rule: re-validate if any observable state that the claim depends on could have changed since VALIDATED_BY was obtained.
+
+**Plans:** 3 plans in 2 waves
+
+Plans:
+- [ ] 14.1-01-PLAN.md — Premise module: models + parser + schema DDL + PremiseRegistry CRUD + episode causal links (Wave 1)
+- [ ] 14.1-02-PLAN.md — PAG PreToolUse hook: transcript scanner + staging writer + PREMISE block extraction + UNVALIDATED/staining warnings (Wave 1)
+- [ ] 14.1-03-PLAN.md — Foil instantiation + staining pipeline + staging ingestion + runner integration (Wave 2, depends on 01+02)
+
+---
+
 ### Phase 15: DDF Detection Substrate
 
 **Goal**: Implement the DDF as a deposit substrate for the AI's concept store. The detection machinery — `flame_events`, `ai_flame_events`, co-pilot interventions — is instrumental: it exists to trigger write-on-detect deposits to `memory_candidates`. Every session produces candidate entries from both human and AI reasoning; the IntelligenceProfile is the measurement surface; `memory_candidates` is the terminal output. The AI has no Raven cost function and therefore no selection pressure to file by essentials — this phase borrows the human's selection pressure (Values → Crow → axis identification) to build the AI's filing system. This is the deposit substrate that Phases 16-18 extend.
@@ -399,6 +435,8 @@ Plans:
   6. Spiral tracking: constraints with ascending scope_paths auto-promoted to `project_wisdom` for review
   7. Every constraint has `epistemological_origin` field: `reactive` | `principled` | `inductive`
   8. `python -m src.pipeline.cli intelligence profile <human_id>` displays basic multi-dimensional gauge; `intelligence profile --ai` shows the AI's own marker profile across sessions
+  9. **False Integration marker** in `ai_flame_events` — fires when the AI applies one reasoning rule across two code entities that belong to different CCD axes (Package Deal fallacy). Signal: the AI generates a single PREMISE whose SCOPE field covers two entities with non-overlapping axes in the `premise_registry`. Detection requires CCD axis tagging of code entities; this is the only fallacy that requires entity-level axis annotation rather than derivation-chain structural observation.
+  10. **Causal Isolation Query** — Method of Difference check for Post Hoc Ergo Propter Hoc detection. When the AI claims a causal relationship from temporal sequence alone ("A caused B because B followed A"), the system constructs a counterfactual query using the foil instantiation mechanism from Phase 14.1: "In historical episodes where A was absent, did B still occur?" If yes → Post Hoc flagged. This is the only fallacy requiring active counterfactual reasoning against historical episodes, not structural observation of the current derivation.
 **Plans:** ~4 plans in 3 waves (to be specified after Phase 14 blueprint)
 
 ### Phase 16: Sacred Fire Intelligence System
@@ -448,7 +486,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.3 -> 14 -> 15 -> 16 -> 17 -> 18
+Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.3 -> 14 -> 14.1 -> 15 -> 16 -> 17 -> 18
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -469,6 +507,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 13.2. Cross-Session Causal Chain Analysis [INSERTED] | —/— | ✓ Complete | 2026-02-22 |
 | 13.3. Identification Transparency Layer [INSERTED] | 4/4 | ✓ Complete | 2026-02-23 |
 | 14. Live Session Governance Research | 0/3 | ⬜ Pending | — |
+| 14.1. Premise Registry + Premise-Assertion Gate [INSERTED] | 0/3 | ⬜ Pending (unblocked: prerequisite ✓ 2026-02-23) | — |
 | 15. DDF Detection Substrate (human + AI) | —/— | ⬜ Pending | — |
 | 16. Sacred Fire Intelligence System | —/— | ⬜ Pending | — |
 | 17. Candidate Assessment System | —/— | ⬜ Pending | — |

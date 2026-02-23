@@ -399,6 +399,11 @@ def create_schema(conn: duckdb.DuckDBPyConnection) -> None:
         "ON policy_error_events(session_id)"
     )
 
+    # Phase 14.1: Premise registry table + episodes parent_episode_id
+    from src.pipeline.premise.schema import create_premise_schema
+
+    create_premise_schema(conn)
+
 
 def drop_schema(conn: duckdb.DuckDBPyConnection) -> None:
     """Drop all pipeline tables (for testing).
@@ -409,6 +414,7 @@ def drop_schema(conn: duckdb.DuckDBPyConnection) -> None:
     Args:
         conn: DuckDB connection to drop tables from.
     """
+    conn.execute("DROP TABLE IF EXISTS premise_registry")
     conn.execute("DROP TABLE IF EXISTS policy_error_events")
     conn.execute("DROP TABLE IF EXISTS stability_outcomes")
     conn.execute("DROP TABLE IF EXISTS project_wisdom")

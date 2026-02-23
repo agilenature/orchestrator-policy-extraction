@@ -505,6 +505,7 @@ def _merge_single_episode(
     ]
 
     config_hash = ep.get("config_hash") or provenance.get("config_hash")
+    parent_episode_id = ep.get("parent_episode_id")
 
     episode_id = ep["episode_id"]
     session_id = ep.get("session_id", "")
@@ -539,12 +540,13 @@ def _merge_single_episode(
             provenance VARCHAR,
             labels VARCHAR,
             source_files VARCHAR,
-            config_hash VARCHAR
+            config_hash VARCHAR,
+            parent_episode_id VARCHAR
         )
     """)
 
     conn.execute(
-        "INSERT INTO _staging_episode VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO _staging_episode VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [
             episode_id,
             session_id,
@@ -571,6 +573,7 @@ def _merge_single_episode(
             labels_json,
             json.dumps(source_files),
             config_hash,
+            parent_episode_id,
         ],
     )
 
@@ -613,7 +616,8 @@ def _merge_single_episode(
                 CAST(s.provenance AS JSON) AS provenance,
                 CAST(s.labels AS JSON) AS labels,
                 CAST(s.source_files AS VARCHAR[]) AS source_files,
-                s.config_hash
+                s.config_hash,
+                s.parent_episode_id
             FROM _staging_episode s
         ) AS source
         ON target.episode_id = source.episode_id
@@ -630,18 +634,19 @@ def _merge_single_episode(
             labels = source.labels,
             source_files = source.source_files,
             config_hash = source.config_hash,
+            parent_episode_id = source.parent_episode_id,
             updated_at = current_timestamp
         WHEN NOT MATCHED THEN INSERT (
             episode_id, session_id, segment_id, timestamp,
             mode, risk, reaction_label, reaction_confidence, outcome_type,
             observation, orchestrator_action, outcome, provenance, labels,
-            source_files, config_hash
+            source_files, config_hash, parent_episode_id
         ) VALUES (
             source.episode_id, source.session_id, source.segment_id, source.timestamp,
             source.mode, source.risk, source.reaction_label, source.reaction_confidence,
             source.outcome_type, source.observation, source.orchestrator_action,
             source.outcome, source.provenance, source.labels,
-            source.source_files, source.config_hash
+            source.source_files, source.config_hash, source.parent_episode_id
         )
     """)
 

@@ -299,6 +299,7 @@ class PipelineRunner:
                         te_tags.append(sec.label)
                 tag_by_event_id[te.event.event_id] = te_tags
 
+            prev_episode_id = None
             for seg in segments:
                 try:
                     # Get events within this segment
@@ -317,6 +318,9 @@ class PipelineRunner:
 
                     # Populate episode
                     episode = self._populator.populate(seg, segment_events, context_events)
+
+                    # Set parent_episode_id for causal chain (Phase 14.1)
+                    episode["parent_episode_id"] = prev_episode_id
 
                     # Find next human message after segment end for reaction labeling
                     next_human_msg = self._find_next_human_message(
@@ -340,6 +344,9 @@ class PipelineRunner:
                         "outcome_type": seg.outcome,
                         "config_hash": self._config_hash,
                     })
+
+                    # Track previous episode_id for causal chain (Phase 14.1)
+                    prev_episode_id = episode.get("episode_id")
 
                 except Exception as e:
                     logger.warning(

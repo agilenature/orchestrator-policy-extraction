@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 14.1 (Premise Registry + Premise-Assertion Gate) — In progress. Plans 01-02 complete: premise_registry DuckDB table, PremiseRecord/ParsedPremise models, PREMISE block regex parser, PremiseRegistry CRUD, episodes.parent_episode_id causal links, PAG PreToolUse hook with transcript scanner, JSONL staging, stained premise detection, foil instantiation warnings, Ad Ignorantiam detection. 124 premise/hook tests passing, 1154 total tests passing (excluding pre-existing segmenter issue).
+**Current focus:** Phase 14.1 (Premise Registry + Premise-Assertion Gate) — Complete. All 3 plans done: premise_registry DuckDB table, PremiseRecord/ParsedPremise models, PREMISE block regex parser, PremiseRegistry CRUD, episodes.parent_episode_id causal links, PAG PreToolUse hook with transcript scanner, JSONL staging, stained premise detection, foil instantiation warnings, Ad Ignorantiam detection, three-tier foil matching with divergence detection, amnesia-driven staining with derivation chain propagation (Stolen Concept), staging ingestion with Begging the Question detection, batch pipeline runner integration. 134 premise tests, 1227 total tests passing (excluding pre-existing segmenter issue).
 
 ## Current Position
 
 Phase: 14.1 (Premise Registry + Premise-Assertion Gate)
-Plan: 2 of 3 in current phase
-Status: In progress
-Last activity: 2026-02-23 -- Completed 14.1-02-PLAN.md (PAG PreToolUse Hook). 60 new tests (30 transcript/staging + 30 hook), 1154 total tests passing. PAG hook operational with backward transcript scanner, JSONL staging, staining check, foil lookup, Ad Ignorantiam detection.
+Plan: 3 of 3 in current phase
+Status: Phase complete
+Last activity: 2026-02-23 -- Completed 14.1-03-PLAN.md (Foil Instantiation + Staining Pipeline + Staging Ingestion). 40 new tests (13 foil + 13 staining + 14 ingestion), 1227 total tests passing. Three-tier foil matching, amnesia-driven staining with derivation propagation, staging ingestion with Begging the Question detection, runner integration.
 
-Progress: [████████████████████░░░░░░░░░░] 67% (2/3 plans in phase 14.1)
-Overall:  [██████████████████████████████████████████████████████████░░] 98% (47/48 plans total)
+Progress: [██████████████████████████████] 100% (3/3 plans in phase 14.1)
+Overall:  [████████████████████████████████████████████████████████████] 100% (48/48 plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 47
+- Total plans completed: 48
 - Average duration: 5.5 min
-- Total execution time: 4.48 hours
+- Total execution time: 4.63 hours
 
 **By Phase:**
 
@@ -42,11 +42,11 @@ Overall:  [███████████████████████
 | 12-governance-protocol-integration | 4 | ~30 min | 7.5 min |
 | 13-policy-to-constraint-feedback-loop | 3 | 19 min | 6.3 min |
 | 13.3-identification-transparency | 4 | 31 min | 7.8 min |
-| 14.1-premise-registry-premise-assertion-gate | 2 | 24 min | 12.0 min |
+| 14.1-premise-registry-premise-assertion-gate | 3 | 33 min | 11.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 6 min, 8 min, 7 min, 13 min, 11 min
-- Trend: consistent (Phase 14.1 plans at 11-13 min due to DuckDB + hook complexity)
+- Last 5 plans: 8 min, 7 min, 13 min, 11 min, 9 min
+- Trend: consistent (Phase 14.1 plans at 9-13 min due to DuckDB + hook complexity)
 
 *Updated after each plan completion*
 
@@ -291,6 +291,11 @@ Recent decisions affecting current work:
 - Plan 14.1-02: Ad Ignorantiam exempt for UNVALIDATED premises (already declare unknown status)
 - Plan 14.1-02: High-risk paths: schema.py, constraints.json, settings.json, models/ directory
 - Plan 14.1-02: 60 new tests (18 transcript, 12 staging, 30 hook), 1154 total tests passing
+- Plan 14.1-03: Keyword search uses CASE WHEN ILIKE positional counting (not full-text search)
+- Plan 14.1-03: Divergence detection uses simplified adjacent-tool-change heuristic for Phase 14.1
+- Plan 14.1-03: Staining propagation uses string matching on JSON column for derivation chain child lookup
+- Plan 14.1-03: Runner integration uses lazy imports (try/except ImportError) to keep premise module optional
+- Plan 14.1-03: 40 new tests (13 foil + 13 staining + 14 ingestion), 134 premise tests, 1227 total tests passing
 
 ### Pending Todos
 
@@ -457,8 +462,19 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Phase 14.1 Plan 02 complete. PAG PreToolUse hook operational. Next: Plan 03 (foil instantiation + staining pipeline integration).
-Resume file: .planning/phases/14.1-premise-registry-premise-assertion-gate/14.1-03-PLAN.md
+Stopped at: Phase 14.1 complete. All 3 plans implemented. Premise Registry fully operational with 134 tests.
+Resume file: N/A (phase complete)
+
+## Phase 14.1 Completion Summary
+
+Phase 14.1 delivered the Premise Registry + Premise-Assertion Gate (all 3 plans):
+- **Plan 01 COMPLETE**: DuckDB premise_registry table (20 columns), PremiseRecord/ParsedPremise models, PREMISE block regex parser, PremiseRegistry CRUD, episodes.parent_episode_id causal links, 64 tests
+- **Plan 02 COMPLETE**: PAG PreToolUse hook with backward transcript scanner, JSONL staging, staining check, foil lookup, Ad Ignorantiam detection, 60 new tests
+- **Plan 03 COMPLETE**: FoilInstantiator (three-tier matching + divergence detection), StainingPipeline (amnesia staining + derivation propagation), staging ingestion (Begging the Question detection), runner integration, 40 new tests
+- **134 premise tests**, 1227 total tests passing
+- **Key modules**: src/pipeline/premise/ (schema, models, parser, registry, staging, transcript, foil, staining, ingestion), src/hooks/pag/ (hook.py, scanner.py)
+- **Full pipeline**: PREMISE blocks parsed -> staged to JSONL -> ingested to DuckDB -> foil matched -> stained from amnesia -> propagated through derivation chains
+- **Three temporal modes operational**: retrospective (existing OPE), introspective (premise validation at tool-call boundary via PAG hook), projective (foil path instantiation from historical episodes)
 
 ## Phase 13.3 Completion Summary
 

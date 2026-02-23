@@ -4,11 +4,15 @@ Provides the ``review`` group with:
 - next: Present one unreviewed identification instance and collect a verdict
 - route: Route unrouted rejected verdicts to spec-correction candidates
 - trust: Show per-classification-rule trust levels
+- harness: Run the out-of-band structural invariant harness
+- stats: Show review coverage, verdict distribution, and trust levels
 
 This is the Agent B terminal command -- the mechanism through which
 the human reviews pipeline classification acts. The ``route`` and
 ``trust`` subcommands close the loop from identification opacity to
-closed-loop-to-specification.
+closed-loop-to-specification. The ``harness`` subcommand is the
+independent trust anchor -- it validates structural invariants against
+durable artifacts without requiring AI session state.
 
 Exports:
     review_group: Click group for review subcommands
@@ -256,6 +260,180 @@ def review_trust(db: str, component: str):
             )
 
         click.echo(f"\n{len(rules)} rule(s) tracked.")
+        conn.close()
+
+    except SystemExit:
+        raise
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+
+@review_group.command(name="harness")
+@click.option("--db", default="data/ope.db", help="DuckDB path")
+@click.option(
+    "--memory-md",
+    default="MEMORY.md",
+    help="Path to MEMORY.md for N-version consistency.",
+)
+def review_harness(db: str, memory_md: str):
+    """Run the out-of-band harness: enforce structural invariants.
+
+    Executes all structural invariants against durable artifacts
+    (DuckDB tables + MEMORY.md) without requiring AI session state.
+    This is the independent trust anchor that resolves bootstrap
+    circularity.
+
+    Exit codes: 0 = all pass, 2 = invariant violation.
+    """
+    _setup_logging()
+    try:
+        import duckdb
+
+        from src.pipeline.review.harness import HarnessRunner
+        from src.pipeline.review.schema import create_review_schema
+
+        conn = duckdb.connect(db)
+        create_review_schema(conn)
+
+        runner = HarnessRunner(conn, memory_md)
+        report = runner.run()
+        click.echo(report.summary())
+
+        if not report.all_passed:
+            for result in report.results:
+                if not result.passed:
+                    click.echo(f"\n--- {result.invariant_name} violations ---")
+                    for v in result.violations:
+                        click.echo(f"  {v}")
+            conn.close()
+            raise SystemExit(2)
+
+        conn.close()
+
+    except SystemExit:
+        raise
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+
+@review_group.command(name="stats")
+@click.option("--db", default="data/ope.db", help="DuckDB path")
+def review_stats(db: str):
+    """Show review coverage, verdict distribution, and trust levels.
+
+    Displays:
+    - Layer coverage: reviewed count and total per layer
+    - Verdict distribution: accepted vs rejected counts
+    - Top pipeline components by reject count
+    - Rules with trust_level='established'
+    """
+    _setup_logging()
+    try:
+        import duckdb
+
+        from src.pipeline.review.schema import create_review_schema
+
+        conn = duckdb.connect(db)
+        create_review_schema(conn)
+
+        # Overall counts
+        total = conn.execute(
+            "SELECT COUNT(*) FROM identification_reviews"
+        ).fetchone()[0]
+        if total == 0:
+            click.echo("No reviews found.")
+            conn.close()
+            return
+
+        # Verdict distribution
+        verdicts = conn.execute(
+            """
+            SELECT verdict, COUNT(*) as cnt
+            FROM identification_reviews
+            GROUP BY verdict
+            ORDER BY verdict
+            """
+        ).fetchall()
+
+        click.echo("=== Verdict Distribution ===")
+        for verdict, cnt in verdicts:
+            pct = (cnt / total) * 100
+            click.echo(f"  {verdict:<10} {cnt:>5}  ({pct:.1f}%)")
+        click.echo(f"  {'total':<10} {total:>5}")
+
+        # Layer coverage
+        layers = conn.execute(
+            """
+            SELECT layer, COUNT(*) as cnt
+            FROM identification_reviews
+            GROUP BY layer
+            ORDER BY layer
+            """
+        ).fetchall()
+
+        click.echo("\n=== Layer Coverage ===")
+        click.echo(f"  {'Layer':<10} {'Reviewed':>10}")
+        click.echo(f"  {'-' * 22}")
+        for layer, cnt in layers:
+            click.echo(f"  {layer:<10} {cnt:>10}")
+
+        # Top pipeline components by reject count
+        rejects = conn.execute(
+            """
+            SELECT pipeline_component, COUNT(*) as cnt
+            FROM identification_reviews
+            WHERE verdict = 'reject'
+            GROUP BY pipeline_component
+            ORDER BY cnt DESC
+            LIMIT 10
+            """
+        ).fetchall()
+
+        if rejects:
+            click.echo("\n=== Top Rejected Components ===")
+            click.echo(f"  {'Component':<30} {'Rejects':>8}")
+            click.echo(f"  {'-' * 40}")
+            for component, cnt in rejects:
+                click.echo(f"  {component:<30} {cnt:>8}")
+
+        # Established trust rules
+        established = conn.execute(
+            """
+            SELECT pipeline_component, point_id, accept_count
+            FROM identification_rule_trust
+            WHERE trust_level = 'established'
+            ORDER BY accept_count DESC
+            """
+        ).fetchall()
+
+        if established:
+            click.echo("\n=== Established Rules ===")
+            click.echo(
+                f"  {'Component':<30} {'Point':<10} {'Accepts':>8}"
+            )
+            click.echo(f"  {'-' * 50}")
+            for component, point_id, accepts in established:
+                click.echo(
+                    f"  {component:<30} {point_id:<10} {accepts:>8}"
+                )
+
+        # Memory candidates summary
+        candidates = conn.execute(
+            """
+            SELECT status, COUNT(*) as cnt
+            FROM memory_candidates
+            GROUP BY status
+            ORDER BY status
+            """
+        ).fetchall()
+
+        if candidates:
+            click.echo("\n=== Memory Candidates ===")
+            for status, cnt in candidates:
+                click.echo(f"  {status:<15} {cnt:>5}")
+
         conn.close()
 
     except SystemExit:

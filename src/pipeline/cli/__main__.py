@@ -20,6 +20,8 @@ Usage:
     python -m src.pipeline.cli review next [options]
     python -m src.pipeline.cli review route [options]
     python -m src.pipeline.cli review trust [options]
+    python -m src.pipeline.cli review harness [options]
+    python -m src.pipeline.cli review stats [options]
 """
 
 import click

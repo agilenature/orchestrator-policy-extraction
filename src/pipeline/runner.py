@@ -419,6 +419,28 @@ class PipelineRunner:
             logger.error("Episode write failed for {}: {}", session_id, e)
             warnings.append(f"Episode write failed: {e}")
 
+        # Step 11.5: Ingest staged premises from PAG hook
+        premise_staging_stats: dict[str, int] = {}
+        try:
+            from src.pipeline.premise.ingestion import ingest_staging as _ingest_staging
+            from src.pipeline.premise.registry import PremiseRegistry as _PremiseRegistry
+            from src.pipeline.premise.schema import create_premise_schema as _create_premise_schema
+            _create_premise_schema(self._conn)
+            _premise_registry = _PremiseRegistry(self._conn)
+            premise_staging_stats = _ingest_staging(_premise_registry)
+            if premise_staging_stats.get("ingested", 0) > 0:
+                logger.info(
+                    "Step 11.5: Ingested {} staged premises ({} errors, {} begging_the_question)",
+                    premise_staging_stats["ingested"],
+                    premise_staging_stats["errors"],
+                    premise_staging_stats["begging_the_question"],
+                )
+        except ImportError:
+            pass  # Premise module not available
+        except Exception as e:
+            logger.warning("Premise staging ingestion failed: {}", e)
+            warnings.append(f"Premise staging ingestion failed: {e}")
+
         # Step 12: Extract constraints from correct/block episodes
         constraints_new = 0
         constraints_dup = 0
@@ -608,6 +630,62 @@ class PipelineRunner:
         except Exception as e:
             logger.warning("Constraint evaluation failed: {}", e)
             warnings.append(f"Constraint evaluation failed: {e}")
+
+        # Step 14.5: Run premise staining from amnesia events
+        premise_staining_stats: dict[str, int] = {}
+        try:
+            from src.pipeline.premise.ingestion import run_staining as _run_staining
+            from src.pipeline.premise.registry import PremiseRegistry as _PremiseRegistry2
+            from src.pipeline.premise.schema import create_premise_schema as _create_premise_schema2
+            _create_premise_schema2(self._conn)
+            _premise_registry2 = _PremiseRegistry2(self._conn)
+            # Collect amnesia events from Step 14
+            if amnesia_count > 0:
+                # Re-read amnesia events from DuckDB for this session
+                try:
+                    amnesia_rows = self._conn.execute(
+                        "SELECT amnesia_id, session_id, constraint_id, constraint_type, "
+                        "severity, evidence, detected_at FROM amnesia_events "
+                        "WHERE session_id = ?",
+                        [session_id],
+                    ).fetchall()
+                    from src.pipeline.durability.amnesia import AmnesiaEvent as _AmnesiaEvent
+                    import json as _json
+                    amnesia_event_list = []
+                    for row in amnesia_rows:
+                        evidence = row[5]
+                        if isinstance(evidence, str):
+                            try:
+                                evidence = _json.loads(evidence)
+                            except Exception:
+                                evidence = []
+                        amnesia_event_list.append(_AmnesiaEvent(
+                            amnesia_id=row[0],
+                            session_id=row[1],
+                            constraint_id=row[2],
+                            constraint_type=row[3],
+                            severity=row[4],
+                            evidence=evidence if evidence else [],
+                            detected_at=str(row[6]) if row[6] else "",
+                        ))
+                    if amnesia_event_list:
+                        premise_staining_stats = _run_staining(
+                            _premise_registry2, amnesia_event_list
+                        )
+                        if premise_staining_stats.get("direct_stains", 0) > 0:
+                            logger.info(
+                                "Step 14.5: Stained {} premises ({} direct, {} propagated)",
+                                premise_staining_stats["direct_stains"] + premise_staining_stats["propagated_stains"],
+                                premise_staining_stats["direct_stains"],
+                                premise_staining_stats["propagated_stains"],
+                            )
+                except Exception as e2:
+                    logger.warning("Amnesia event re-read for staining failed: {}", e2)
+        except ImportError:
+            pass  # Premise module not available
+        except Exception as e:
+            logger.warning("Premise staining failed: {}", e)
+            warnings.append(f"Premise staining failed: {e}")
 
         # Step 15: Compute stats
         tag_distribution = self._compute_tag_distribution(tagged_events)

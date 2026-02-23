@@ -245,6 +245,22 @@ class PremiseRegistry:
         ).fetchall()
         return [self._row_to_record(row) for row in rows]
 
+    def update_derivation_depth(self, premise_id: str, depth: int) -> None:
+        """Update the derivation_depth for a premise.
+
+        Called during staging ingestion after computing chain length.
+
+        Args:
+            premise_id: The premise ID to update.
+            depth: The computed derivation depth.
+        """
+        self._conn.execute(
+            "UPDATE premise_registry "
+            "SET derivation_depth = ?, updated_at = ? "
+            "WHERE premise_id = ?",
+            [depth, _now_iso(), premise_id],
+        )
+
     def count(self) -> int:
         """Return the total number of premises in the registry.
 

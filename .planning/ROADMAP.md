@@ -342,10 +342,10 @@ The architecture is two-layer, not one. **Agent B** (classification judge) and *
 **Plans:** 4 plans in 3 waves
 
 Plans:
-- [ ] 13.3-01-PLAN.md — identification_reviews schema (append-only) + IdentificationPoint model + pool builder + balanced sampler + CCD format constraint (Wave 1)
-- [ ] 13.3-02-PLAN.md — Agent B: `review next` CLI command — sample, present, collect, write [TDD] (Wave 1)
-- [ ] 13.3-03-PLAN.md — rejected verdict routing → memory_candidates spec-correction candidate + trust accumulation per classification rule (Wave 2)
-- [ ] 13.3-04-PLAN.md — Harness: 4 invariants + append-only enforcement + metamorphic testing + N-version consistency + `review harness` CLI (Wave 3)
+- [x] 13.3-01-PLAN.md — identification_reviews schema (append-only) + IdentificationPoint model + pool builder + balanced sampler + CCD format constraint (Wave 1)
+- [x] 13.3-02-PLAN.md — Agent B: `review next` CLI command — sample, present, collect, write [TDD] (Wave 1)
+- [x] 13.3-03-PLAN.md — rejected verdict routing → memory_candidates spec-correction candidate + trust accumulation per classification rule (Wave 2)
+- [x] 13.3-04-PLAN.md — Harness: 4 invariants + append-only enforcement + metamorphic testing + N-version consistency + `review harness` CLI (Wave 3)
 
 ---
 
@@ -467,7 +467,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 13. Policy-to-Constraint Feedback Loop | 3/3 | ✓ Complete | 2026-02-20 |
 | 13.1. Cross-Domain Axis Extraction [INSERTED] | —/— | ✓ Complete | 2026-02-22 |
 | 13.2. Cross-Session Causal Chain Analysis [INSERTED] | —/— | ✓ Complete | 2026-02-22 |
-| 13.3. Identification Transparency Layer [INSERTED] | 0/4 | ⬜ Pending | — |
+| 13.3. Identification Transparency Layer [INSERTED] | 4/4 | ✓ Complete | 2026-02-23 |
 | 14. Live Session Governance Research | 0/3 | ⬜ Pending | — |
 | 15. DDF Detection Substrate (human + AI) | —/— | ⬜ Pending | — |
 | 16. Sacred Fire Intelligence System | —/— | ⬜ Pending | — |

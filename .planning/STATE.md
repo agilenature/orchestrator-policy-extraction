@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 13.3 (Identification Transparency Layer) — In progress. Plans 01-03 complete: data foundation + review CLI + verdict routing/trust accumulation. Phase 13.1 complete: 6 CCDs deposited to MEMORY.md. Phase 13.2 complete: 2 CCDs deposited (decision-boundary-externalization, causal-chain-completeness). Phase 13.3 is the Identification Transparency Layer: Agent B two-layer validation architecture (Agent B classification judge + Harness out-of-band oracle) resolving bootstrap-circularity and identity-firewall violations.
+**Current focus:** Phase 13.3 (Identification Transparency Layer) — Complete. All 4 plans executed: data foundation + review CLI + verdict routing/trust accumulation + out-of-band harness. Phase 13.1 complete: 6 CCDs deposited to MEMORY.md. Phase 13.2 complete: 2 CCDs deposited (decision-boundary-externalization, causal-chain-completeness). Phase 13.3 complete: Agent B two-layer validation architecture (Agent B classification judge + Harness out-of-band oracle) resolving bootstrap-circularity and identity-firewall violations.
 
 ## Current Position
 
 Phase: 13.3 (Identification Transparency Layer)
-Plan: 3 of 4 in current phase
-Status: In progress
-Last activity: 2026-02-23 -- Completed 13.3-03-PLAN.md (Rejected verdict routing + trust accumulation). Added VerdictRouter, TrustAccumulator, CLI route/trust commands. 134 tests passing in review module.
+Plan: 4 of 4 in current phase
+Status: Phase complete
+Last activity: 2026-02-23 -- Completed 13.3-04-PLAN.md (The Harness -- Out-of-Band Oracle). Added invariants, metamorphic testing, N-version consistency, HarnessRunner, CLI harness/stats commands. 176 tests passing in review module.
 
-Progress: [████████████████████████░░░░░░] 75% (3/4 plans in phase 13.3)
-Overall:  [██████████████████████████████████████████████████████░░] 98% (44/45 plans total)
+Progress: [██████████████████████████████] 100% (4/4 plans in phase 13.3)
+Overall:  [████████████████████████████████████████████████████████] 100% (45/45 plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 44
+- Total plans completed: 45
 - Average duration: 5.3 min
-- Total execution time: 3.97 hours
+- Total execution time: 4.08 hours
 
 **By Phase:**
 
@@ -41,10 +41,10 @@ Overall:  [███████████████████████
 
 | 12-governance-protocol-integration | 4 | ~30 min | 7.5 min |
 | 13-policy-to-constraint-feedback-loop | 3 | 19 min | 6.3 min |
-| 13.3-identification-transparency | 3 | 24 min | 8.0 min |
+| 13.3-identification-transparency | 4 | 31 min | 7.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 7 min, 8 min, 10 min, 6 min, 8 min
+- Last 5 plans: 8 min, 10 min, 6 min, 8 min, 7 min
 - Trend: stable
 
 *Updated after each plan completion*
@@ -273,6 +273,12 @@ Recent decisions affecting current work:
 - Plan 13.3-03: ON CONFLICT DO NOTHING (DuckDB syntax) for idempotent routing, not INSERT OR IGNORE (SQLite)
 - Plan 13.3-03: Trust level degrades on rejects (established->provisional at 10 accepts + 1 reject)
 - Plan 13.3-03: 134 tests passing for review module (80 baseline + 54 new)
+- Plan 13.3-04: Harness is read-only on identification_reviews; writes only layer_coverage_snapshots for monotonicity tracking
+- Plan 13.3-04: delta_retrieval uses status='validated' (matching actual memory_candidates CHECK constraint, not plan's 'accepted')
+- Plan 13.3-04: N-version consistency regex co-dependent with MEMORY.md format (if format changes, both break together)
+- Plan 13.3-04: Exit codes: 0=pass, 1=runtime-error, 2=invariant-violation (consistent with existing OPE CLI conventions)
+- Plan 13.3-04: Metamorphic testing uses separate metamorphic_test_reviews table to allow multiple verdicts per instance
+- Plan 13.3-04: 176 tests passing for review module (134 baseline + 42 new)
 
 ### Pending Todos
 
@@ -430,5 +436,17 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-23
-Stopped at: Phase 13.3 Plan 03 complete. Verdict routing + trust accumulation operational.
-Resume file: .planning/phases/13.3-identification-transparency/13.3-04-PLAN.md
+Stopped at: Phase 13.3 complete. All 45 plans across all phases executed. Out-of-band harness operational.
+Resume file: N/A -- all planned phases complete.
+
+## Phase 13.3 Completion Summary
+
+Phase 13.3 delivered the Identification Transparency Layer (all 4 plans):
+- **Plan 01 COMPLETE**: Data foundation (identification_reviews, memory_candidates, layer_coverage_snapshots tables), PoolBuilder, BalancedLayerSampler, 49 tests
+- **Plan 02 COMPLETE**: Review CLI (next command), VerdictCollector, ReviewWriter (append-only), Presenter, 80 tests
+- **Plan 03 COMPLETE**: VerdictRouter (reject->memory_candidates, accept->trust), TrustAccumulator, CLI route/trust commands, 134 tests
+- **Plan 04 COMPLETE**: Harness out-of-band oracle (4 structural invariants + N-version consistency), MetamorphicTester, HarnessRunner, CLI harness/stats commands, 176 tests
+- **Two-layer validation architecture**: Agent B (classification judge) + Harness (independent trust anchor)
+- **Bootstrap circularity resolved**: Harness has no memory, only structural checks against durable artifacts
+- **Key modules**: src/pipeline/review/ (models, schema, pool_builder, sampler, presenter, collector, writer, router, trust, invariants, metamorphic, nversion, harness), src/pipeline/cli/review.py
+- **Full CLI**: `python -m src.pipeline.cli review next|route|trust|harness|stats`

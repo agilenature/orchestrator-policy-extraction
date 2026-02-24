@@ -463,6 +463,28 @@ Plans:
   8. **IntelligenceProfile CLI extended** — `profile <human_id>` shows full TransportEfficiency breakdown; `profile --ai` shows AI's own TransportEfficiency trend, pending memory_candidates count, and accepted entries that produced measurable improvement
 **Plans:** ~4 plans in 3 waves (to be specified after Phase 15)
 
+### Phase 16.1: Topological Edge-Generation [INSERTED]
+
+**Goal**: Build the edge layer of the AI's Causal Map by mapping conditional relationships between established CCD axis nodes. Phase 16 creates weighted Basement nodes (MEMORY.md filing keys with Gravity); Phase 16.1 connects those nodes with activation-conditioned edges, enabling cross-axis implication checking, Frontier Warning detection, and Trunk→Edge→Trunk traversal that eliminates Basement descent between established principles. Central architectural constraint: edges are NOT unconditional pointers — they are first-class knowledge artifacts stored with (axis_a | axis_b | relationship | activation_condition | evidence | abstraction_level), created only from conjunctive Flame events (Level ≥ 5 AND Δ ≥ 2 above baseline_marker_level) where both axes are simultaneously active. Pre-computing edges without activation conditions recreates the flat Basement problem at a higher level — this is the structural flaw the activation_condition requirement prevents.
+**Depends on**: Phase 16 (MEMORY.md populated with CCD-quality node entries; baseline_marker_level logged by PAG gate; flame_events operational)
+**Requirements**: TOPO-01 (axis_edges first-class schema), TOPO-02 (Frontier Warning in PAG gate), TOPO-03 (cross-axis Registry Verification), TOPO-04 (Edge retirement via trunk_quality), TOPO-05 (activation_condition mandatory enforcement)
+**Success Criteria** (what must be TRUE):
+  1. `axis_edges` DuckDB table stores conditional cross-axis relationships as first-class knowledge artifacts: (edge_id SHA-256[:16], axis_a, axis_b, relationship_text, activation_condition JSON, evidence JSON of flame_event_ids, abstraction_level int, status VARCHAR CHECK IN ('candidate','active','superseded'), created_session_id) — same structural discipline as memory_candidates, not a pointer table
+  2. Edges created ONLY from conjunctive Flame events: Level ≥ 5 AND Abstraction Delta ≥ 2 above baseline_marker_level, where both axes are simultaneously active in scope — prevents Stripe-level (Level 1-2) cross-axis noise from polluting the edge table. The conjunctive trigger (Level AND Delta) is enforced at write time, not at review time
+  3. Every edge carries a mandatory `activation_condition` — structurally prohibited from being null: {goal_type: list[str], scope_prefix: str, min_axes_simultaneously_active: int}. An edge without activation_condition is an unconditional cross-axis inference, which recreates the flat Basement problem at a higher level of abstraction. The system must reject edge candidates with null activation_condition
+  4. Frontier Warning fires from PAG gate when two or more CCD axes are simultaneously active in scope AND no recorded `active` edge exists for the axis pair: "Operating between [axis_a] and [axis_b] with no recorded relationship — Frontier territory. Geological Drill zone." This is a sensitivity increase, not a prohibition — the PAG gate prompts forced explication in uncharted terrain
+  5. Registry Verification extended to check new premises against recorded cross-axis edges filtered by activation_condition — catches implication errors that span axes (premise consistent with axis_a node but violating the recorded axis_a → axis_b relationship in the current activation context)
+  6. Edge retirement: when an active edge produces a pattern of Registry contradictions rather than Causal Isolation successes (trunk_quality degradation applied to edges, same mechanism as node retirement in Phase 16), edge status → 'superseded' and human prompted to define replacement. A broken cable actively distorts the topology — it is structurally worse than no cable, because it forces false contradictions in the PAG gate
+  7. `intelligence edges [axis_a] [axis_b]` CLI displays relationship, activation_condition, evidence, status for a specified axis pair; `intelligence edges --frontier` lists all simultaneously active axis pairs in the current session with no recorded active edge — the map's blank spaces made visible
+  8. End-to-end integration verified: Level 5+ event with two simultaneously active axes → EdgeRecord candidate deposited → human review → edge registered with activation_condition → second session with same axis pair in scope → Frontier Warning suppressed (edge found, activation_condition matched)
+**Plans:** 4 plans in 3 waves
+
+Plans:
+- [ ] 16.1-01-PLAN.md — axis_edges schema + EdgeRecord model + EdgeWriter + tests (Wave 1)
+- [ ] 16.1-02-PLAN.md — ConjunctiveFlameDetector + EdgeGenerator + tests (Wave 2)
+- [ ] 16.1-03-PLAN.md — PAG gate extension: FrontierChecker + Cross-Axis Verification + tests (Wave 2)
+- [ ] 16.1-04-PLAN.md — integration tests + intelligence edges CLI (Wave 3)
+
 ### Phase 17: Candidate Assessment System
 
 **Goal**: Use the full IntelligenceProfile (Phase 15 FlameEvents + Phase 16 TransportEfficiency) to assess the epistemological quality of candidates for collaborating with AI. The AI participates as a calibrated collaborator — not a passive tool. Because the AI's own IntelligenceProfile is now known and its TransportEfficiency is measured, the assessment captures the human-AI system quality, not just the human in isolation. A scenario generator produces calibrated pile problems. An Assessment Report profiles how the candidate thinks *with* AI at every DDF level. **Phase 17 is also — and primarily — the highest-fidelity mechanism for generating novel axis-level insights that upgrade the AI itself**: forcing the AI to reason at DDF Levels 5–7 under calibrated challenge produces ai_flame_events at a density and depth that routine sessions cannot generate — every assessment session is simultaneously an AI self-improvement session, depositing candidates into memory_candidates that are qualitatively richer than those from ordinary work.
@@ -494,7 +516,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.3 -> 14 -> 14.1 -> 15 -> 16 -> 17 -> 18
+Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.3 -> 14 -> 14.1 -> 15 -> 16 -> 16.1 -> 17 -> 18
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -516,7 +538,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 13.3. Identification Transparency Layer [INSERTED] | 4/4 | ✓ Complete | 2026-02-23 |
 | 14. Live Session Governance Research | 4/4 | ✓ Complete | 2026-02-24 |
 | 14.1. Premise Registry + Premise-Assertion Gate [INSERTED] | 3/3 | ✓ Complete | 2026-02-23 |
-| 15. DDF Detection Substrate (human + AI) | 0/7 | ⬜ Pending | — |
+| 15. DDF Detection Substrate (human + AI) | 7/7 | ✓ Complete | 2026-02-24 |
 | 16. Sacred Fire Intelligence System | —/— | ⬜ Pending | — |
+| 16.1. Topological Edge-Generation [INSERTED] | 0/4 | ⬜ Planned | — |
 | 17. Candidate Assessment System | —/— | ⬜ Pending | — |
 | 18. Bridge-Warden Structural Integrity Detection | —/— | ⬜ Pending | — |

@@ -365,13 +365,13 @@ Plans:
   7. **Constraint CCD architecture decision documented:** constraint data models specify `ccd_axis` and `epistemological_origin` fields; the SessionStart briefing format groups by CCD axis (algebraic, one principle covering N instances) rather than listing flat concretes — this is the architectural inflection from arithmetic to algebraic governance that enables exponential rather than linear compounding of the system's intelligence (see 14-CONTEXT.md)
   8. **Policy Automatization Detector designed:** the governing session daemon includes a specification for tracking per-constraint activation/violation rates; constraints whose violation rate drops to near-zero over N sessions are graduated from the enforcement Desktop to the wisdom Library — the Desktop-clearing mechanism that frees governance capacity for higher-order principles as the system matures
 **Design brief:** `14-CONTEXT.md` — Binswanger exponential intelligence framework as architectural foundation (Crow/Desktop, Automatization, Trunk Indexing, Suspension Bridge)
-**Plans:** 5 plans in 3 waves
+**Plans:** 4 plans in 2 waves
 
 Plans:
-- [ ] 14-01-PLAN.md — Hook contracts (LIVE-01, LIVE-02) + stream processor architecture (LIVE-03) + CCD constraint architecture decision (Wave 1)
-- [ ] 14-02-PLAN.md — Inter-session bus design (LIVE-04) + governing session pattern (LIVE-05) + DDF co-pilot architecture (LIVE-06) + Policy Automatization Detector design (Wave 1)
-- [ ] 14-03-PLAN.md — Executive spike: real-time DDF detection on UserPromptSubmit hook + Flame Events dashboard panel (Wave 2, depends on 14-01, 14-02; uses https://github.com/ncr5012/executive as hook substrate; tests: is per-prompt detection fast enough to intervene before Claude responds?)
-- [ ] 14-04-PLAN.md — OpenClaw bus spike: inter-session bus selection + OPE pipeline as post-task memory layer (Wave 2, parallel to 14-03; governing orchestrator runs `python -m src.pipeline.cli extract` on completed worker JSONL files, FlameEvents extracted in batch; tests: does full-session context produce richer DDF signal than per-prompt detection?)
+- [x] 14-01-PLAN.md — Hook contracts (LIVE-01, LIVE-02) + stream processor architecture (LIVE-03) + CCD constraint architecture decision (Wave 1)
+- [x] 14-02-PLAN.md — Inter-session bus design (LIVE-04) + governing session pattern (LIVE-05) + DDF co-pilot architecture (LIVE-06) + Policy Automatization Detector design (Wave 1)
+- [x] 14-03-PLAN.md — Phase 15 implementation blueprint: 5 waves, 9 plans, 33 file targets, 86 API contracts, ~125 tests (Wave 2)
+- [x] 14-04-PLAN.md — Spike validation: OPE pipeline as post-task memory layer (3.3s/498 events), bus transport LOCKED at 1.6ms p99, hook stdout resolved, two-tier fidelity model validated (Wave 2)
   **Session file capture requires NO special mechanism** — Claude Code already writes every session to disk in real time:
   - Full transcripts: `~/.claude/projects/<encoded-project-path>/<session-id>.jsonl` (encoded path = `/` replaced with `-`, prefixed)
   - Sub-agent transcripts: `~/.claude/projects/<encoded-path>/agent-<agentId>.jsonl`
@@ -383,7 +383,6 @@ Plans:
   B) **Lightweight message broker** (NATS or Redis Streams): pure machine-to-machine, subjects like `openclaw.tasks` / `openclaw.results` / `openclaw.status.<worker_id>`, zero chat overhead, Redis trivial to add (Docker); recommended if OPE pipeline is the only consumer of worker output
   C) **Tiny local HTTP bus** (FastAPI + SQLite): `POST /tasks`, `GET /tasks/next`, `POST /results`; zero new dependencies beyond what OPE already has, full control over schema, swappable internals later; sweet spot for a hackable single-machine spike
   Spike recommendation: start with **C** (local HTTP bus) for zero-dependency validation, with the bus interface abstracted so A or B can be swapped in for production without changing the Claude Code session scripts
-- [ ] 14-05-PLAN.md — Phase 15 + 16 implementation blueprint (Wave 3, informed by both spike results: real-time vs. batch detection trade-offs, bus selection decision)
 
 ---
 
@@ -415,9 +414,9 @@ Plans:
 **Plans:** 3 plans in 3 waves
 
 Plans:
-- [ ] 14.1-01-PLAN.md — Premise module: models + parser + schema DDL + PremiseRegistry CRUD + episode causal links (Wave 1)
-- [ ] 14.1-02-PLAN.md — PAG PreToolUse hook: transcript scanner + staging writer + PREMISE block extraction + UNVALIDATED/staining/foil/Ad Ignorantiam warnings (Wave 2, depends on 01)
-- [ ] 14.1-03-PLAN.md — Foil instantiation + staining pipeline + staging ingestion + BtQ detection + runner integration (Wave 3, depends on 01+02)
+- [x] 14.1-01-PLAN.md — Premise module: models + parser + schema DDL + PremiseRegistry CRUD + episode causal links (Wave 1)
+- [x] 14.1-02-PLAN.md — PAG PreToolUse hook: transcript scanner + staging writer + PREMISE block extraction + UNVALIDATED/staining/foil/Ad Ignorantiam warnings (Wave 2, depends on 01)
+- [x] 14.1-03-PLAN.md — Foil instantiation + staining pipeline + staging ingestion + BtQ detection + runner integration (Wave 3, depends on 01+02)
 
 ---
 
@@ -437,7 +436,16 @@ Plans:
   8. `python -m src.pipeline.cli intelligence profile <human_id>` displays basic multi-dimensional gauge; `intelligence profile --ai` shows the AI's own marker profile across sessions
   9. **False Integration marker** in `ai_flame_events` — fires when the AI applies one reasoning rule across two code entities that belong to different CCD axes (Package Deal fallacy). Signal: the AI generates a single PREMISE whose SCOPE field covers two entities with non-overlapping axes in the `premise_registry`. Detection requires CCD axis tagging of code entities; this is the only fallacy that requires entity-level axis annotation rather than derivation-chain structural observation.
   10. **Causal Isolation Query** — Method of Difference check for Post Hoc Ergo Propter Hoc detection. When the AI claims a causal relationship from temporal sequence alone ("A caused B because B followed A"), the system constructs a counterfactual query using the foil instantiation mechanism from Phase 14.1: "In historical episodes where A was absent, did B still occur?" If yes → Post Hoc flagged. This is the only fallacy requiring active counterfactual reasoning against historical episodes, not structural observation of the current derivation.
-**Plans:** ~4 plans in 3 waves (to be specified after Phase 14 blueprint)
+**Plans:** 7 plans in 5 waves
+
+Plans:
+- [ ] 15-01-PLAN.md — DDF schema + models + config + O_AXS classification (Wave 1)
+- [ ] 15-02-PLAN.md — Tier 1 markers (L0-2 + O_AXS) + writer + deposit function (Wave 1)
+- [ ] 15-03-PLAN.md — Tier 2 enrichment: FlameEventExtractor + CausalIsolation + FalseIntegration (Wave 2)
+- [ ] 15-04-PLAN.md — Epistemological origin + GeneralizationRadius + spiral tracking (Wave 3)
+- [ ] 15-05-PLAN.md — IntelligenceProfile aggregation (Wave 3)
+- [ ] 15-06-PLAN.md — Pipeline runner integration + segmenter O_AXS + intelligence CLI (Wave 4)
+- [ ] 15-07-PLAN.md — Integration tests for all 10 DDF requirements (Wave 5)
 
 ### Phase 16: Sacred Fire Intelligence System
 
@@ -506,9 +514,9 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 13.1. Cross-Domain Axis Extraction [INSERTED] | —/— | ✓ Complete | 2026-02-22 |
 | 13.2. Cross-Session Causal Chain Analysis [INSERTED] | —/— | ✓ Complete | 2026-02-22 |
 | 13.3. Identification Transparency Layer [INSERTED] | 4/4 | ✓ Complete | 2026-02-23 |
-| 14. Live Session Governance Research | 0/3 | ⬜ Pending | — |
+| 14. Live Session Governance Research | 4/4 | ✓ Complete | 2026-02-24 |
 | 14.1. Premise Registry + Premise-Assertion Gate [INSERTED] | 3/3 | ✓ Complete | 2026-02-23 |
-| 15. DDF Detection Substrate (human + AI) | —/— | ⬜ Pending | — |
+| 15. DDF Detection Substrate (human + AI) | 0/7 | ⬜ Pending | — |
 | 16. Sacred Fire Intelligence System | —/— | ⬜ Pending | — |
 | 17. Candidate Assessment System | —/— | ⬜ Pending | — |
 | 18. Bridge-Warden Structural Integrity Detection | —/— | ⬜ Pending | — |

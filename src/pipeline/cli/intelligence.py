@@ -4,6 +4,7 @@ Provides subcommands under `intelligence`:
 - profile: Display IntelligenceProfile for a human or AI subject
 - stagnant: List stagnant constraints (floating abstractions)
 - edges: Topology edge management (list, frontier, show)
+- memory-review: Review pending memory_candidates and accept/reject to MEMORY.md
 
 Exports:
     intelligence_group: Click group for intelligence subcommands
@@ -12,10 +13,18 @@ Exports:
 from __future__ import annotations
 
 import json
+import os
 import sys
+import tempfile
 
 import click
 from loguru import logger
+
+# Default MEMORY.md path for OPE project
+_DEFAULT_MEMORY_PATH = os.path.expanduser(
+    "~/.claude/projects/-Users-david-projects-orchestrator-policy-extraction"
+    "/memory/MEMORY.md"
+)
 
 
 @click.group("intelligence")
@@ -363,6 +372,258 @@ def edges_show(edge_id: str, db: str) -> None:
     except Exception as e:
         click.echo(f"Error: {e}", err=True)
         sys.exit(1)
+
+
+@intelligence_group.command(name="memory-review")
+@click.option("--db", default="data/ope.db", help="DuckDB database path.")
+@click.option("--memory-file", default=None, help="Override MEMORY.md path.")
+def memory_review(db: str, memory_file: str | None) -> None:
+    """Review pending memory_candidates and accept/reject to MEMORY.md.
+
+    The terminal act of the deposit chain: transforms pending
+    memory_candidates into permanent MEMORY.md entries that change
+    what the AI retrieves next session.
+
+    Usage:
+        python -m src.pipeline.cli intelligence memory-review
+        python -m src.pipeline.cli intelligence memory-review --db data/ope.db
+    """
+    _setup_logging()
+    _memory_review_impl(db=db, memory_file=memory_file, input_fn=input)
+
+
+def _memory_review_impl(
+    db: str,
+    memory_file: str | None,
+    input_fn=input,
+) -> None:
+    """Implementation of memory-review, with injectable input_fn for testing.
+
+    Args:
+        db: DuckDB database path.
+        memory_file: Override MEMORY.md path. If None, uses default project path.
+        input_fn: Callable for user input (default=input). Injectable for tests.
+    """
+    import duckdb
+
+    memory_path = memory_file or _DEFAULT_MEMORY_PATH
+
+    conn = duckdb.connect(db)
+
+    # Query pending candidates
+    try:
+        rows = conn.execute(
+            "SELECT id, ccd_axis, scope_rule, flood_example, "
+            "confidence, subject, source_flame_event_id, session_id, "
+            "detection_count "
+            "FROM memory_candidates "
+            "WHERE status = 'pending' "
+            "ORDER BY confidence DESC NULLS LAST, detection_count DESC"
+        ).fetchall()
+    except Exception as e:
+        click.echo(f"Error querying memory_candidates: {e}", err=True)
+        conn.close()
+        sys.exit(1)
+
+    if not rows:
+        click.echo("No pending memory candidates.")
+        conn.close()
+        return
+
+    total = len(rows)
+    for idx, row in enumerate(rows, 1):
+        (
+            candidate_id, ccd_axis, scope_rule, flood_example,
+            confidence, subject, source_flame_event_id, session_id,
+            detection_count,
+        ) = row
+
+        # Display candidate
+        conf_str = f"{confidence:.2f}" if confidence is not None else "N/A"
+        subj_str = subject or "N/A"
+        det_str = str(detection_count) if detection_count is not None else "0"
+        click.echo(f"\n---")
+        click.echo(
+            f"CANDIDATE [{idx}/{total}] -- "
+            f"Confidence: {conf_str} | Subject: {subj_str} | Detections: {det_str}"
+        )
+        click.echo(f"---")
+        click.echo(f"CCD axis:      {ccd_axis}")
+        click.echo(f"Scope rule:    {scope_rule}")
+        click.echo(f"Flood example: {flood_example}")
+        fe_str = source_flame_event_id or "N/A"
+        sess_str = session_id or "N/A"
+        click.echo(f"Source:        flame_event {fe_str} | session {sess_str}")
+        click.echo(f"---")
+        click.echo("[a]ccept  [r]eject  [e]dit  [s]kip  [q]uit")
+
+        choice = input_fn("Choice: ").strip().lower()
+
+        if choice in ("a", "accept"):
+            _handle_accept(
+                conn, candidate_id, ccd_axis, scope_rule,
+                flood_example, memory_path, input_fn,
+            )
+        elif choice in ("r", "reject"):
+            _handle_reject(conn, candidate_id, ccd_axis)
+        elif choice in ("e", "edit"):
+            edited = _handle_edit(
+                ccd_axis, scope_rule, flood_example, input_fn,
+            )
+            if edited is not None:
+                ccd_axis, scope_rule, flood_example = edited
+                # Show updated candidate and ask for accept/reject/skip
+                click.echo(f"\n--- EDITED ---")
+                click.echo(f"CCD axis:      {ccd_axis}")
+                click.echo(f"Scope rule:    {scope_rule}")
+                click.echo(f"Flood example: {flood_example}")
+                click.echo("[a]ccept  [r]eject  [s]kip")
+                post_choice = input_fn("Choice: ").strip().lower()
+                if post_choice in ("a", "accept"):
+                    # Update the candidate with edited values before accepting
+                    conn.execute(
+                        "UPDATE memory_candidates SET ccd_axis = ?, "
+                        "scope_rule = ?, flood_example = ? WHERE id = ?",
+                        [ccd_axis, scope_rule, flood_example, candidate_id],
+                    )
+                    _handle_accept(
+                        conn, candidate_id, ccd_axis, scope_rule,
+                        flood_example, memory_path, input_fn,
+                    )
+                elif post_choice in ("r", "reject"):
+                    _handle_reject(conn, candidate_id, ccd_axis)
+                # else skip
+        elif choice in ("q", "quit"):
+            click.echo("Quit.")
+            break
+        # else skip (including 's')
+
+    conn.close()
+
+
+def _handle_accept(
+    conn,
+    candidate_id: str,
+    ccd_axis: str,
+    scope_rule: str,
+    flood_example: str,
+    memory_path: str,
+    input_fn,
+) -> None:
+    """Accept a candidate: write to MEMORY.md and update status."""
+    # Check if MEMORY.md exists
+    if not os.path.exists(memory_path):
+        click.echo(f"WARNING: MEMORY.md not found at {memory_path}")
+        click.echo("Creating new file.")
+        os.makedirs(os.path.dirname(memory_path), exist_ok=True)
+        memory_content = ""
+    else:
+        with open(memory_path) as f:
+            memory_content = f.read()
+
+    # Dedup check: case-insensitive substring match of ccd_axis
+    if ccd_axis.lower() in memory_content.lower():
+        click.echo(
+            f"WARNING: CCD axis '{ccd_axis}' already appears in MEMORY.md."
+        )
+        proceed = input_fn("Proceed anyway? [y/N]: ").strip().lower()
+        if proceed not in ("y", "yes"):
+            click.echo("Skipped (duplicate).")
+            return
+
+    # Format entry in CCD format
+    entry = (
+        f"\n---\n\n"
+        f"## {ccd_axis}\n\n"
+        f"**CCD axis:** {ccd_axis}\n"
+        f"**Scope rule:** {scope_rule}\n"
+        f"**Flood example:** {flood_example}\n\n"
+    )
+
+    # Atomic write: read full file, append entry, write full file
+    new_content = memory_content + entry
+    with open(memory_path, "w") as f:
+        f.write(new_content)
+
+    # Update status to 'validated'
+    conn.execute(
+        "UPDATE memory_candidates SET status = 'validated', "
+        "reviewed_at = NOW() WHERE id = ?",
+        [candidate_id],
+    )
+
+    click.echo(f"ACCEPTED: {ccd_axis} -> MEMORY.md")
+
+
+def _handle_reject(conn, candidate_id: str, ccd_axis: str) -> None:
+    """Reject a candidate: update status to 'rejected'."""
+    conn.execute(
+        "UPDATE memory_candidates SET status = 'rejected', "
+        "reviewed_at = NOW() WHERE id = ?",
+        [candidate_id],
+    )
+    click.echo(f"REJECTED: {ccd_axis}")
+
+
+def _handle_edit(
+    ccd_axis: str,
+    scope_rule: str,
+    flood_example: str,
+    input_fn,
+) -> tuple[str, str, str] | None:
+    """Edit a candidate's CCD fields via $EDITOR.
+
+    Returns:
+        Tuple of (ccd_axis, scope_rule, flood_example) if edited,
+        or None if editing failed or was cancelled.
+    """
+    editor = os.environ.get("EDITOR", "vi")
+
+    # Write fields to temp file
+    content = (
+        f"ccd_axis: {ccd_axis}\n"
+        f"scope_rule: {scope_rule}\n"
+        f"flood_example: {flood_example}\n"
+    )
+
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".txt", delete=False, prefix="memory_review_"
+        ) as tmp:
+            tmp.write(content)
+            tmp_path = tmp.name
+
+        # Open editor
+        ret = os.system(f'{editor} "{tmp_path}"')
+        if ret != 0:
+            click.echo("Editor exited with error. Skipping edit.")
+            return None
+
+        # Re-read and parse
+        with open(tmp_path) as f:
+            edited_content = f.read()
+
+        os.unlink(tmp_path)
+
+        # Parse fields back
+        new_axis = ccd_axis
+        new_scope = scope_rule
+        new_flood = flood_example
+
+        for line in edited_content.split("\n"):
+            line = line.strip()
+            if line.startswith("ccd_axis:"):
+                new_axis = line[len("ccd_axis:"):].strip()
+            elif line.startswith("scope_rule:"):
+                new_scope = line[len("scope_rule:"):].strip()
+            elif line.startswith("flood_example:"):
+                new_flood = line[len("flood_example:"):].strip()
+
+        return (new_axis, new_scope, new_flood)
+
+    except Exception as e:
+        click.echo(f"Edit failed: {e}")
+        return None
 
 
 def _setup_logging() -> None:

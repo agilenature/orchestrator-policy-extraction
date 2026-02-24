@@ -24,6 +24,7 @@ Usage:
     python -m src.pipeline.cli review stats [options]
     python -m src.pipeline.cli intelligence profile <human_id> [options]
     python -m src.pipeline.cli intelligence stagnant [options]
+    python -m src.pipeline.cli intelligence memory-review [options]
 """
 
 import click

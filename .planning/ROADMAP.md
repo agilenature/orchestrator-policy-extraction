@@ -540,6 +540,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 14.1. Premise Registry + Premise-Assertion Gate [INSERTED] | 3/3 | ✓ Complete | 2026-02-23 |
 | 15. DDF Detection Substrate (human + AI) | 7/7 | ✓ Complete | 2026-02-24 |
 | 16. Sacred Fire Intelligence System | —/— | ⬜ Pending | — |
-| 16.1. Topological Edge-Generation [INSERTED] | 0/4 | ⬜ Planned | — |
+| 16.1. Topological Edge-Generation [INSERTED] | 4/4 | ✓ Complete | 2026-02-24 |
 | 17. Candidate Assessment System | —/— | ⬜ Pending | — |
 | 18. Bridge-Warden Structural Integrity Detection | —/— | ⬜ Pending | — |

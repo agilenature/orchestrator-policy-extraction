@@ -136,3 +136,8 @@ def create_ddf_schema(conn: duckdb.DuckDBPyConnection) -> None:
             )
         except Exception:
             pass  # Column already exists (idempotent)
+
+    # Phase 16.1: Topological edge-generation tables
+    from src.pipeline.ddf.topology.schema import create_topology_schema
+
+    create_topology_schema(conn)

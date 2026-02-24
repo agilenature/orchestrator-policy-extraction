@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 16 (Sacred Fire Intelligence System) — Complete. All 4 plans executed: schema, TE computation, CLI display, integration tests.
+**Current focus:** Phase 17 (Candidate Assessment System) — In progress. Plan 01 complete (schema+spike). Next: Plan 02 (scenario generator+CLI).
 
 ## Current Position
 
-Phase: 16 (Sacred Fire Intelligence System)
-Plan: 4 of 4 in current phase
-Status: Phase complete
-Last activity: 2026-02-24 -- Completed 16-04-PLAN.md (Phase 16 integration tests)
+Phase: 17 (Candidate Assessment System)
+Plan: 1 of 4 in current phase
+Status: In progress
+Last activity: 2026-02-24 -- Completed 17-01-PLAN.md (Schema + Models + Session Launch Spike)
 
-Progress: [████████████████████████████████] 100% (4/4 plans in phase 16)
-Overall:  [████████████████████████████████████████████████████████████████████] 67/67 plans total
+Progress: [████████░░░░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans in phase 17)
+Overall:  [█████████████████████████████████████████████████████████████████████░] 68/71 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 67
+- Total plans completed: 68
 - Average duration: 5.5 min
-- Total execution time: 6.58 hours
+- Total execution time: 6.75 hours
 
 **By Phase:**
 
@@ -48,9 +48,11 @@ Overall:  [███████████████████████
 | 16.1-topological-edge-generation | 4 | 22 min | 5.5 min |
 | 16-sacred-fire-intelligence-system | 4 | 18 min | 4.5 min |
 
+| 17-candidate-assessment-system | 1 | 10 min | 10.0 min |
+
 **Recent Trend:**
-- Last 5 plans: 5 min, 5 min, 6 min, 3 min, 4 min
-- Trend: consistent (~4.6 min per plan)
+- Last 5 plans: 5 min, 6 min, 3 min, 4 min, 10 min
+- Trend: 17-01 spike exploration added ~5 min overhead
 
 *Updated after each plan completion*
 
@@ -400,6 +402,12 @@ Recent decisions affecting current work:
 - Plan 16-04: File-based DuckDB used for CLI tests because memory-review opens its own connection (in-memory DB not shareable)
 - Plan 16-04: CliRunner with stdin input for memory-review tests (input='a\n') tests actual CLI path
 - Plan 16-04: 1519 tests passing (1517 total + 2 pre-existing segmenter failures, zero Phase 16 regressions)
+- Plan 17-01: Claude CLI --session-id flag exists -- enables deterministic JSONL path derivation before session launch
+- Plan 17-01: MEMORY.md pre-seeding via ~/.claude/projects/{encoded}/memory/ verified working for handicap injection
+- Plan 17-01: ai_flame_events view requires CREATE OR REPLACE VIEW refresh after ALTER TABLE on flame_events (DuckDB caches SELECT * column types)
+- Plan 17-01: source_type validated in Pydantic only (not DuckDB CHECK) per DuckDB ALTER TABLE limitation
+- Plan 17-01: Assessment dir encoding: all slashes replaced with dashes (/tmp/foo -> -tmp-foo)
+- Plan 17-01: 1533 tests passing (1517 baseline + 16 new, excluding pre-existing segmenter failures)
 
 ### Pending Todos
 
@@ -566,8 +574,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 16 COMPLETE. All 4 plans executed (schema, TE computation, CLI display, integration tests).
-Resume file: Next phase TBD
+Stopped at: Phase 17 Plan 01 COMPLETE. Schema + Models + Session Launch Spike.
+Resume file: .planning/phases/17-candidate-assessment-system/17-02-PLAN.md
 
 ## Phase 15 Completion Summary
 

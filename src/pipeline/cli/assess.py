@@ -5,6 +5,7 @@ Provides subcommands under `assess`:
 - list-scenarios: Display scenario inventory with annotation status
 - run: Full assessment lifecycle (setup -> launch -> observe -> score -> cleanup)
 - calibrate: Compute scenario baseline TE via calibration run
+- report: Generate Assessment Report and terminal deposit to memory_candidates
 
 The assess group is registered under intelligence_group in intelligence.py,
 accessible via: python -m src.pipeline.cli intelligence assess <command>
@@ -528,5 +529,88 @@ def calibrate_scenario(scenario_id: str, db: str, timeout: int) -> None:
     else:
         click.echo("Baseline TE: N/A (no flame events)")
     click.echo(f"Archive:     {session.session_artifact_path}")
+
+    conn.close()
+
+
+@assess_group.command(name="report")
+@click.argument("session_id")
+@click.option("--db", default="data/ope.db", help="DuckDB database path.")
+@click.option("--output", default=None, help="Write report to file.")
+@click.option("--no-deposit", is_flag=True, help="Skip terminal deposit.")
+def report_assessment(
+    session_id: str, db: str, output: str | None, no_deposit: bool
+) -> None:
+    """Generate Assessment Report for a completed session.
+
+    Produces a comprehensive markdown report with FlameEvent timeline,
+    level distribution, 3-metric TE, rejection analysis, AI contribution
+    profile, and population comparison. Terminal deposit writes the report
+    to memory_candidates with source_type='simulation_review'.
+
+    Usage:
+        python -m src.pipeline.cli intelligence assess report <session_id>
+        python -m src.pipeline.cli intelligence assess report <session_id> --output report.md
+        python -m src.pipeline.cli intelligence assess report <session_id> --no-deposit
+    """
+    import duckdb
+
+    from src.pipeline.assessment.reporter import AssessmentReporter
+    from src.pipeline.assessment.schema import create_assessment_schema
+
+    try:
+        conn = duckdb.connect(db)
+    except Exception as e:
+        click.echo(f"Error connecting to database: {e}", err=True)
+        sys.exit(1)
+
+    # Ensure schema exists
+    try:
+        create_assessment_schema(conn)
+    except Exception:
+        pass
+
+    # Look up session
+    row = conn.execute(
+        "SELECT session_id, scenario_id, candidate_id "
+        "FROM assessment_te_sessions WHERE session_id = ?",
+        [session_id],
+    ).fetchone()
+
+    if row is None:
+        click.echo(f"No assessment session found: {session_id}", err=True)
+        conn.close()
+        sys.exit(1)
+
+    _, scenario_id, candidate_id = row
+
+    # Generate report
+    reporter = AssessmentReporter(conn)
+    report = reporter.generate_report(session_id, scenario_id, candidate_id)
+
+    # Format markdown
+    markdown = reporter.format_report_markdown(report)
+
+    # Output
+    if output:
+        with open(output, "w") as f:
+            f.write(markdown)
+        click.echo(f"Report written to: {output}")
+    else:
+        click.echo(markdown)
+
+    # Terminal deposit
+    if not no_deposit:
+        mc_id = reporter.deposit_report(report)
+        if mc_id:
+            click.echo(
+                f"\nTerminal deposit: memory_candidates id={mc_id} "
+                f"(source_type=simulation_review, fidelity=3)"
+            )
+
+    # Auto-calibration check
+    cal_id = reporter.check_auto_calibration(scenario_id)
+    if cal_id:
+        click.echo(f"Auto-calibration proposal deposited: {cal_id}")
 
     conn.close()

@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 14.1 (Premise Registry + Premise-Assertion Gate) — Complete. All 3 plans done: premise_registry DuckDB table, PremiseRecord/ParsedPremise models, PREMISE block regex parser, PremiseRegistry CRUD, episodes.parent_episode_id causal links, PAG PreToolUse hook with transcript scanner, JSONL staging, stained premise detection, foil instantiation warnings, Ad Ignorantiam detection, three-tier foil matching with divergence detection, amnesia-driven staining with derivation chain propagation (Stolen Concept), staging ingestion with Begging the Question detection, batch pipeline runner integration. 134 premise tests, 1227 total tests passing (excluding pre-existing segmenter issue).
+**Current focus:** Phase 14 (Live Session Governance Research) — In progress. Plan 01 complete: design specification for PreToolUse hook (LIVE-01), SessionStart briefing (LIVE-02), and JSONL stream processor (LIVE-03) with CCD-axis grouping, boundary_dependency dispatch, and TENTATIVE_END/CONFIRMED_END state machine.
 
 ## Current Position
 
-Phase: 14.1 (Premise Registry + Premise-Assertion Gate)
-Plan: 3 of 3 in current phase
-Status: Phase complete
-Last activity: 2026-02-23 -- Completed 14.1-03-PLAN.md (Foil Instantiation + Staining Pipeline + Staging Ingestion). 40 new tests (13 foil + 13 staining + 14 ingestion), 1227 total tests passing. Three-tier foil matching, amnesia-driven staining with derivation propagation, staging ingestion with Begging the Question detection, runner integration.
+Phase: 14 (Live Session Governance Research)
+Plan: 1 of 4 in current phase
+Status: In progress
+Last activity: 2026-02-24 -- Completed 14-01-PLAN.md (Single-Session Governance Layer Design). Complete spec for LIVE-01/LIVE-02/LIVE-03 with 5 JSON schemas, 6 Pydantic models, 3 incremental adapters, episode boundary state machine.
 
-Progress: [██████████████████████████████] 100% (3/3 plans in phase 14.1)
-Overall:  [████████████████████████████████████████████████████████████] 100% (48/48 plans total)
+Progress: [████████░░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans in phase 14)
+Overall:  [████████████████████████████████████████████████████████████░] 98% (49/52 plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 48
+- Total plans completed: 49
 - Average duration: 5.5 min
-- Total execution time: 4.63 hours
+- Total execution time: 4.76 hours
 
 **By Phase:**
 
@@ -43,10 +43,11 @@ Overall:  [███████████████████████
 | 13-policy-to-constraint-feedback-loop | 3 | 19 min | 6.3 min |
 | 13.3-identification-transparency | 4 | 31 min | 7.8 min |
 | 14.1-premise-registry-premise-assertion-gate | 3 | 33 min | 11.0 min |
+| 14-live-session-governance-research | 1 (of 4) | 8 min | 8.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 8 min, 7 min, 13 min, 11 min, 9 min
-- Trend: consistent (Phase 14.1 plans at 9-13 min due to DuckDB + hook complexity)
+- Last 5 plans: 7 min, 13 min, 11 min, 9 min, 8 min
+- Trend: consistent (design-only plans faster than implementation plans)
 
 *Updated after each plan completion*
 
@@ -296,6 +297,12 @@ Recent decisions affecting current work:
 - Plan 14.1-03: Staining propagation uses string matching on JSON column for derivation chain child lookup
 - Plan 14.1-03: Runner integration uses lazy imports (try/except ImportError) to keep premise module optional
 - Plan 14.1-03: 40 new tests (13 foil + 13 staining + 14 ingestion), 134 premise tests, 1227 total tests passing
+- Plan 14-01: CCD Constraint Architecture: all constraints carry ccd_axis and epistemological_origin; briefings group by axis (12-15 axes cover 80%+ of 332 active constraints)
+- Plan 14-01: Fail-open hook design: every failure mode in PreToolUse/SessionStart exits 0 (governance is advisory, not security)
+- Plan 14-01: GovernanceSignal boundary_dependency: event_level fires immediately, episode_level buffers until CONFIRMED_END
+- Plan 14-01: TTL episodes (30-min timeout) excluded from constraint extraction training (inferred outcome, completeness=4/5)
+- Plan 14-01: X_ASK excluded from end triggers in stream processor (consistent with post-hoc segmenter locked decision)
+- Plan 14-01: scopes_overlap() is in src/pipeline/utils.py (plan referenced durability/utils.py which does not exist)
 
 ### Pending Todos
 
@@ -461,9 +468,9 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 
 ## Session Continuity
 
-Last session: 2026-02-23
-Stopped at: Phase 14.1 complete. All 3 plans implemented. Premise Registry fully operational with 134 tests.
-Resume file: N/A (phase complete)
+Last session: 2026-02-24
+Stopped at: Phase 14 plan 01 complete. Design specification for LIVE-01/LIVE-02/LIVE-03 written.
+Resume file: .planning/phases/14-live-session-governance-research/14-02-PLAN.md
 
 ## Phase 14.1 Completion Summary
 

@@ -5,6 +5,7 @@ Provides subcommands under `intelligence`:
 - stagnant: List stagnant constraints (floating abstractions)
 - edges: Topology edge management (list, frontier, show)
 - memory-review: Review pending memory_candidates and accept/reject to MEMORY.md
+- assess: Assessment scenario management (annotate-scenarios, list-scenarios)
 
 Exports:
     intelligence_group: Click group for intelligence subcommands
@@ -786,3 +787,9 @@ def _setup_logging() -> None:
     """Configure logging to suppress INFO in CLI output."""
     logger.remove()
     logger.add(sys.stderr, level="WARNING", format="{time:HH:mm:ss} | {level:<7} | {message}")
+
+
+# Register assess subgroup (Phase 17, Plan 02)
+from src.pipeline.cli.assess import assess_group  # noqa: E402
+
+intelligence_group.add_command(assess_group)

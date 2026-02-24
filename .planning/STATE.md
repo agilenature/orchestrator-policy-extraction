@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 17 (Candidate Assessment System) — In progress. Plans 01-02 complete. Next: Plan 03 (session launcher).
+**Current focus:** Phase 17 (Candidate Assessment System) — In progress. Plans 01-03 complete. Next: Plan 04 (reporting + assessment dashboard).
 
 ## Current Position
 
 Phase: 17 (Candidate Assessment System)
-Plan: 2 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-24 -- Completed 17-02-PLAN.md (Scenario Generator + Annotation CLI)
+Last activity: 2026-02-24 -- Completed 17-03-PLAN.md (Session Runner + Observer + Rejection Detector)
 
-Progress: [████████████████░░░░░░░░░░░░░░░░] 50% (2/4 plans in phase 17)
-Overall:  [██████████████████████████████████████████████████████████████████████░] 69/71 plans total
+Progress: [████████████████████████░░░░░░░░] 75% (3/4 plans in phase 17)
+Overall:  [██████████████████████████████████████████████████████████████████████░░] 70/71 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 69
+- Total plans completed: 70
 - Average duration: 5.5 min
-- Total execution time: 6.88 hours
+- Total execution time: 7.08 hours
 
 **By Phase:**
 
@@ -48,10 +48,10 @@ Overall:  [███████████████████████
 | 16.1-topological-edge-generation | 4 | 22 min | 5.5 min |
 | 16-sacred-fire-intelligence-system | 4 | 18 min | 4.5 min |
 
-| 17-candidate-assessment-system | 2 | 18 min | 9.0 min |
+| 17-candidate-assessment-system | 3 | 30 min | 10.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 6 min, 3 min, 4 min, 10 min, 8 min
+- Last 5 plans: 3 min, 4 min, 10 min, 8 min, 12 min
 - Trend: steady execution pace
 
 *Updated after each plan completion*
@@ -413,6 +413,12 @@ Recent decisions affecting current work:
 - Plan 17-02: list-scenarios opens DB read-only with graceful error when assessment schema columns missing
 - Plan 17-02: assess group nested under intelligence_group (access: `intelligence assess <command>`)
 - Plan 17-02: 1518 tests passing (1500 baseline + 18 new, excluding pre-existing segmenter failure)
+- Plan 17-03: Assessment TE uses 3-metric formula (no transport_speed) because sessions are too short
+- Plan 17-03: Rejection threshold uses strict > (not >=): candidate at exactly threshold is stubbornness
+- Plan 17-03: Fringe-signal rejections bypass outcome gate entirely (fringe_L5)
+- Plan 17-03: Observer uses lazy imports for PipelineRunner/load_config to avoid circular dependencies
+- Plan 17-03: assessment_session_id IS NULL filter added to all 5 IntelligenceProfile flame_events queries
+- Plan 17-03: 1558 tests passing (1518 baseline + 40 new, excluding pre-existing segmenter failure)
 
 ### Pending Todos
 
@@ -579,8 +585,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 17 Plan 02 COMPLETE. Scenario Generator + Annotation CLI.
-Resume file: .planning/phases/17-candidate-assessment-system/17-03-PLAN.md
+Stopped at: Phase 17 Plan 03 COMPLETE. Session Runner + Observer + Rejection Detector.
+Resume file: .planning/phases/17-candidate-assessment-system/17-04-PLAN.md
 
 ## Phase 15 Completion Summary
 

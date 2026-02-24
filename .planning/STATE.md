@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 15 (DDF Detection Substrate) — In progress. Plan 01 complete (schema + models). 6 plans remaining.
+**Current focus:** Phase 15 (DDF Detection Substrate) — In progress. Plans 01-02 complete. 5 plans remaining.
 
 ## Current Position
 
 Phase: 15 (DDF Detection Substrate)
-Plan: 1 of 7 in current phase
+Plan: 2 of 7 in current phase
 Status: In progress
-Last activity: 2026-02-24 -- Completed 15-01-PLAN.md (DDF schema + models + config + tests)
+Last activity: 2026-02-24 -- Completed 15-02-PLAN.md (Tier 1 detectors L0-L2, OAxsDetector, writer, deposit)
 
-Progress: [████░░░░░░░░░░░░░░░░░░░░░░░░░░] 14% (1/7 plans in phase 15)
-Overall:  [████████████████████████████████████████████████████████████░░] 53/59 plans total
+Progress: [████████░░░░░░░░░░░░░░░░░░░░░░] 29% (2/7 plans in phase 15)
+Overall:  [█████████████████████████████████████████████████████████████░░] 54/59 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 53
+- Total plans completed: 54
 - Average duration: 5.5 min
-- Total execution time: 5.19 hours
+- Total execution time: 5.29 hours
 
 **By Phase:**
 
@@ -44,10 +44,10 @@ Overall:  [███████████████████████
 | 13.3-identification-transparency | 4 | 31 min | 7.8 min |
 | 14.1-premise-registry-premise-assertion-gate | 3 | 33 min | 11.0 min |
 | 14-live-session-governance-research | 4 | 28 min | 7.0 min |
-| 15-ddf-detection-substrate | 1 | 6 min | 6.0 min |
+| 15-ddf-detection-substrate | 2 | 12 min | 6.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 8 min, 8 min, 6 min, 6 min, 6 min
+- Last 5 plans: 8 min, 6 min, 6 min, 6 min, 6 min
 - Trend: consistent (~6 min per plan)
 
 *Updated after each plan completion*
@@ -322,6 +322,15 @@ Recent decisions affecting current work:
 - Plan 14-04: Bus transport LOCKED at Unix socket + uvicorn/starlette: PolicyViolationChecker.check() 0.082ms, bus p99 ~1.6ms
 - Plan 14-04: Phase 15 Wave 1 = deposit-first: flame_events + write-on-detect to memory_candidates (no scaffolding)
 - Plan 14-04: Pre-Phase 15 fix required: orchestrator-episode.schema.json needs parent_episode_id (schema drift from 14.1-01)
+- Plan 15-01: FlameEvent model frozen=True with make_id(session_id, prompt_number, marker_type) -> SHA-256[:16]
+- Plan 15-01: DDF schema integrated into create_schema() via create_ddf_schema() call at end
+- Plan 15-01: memory_candidates extended with source_flame_event_id, fidelity, detection_count columns (ALTER TABLE)
+- Plan 15-02: L0-L2 regex detectors are HIGH RECALL by design; false positives filtered downstream by Tier 2
+- Plan 15-02: OAxsDetector requires BOTH granularity drop AND novel concept (dual-signal to reduce false positives)
+- Plan 15-02: deposit_to_memory_candidates uses soft dedup on normalized (ccd_axis, scope_rule) with detection_count increment
+- Plan 15-02: write_flame_events uses INSERT OR REPLACE for idempotent DuckDB writes
+- Plan 15-02: detect_markers filters by actor=human_orchestrator and event_type in (user_msg, human_msg, message)
+- Plan 15-02: 1236 tests passing (1227 baseline + 30 new: 18 tier1 + 12 writer, excluding pre-existing segmenter failure)
 
 ### Pending Todos
 
@@ -488,8 +497,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 15 plan 01 complete (DDF schema + models + config + tests). Ready for 15-02.
-Resume file: .planning/phases/15-ddf-detection-substrate/15-02-PLAN.md
+Stopped at: Phase 15 plan 02 complete (Tier 1 detectors, writer, deposit). Ready for 15-03.
+Resume file: .planning/phases/15-ddf-detection-substrate/15-03-PLAN.md
 
 ## Phase 14 Completion Summary
 

@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 14 (Live Session Governance Research) — In progress. Plan 01 complete: design specification for PreToolUse hook (LIVE-01), SessionStart briefing (LIVE-02), and JSONL stream processor (LIVE-03) with CCD-axis grouping, boundary_dependency dispatch, and TENTATIVE_END/CONFIRMED_END state machine.
+**Current focus:** Phase 14 (Live Session Governance Research) — In progress. Plan 02 complete: design specification for inter-session bus (LIVE-04, 10 API routes), governing session daemon with Policy Automatization Detector (LIVE-05), and DDF co-pilot with three intervention types and write-on-detect memory_candidates deposit (LIVE-06).
 
 ## Current Position
 
 Phase: 14 (Live Session Governance Research)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-24 -- Completed 14-01-PLAN.md (Single-Session Governance Layer Design). Complete spec for LIVE-01/LIVE-02/LIVE-03 with 5 JSON schemas, 6 Pydantic models, 3 incremental adapters, episode boundary state machine.
+Last activity: 2026-02-24 -- Completed 14-02-PLAN.md (Multi-Session Coordination Layer Design). Complete spec for LIVE-04 (10 bus API routes), LIVE-05 (governor daemon + Policy Automatization Detector), LIVE-06 (DDF co-pilot with 3 intervention types + write-on-detect).
 
-Progress: [████████░░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans in phase 14)
-Overall:  [████████████████████████████████████████████████████████████░] 98% (49/52 plans total)
+Progress: [████████████████░░░░░░░░░░░░░░] 50% (2/4 plans in phase 14)
+Overall:  [█████████████████████████████████████████████████████████████] 98% (50/52 plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 49
+- Total plans completed: 50
 - Average duration: 5.5 min
-- Total execution time: 4.76 hours
+- Total execution time: 4.89 hours
 
 **By Phase:**
 
@@ -43,11 +43,11 @@ Overall:  [███████████████████████
 | 13-policy-to-constraint-feedback-loop | 3 | 19 min | 6.3 min |
 | 13.3-identification-transparency | 4 | 31 min | 7.8 min |
 | 14.1-premise-registry-premise-assertion-gate | 3 | 33 min | 11.0 min |
-| 14-live-session-governance-research | 1 (of 4) | 8 min | 8.0 min |
+| 14-live-session-governance-research | 2 (of 4) | 16 min | 8.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 7 min, 13 min, 11 min, 9 min, 8 min
-- Trend: consistent (design-only plans faster than implementation plans)
+- Last 5 plans: 13 min, 11 min, 9 min, 8 min, 8 min
+- Trend: consistent (design-only plans ~8 min)
 
 *Updated after each plan completion*
 
@@ -303,6 +303,13 @@ Recent decisions affecting current work:
 - Plan 14-01: TTL episodes (30-min timeout) excluded from constraint extraction training (inferred outcome, completeness=4/5)
 - Plan 14-01: X_ASK excluded from end triggers in stream processor (consistent with post-hoc segmenter locked decision)
 - Plan 14-01: scopes_overlap() is in src/pipeline/utils.py (plan referenced durability/utils.py which does not exist)
+- Plan 14-02: Governor is Python daemon co-located with bus process (not a Claude Code session): zero LLM tokens for routine monitoring
+- Plan 14-02: Bus uses Unix domain socket at /tmp/ope-governance-bus.sock (sub-ms latency, local-only, no port conflicts)
+- Plan 14-02: Pull-based broadcast delivery: interventions piggybacked on /api/check responses at natural tool-call cadence
+- Plan 14-02: Policy Automatization Detector differentiates by epistemological_origin: principled at 10 sessions (<1%), reactive at 20 sessions (<2%)
+- Plan 14-02: Three DDF co-pilot intervention types: O_AXS (post-naming, 0.8), Fringe (pre-naming negative, 0.6), Affect Spike (pre-naming positive, 0.75)
+- Plan 14-02: AI-side DDF deposits at lower confidence (0.7) than human-side (0.8) per raven-cost-function-absent CCD axis
+- Plan 14-02: memory_candidates schema extended with session_id, subject, origin, confidence, perception_pointer for co-pilot deposits
 
 ### Pending Todos
 
@@ -469,8 +476,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 14 plan 01 complete. Design specification for LIVE-01/LIVE-02/LIVE-03 written.
-Resume file: .planning/phases/14-live-session-governance-research/14-02-PLAN.md
+Stopped at: Phase 14 plan 02 complete. Design specification for LIVE-04/LIVE-05/LIVE-06 written.
+Resume file: .planning/phases/14-live-session-governance-research/14-03-PLAN.md
 
 ## Phase 14.1 Completion Summary
 

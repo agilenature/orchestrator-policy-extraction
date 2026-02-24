@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 16.1 (Topological Edge-Generation) — In progress. Plans 01-03 complete (data foundation + detector/generator + PAG extensions).
+**Current focus:** Phase 16.1 (Topological Edge-Generation) — COMPLETE. All 4 plans executed (data foundation + detector/generator + PAG extensions + CLI/integration tests).
 
 ## Current Position
 
 Phase: 16.1 (Topological Edge-Generation)
-Plan: 3 of 4 in current phase
-Status: In progress
-Last activity: 2026-02-24 -- Completed 16.1-03-PLAN.md (frontier checker + cross-axis verifier + PAG gate extension)
+Plan: 4 of 4 in current phase
+Status: Phase complete
+Last activity: 2026-02-24 -- Completed 16.1-04-PLAN.md (CLI subcommands + 15 end-to-end integration tests)
 
-Progress: [████████████████████████░░░░░░] 75% (3/4 plans in phase 16.1)
-Overall:  [██████████████████████████████████████████████████████████████████░░] 62/63 plans total
+Progress: [████████████████████████████████] 100% (4/4 plans in phase 16.1)
+Overall:  [████████████████████████████████████████████████████████████████████] 63/63 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 62
+- Total plans completed: 63
 - Average duration: 5.5 min
-- Total execution time: 6.20 hours
+- Total execution time: 6.28 hours
 
 **By Phase:**
 
@@ -45,11 +45,11 @@ Overall:  [███████████████████████
 | 14.1-premise-registry-premise-assertion-gate | 3 | 33 min | 11.0 min |
 | 14-live-session-governance-research | 4 | 28 min | 7.0 min |
 | 15-ddf-detection-substrate | 7 | 49 min | 7.0 min |
-| 16.1-topological-edge-generation | 3 | 17 min | 5.7 min |
+| 16.1-topological-edge-generation | 4 | 22 min | 5.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 11 min, 9 min, 4 min, 6 min, 7 min
-- Trend: consistent (~7 min per plan)
+- Last 5 plans: 9 min, 4 min, 6 min, 7 min, 5 min
+- Trend: consistent (~6 min per plan)
 
 *Updated after each plan completion*
 
@@ -376,6 +376,10 @@ Recent decisions affecting current work:
 - Plan 16.1-03: PAG gate axis extraction uses memory_candidates ccd_axis for known axis lookup (case-insensitive substring)
 - Plan 16.1-03: PAG gate now has 6 check types: high-risk, stained, foil, Ad Ignorantiam, frontier, cross-axis
 - Plan 16.1-03: 1391 tests passing (1379 baseline + 12 new, excluding pre-existing segmenter failure)
+- Plan 16.1-04: CLI is Layer 6 scaffolding (instrumental); integration tests verifying deposit flow are terminal
+- Plan 16.1-04: Nested Click subgroup pattern: @parent_group.group(name='edges') for n-level CLI hierarchy
+- Plan 16.1-04: FrontierChecker goal_type filtering tested explicitly (edge goal_type=['refactor'] does NOT suppress for goal_type='document')
+- Plan 16.1-04: 1406 tests passing (1391 baseline + 15 new integration tests, excluding pre-existing segmenter failure)
 
 ### Pending Todos
 
@@ -542,8 +546,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 16.1 Plan 03 complete (frontier checker + cross-axis verifier + PAG gate extension). Plan 04 remains.
-Resume file: .planning/phases/16.1-topological-edge-generation/16.1-04-PLAN.md
+Stopped at: Phase 16.1 COMPLETE (all 4 plans). Next phase TBD.
+Resume file: N/A (phase complete)
 
 ## Phase 15 Completion Summary
 
@@ -600,3 +604,15 @@ Phase 13.3 delivered the Identification Transparency Layer (all 4 plans):
 - **Bootstrap circularity resolved**: Harness has no memory, only structural checks against durable artifacts
 - **Key modules**: src/pipeline/review/ (models, schema, pool_builder, sampler, presenter, collector, writer, router, trust, invariants, metamorphic, nversion, harness), src/pipeline/cli/review.py
 - **Full CLI**: `python -m src.pipeline.cli review next|route|trust|harness|stats`
+
+## Phase 16.1 Completion Summary
+
+Phase 16.1 delivered topological edge-generation (all 4 plans):
+- **Plan 01 COMPLETE**: axis_edges DuckDB schema with DDL/indexes, ActivationCondition + EdgeRecord Pydantic models, EdgeWriter with idempotent writes + degradation + retirement, topology schema integrated into create_schema() chain, 12 tests
+- **Plan 02 COMPLETE**: ConjunctiveFlameDetector (Level>=5 AND Delta>=2 AND >=2 axes), EdgeGenerator (C(N,2) pairs), rolling median baseline, 15 tests
+- **Plan 03 COMPLETE**: FrontierChecker (uncharted axis pair detection with activation_condition filtering), CrossAxisVerifier (foil level-matching for Equivocation detection), PAG gate extension (frontier + cross-axis checks), 12 tests
+- **Plan 04 COMPLETE**: intelligence edges CLI subgroup (list/frontier/show), 15 end-to-end integration tests (deposit flow, frontier lifecycle, retirement flow, CLI commands)
+- **1406 tests** passing (1391 baseline + 15 new integration tests, excluding pre-existing segmenter failure)
+- **Full topology pipeline**: FlameEvent -> ConjunctiveFlameDetector -> EdgeGenerator -> EdgeWriter -> axis_edges -> FrontierChecker/CrossAxisVerifier -> PAG gate
+- **Key modules**: src/pipeline/ddf/topology/ (models.py, schema.py, writer.py, detector.py, generator.py, frontier.py, verifier.py), src/pipeline/cli/intelligence.py (edges subgroup)
+- **CLI**: `python -m src.pipeline.cli intelligence edges list|frontier|show`

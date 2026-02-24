@@ -461,7 +461,13 @@ Plans:
   6. **The closed loop is operational and bidirectional**: Human session → FlameEvents → Level 6 Floods → memory_candidates → review → MEMORY.md upgrade → AI retrieves by axis next session → AI reasons at higher DDF level → human reaches higher DDF levels → richer FlameEvents → better memory_candidates. The AI improves itself not by retraining but by accumulating a better concept store
   7. **AI TransportEfficiency trend** is tracked across sessions — before MEMORY.md entries are accepted vs. after. The delta is the empirical measure of how much each CCD-quality entry improves the AI's retrieval quality. This makes the MEMORY.md pipeline's value falsifiable and measurable
   8. **IntelligenceProfile CLI extended** — `profile <human_id>` shows full TransportEfficiency breakdown; `profile --ai` shows AI's own TransportEfficiency trend, pending memory_candidates count, and accepted entries that produced measurable improvement
-**Plans:** ~4 plans in 3 waves (to be specified after Phase 15)
+**Plans:** 4 plans in 3 waves
+
+Plans:
+- [ ] 16-01-PLAN.md — Data foundation (TE table + MC extensions) + MEMORY.md review CLI (Wave 1)
+- [ ] 16-02-PLAN.md — TE computation engine + fringe drift + backfill jobs + pipeline Step 20 (Wave 2)
+- [ ] 16-03-PLAN.md — Extended intelligence profile display: TE breakdown + AI trend + te_delta ranking (Wave 3)
+- [ ] 16-04-PLAN.md — Integration tests for all Phase 16 DDF requirements (Wave 3)
 
 ### Phase 16.1: Topological Edge-Generation [INSERTED]
 
@@ -480,10 +486,10 @@ Plans:
 **Plans:** 4 plans in 3 waves
 
 Plans:
-- [ ] 16.1-01-PLAN.md — axis_edges schema + EdgeRecord model + EdgeWriter + tests (Wave 1)
-- [ ] 16.1-02-PLAN.md — ConjunctiveFlameDetector + EdgeGenerator + tests (Wave 2)
-- [ ] 16.1-03-PLAN.md — PAG gate extension: FrontierChecker + Cross-Axis Verification + tests (Wave 2)
-- [ ] 16.1-04-PLAN.md — integration tests + intelligence edges CLI (Wave 3)
+- [x] 16.1-01-PLAN.md — axis_edges schema + EdgeRecord model + EdgeWriter + tests (Wave 1)
+- [x] 16.1-02-PLAN.md — ConjunctiveFlameDetector + EdgeGenerator + tests (Wave 2)
+- [x] 16.1-03-PLAN.md — PAG gate extension: FrontierChecker + Cross-Axis Verification + tests (Wave 2)
+- [x] 16.1-04-PLAN.md — integration tests + intelligence edges CLI (Wave 3)
 
 ### Phase 17: Candidate Assessment System
 
@@ -539,7 +545,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 14. Live Session Governance Research | 4/4 | ✓ Complete | 2026-02-24 |
 | 14.1. Premise Registry + Premise-Assertion Gate [INSERTED] | 3/3 | ✓ Complete | 2026-02-23 |
 | 15. DDF Detection Substrate (human + AI) | 7/7 | ✓ Complete | 2026-02-24 |
-| 16. Sacred Fire Intelligence System | —/— | ⬜ Pending | — |
+| 16. Sacred Fire Intelligence System | 0/4 | ⬜ Pending | — |
 | 16.1. Topological Edge-Generation [INSERTED] | 4/4 | ✓ Complete | 2026-02-24 |
 | 17. Candidate Assessment System | —/— | ⬜ Pending | — |
 | 18. Bridge-Warden Structural Integrity Detection | —/— | ⬜ Pending | — |

@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 15 (DDF Detection Substrate) — In progress. Plans 01-05 complete. 2 plans remaining.
+**Current focus:** Phase 15 (DDF Detection Substrate) — In progress. Plans 01-06 complete. 1 plan remaining.
 
 ## Current Position
 
 Phase: 15 (DDF Detection Substrate)
-Plan: 5 of 7 in current phase
+Plan: 6 of 7 in current phase
 Status: In progress
-Last activity: 2026-02-24 -- Completed 15-04-PLAN.md (Epistemological origin, GeneralizationRadius, spiral tracking)
+Last activity: 2026-02-24 -- Completed 15-06-PLAN.md (Pipeline integration + Intelligence CLI)
 
-Progress: [████████████████████░░░░░░░░░░] 71% (5/7 plans in phase 15)
-Overall:  [████████████████████████████████████████████████████████████████░] 57/59 plans total
+Progress: [█████████████████████████░░░░░] 86% (6/7 plans in phase 15)
+Overall:  [█████████████████████████████████████████████████████████████████░] 58/59 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 57
+- Total plans completed: 58
 - Average duration: 5.6 min
-- Total execution time: 5.66 hours
+- Total execution time: 5.81 hours
 
 **By Phase:**
 
@@ -44,10 +44,10 @@ Overall:  [███████████████████████
 | 13.3-identification-transparency | 4 | 31 min | 7.8 min |
 | 14.1-premise-registry-premise-assertion-gate | 3 | 33 min | 11.0 min |
 | 14-live-session-governance-research | 4 | 28 min | 7.0 min |
-| 15-ddf-detection-substrate | 5 | 34 min | 6.8 min |
+| 15-ddf-detection-substrate | 6 | 43 min | 7.2 min |
 
 **Recent Trend:**
-- Last 5 plans: 6 min, 6 min, 7 min, 4 min, 11 min
+- Last 5 plans: 6 min, 7 min, 4 min, 11 min, 9 min
 - Trend: consistent (~7 min per plan)
 
 *Updated after each plan completion*
@@ -353,6 +353,11 @@ Recent decisions affecting current work:
 - Plan 15-05: AI profile uses human_id='ai' sentinel value for IntelligenceProfile model compatibility
 - Plan 15-05: avg_marker_level rounded to 4 decimal places to avoid floating-point display noise
 - Plan 15-05: 1153 tests passing (1141 baseline + 12 new, excluding pre-existing segmenter failure)
+- Plan 15-06: DDF schema lazily created in Step 15 (first DDF step) rather than __init__, keeping DDF optional
+- Plan 15-06: TaggedEvent objects converted to dicts for AI marker detection in Tier 2
+- Plan 15-06: CLI profile opens DuckDB read-only; create_ddf_schema wrapped in try/except for compatibility
+- Plan 15-06: Step 19 spiral promotion uses self._db_path with `:memory:` fallback to data/ope.db
+- Plan 15-06: 1201 tests passing (1180 baseline + 21 new, excluding pre-existing segmenter failure)
 
 ### Pending Todos
 
@@ -519,8 +524,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 15 plan 04 complete (Epistemological origin, GeneralizationRadius, spiral tracking). Plans 01-05 complete. Ready for 15-06 or 15-07.
-Resume file: .planning/phases/15-ddf-detection-substrate/15-06-PLAN.md
+Stopped at: Phase 15 plan 06 complete (Pipeline integration + Intelligence CLI). Plans 01-06 complete. Ready for 15-07.
+Resume file: .planning/phases/15-ddf-detection-substrate/15-07-PLAN.md
 
 ## Phase 14 Completion Summary
 

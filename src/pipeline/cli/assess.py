@@ -146,6 +146,7 @@ def list_scenarios(db: str, level: int | None) -> None:
         click.echo(f"Error connecting to database: {e}", err=True)
         sys.exit(1)
 
+    # Check if assessment columns exist; they may not if schema hasn't been applied
     try:
         rows = conn.execute(
             "SELECT wisdom_id, entity_type, title, ddf_target_level, "
@@ -154,7 +155,15 @@ def list_scenarios(db: str, level: int | None) -> None:
             "ORDER BY ddf_target_level NULLS LAST, entity_type, title"
         ).fetchall()
     except Exception as e:
-        click.echo(f"Error querying project_wisdom: {e}", err=True)
+        err_msg = str(e)
+        if "ddf_target_level" in err_msg or "scenario_seed" in err_msg:
+            click.echo(
+                "Assessment columns not found on project_wisdom table. "
+                "Run 'annotate-scenarios' first to apply the schema.",
+                err=True,
+            )
+        else:
+            click.echo(f"Error querying project_wisdom: {e}", err=True)
         conn.close()
         sys.exit(1)
 

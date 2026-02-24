@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 16 (Sacred Fire Intelligence System) — In progress. Plan 03 complete (extended TE profile display).
+**Current focus:** Phase 16 (Sacred Fire Intelligence System) — Complete. All 4 plans executed: schema, TE computation, CLI display, integration tests.
 
 ## Current Position
 
 Phase: 16 (Sacred Fire Intelligence System)
-Plan: 3 of 4 in current phase
-Status: In progress
-Last activity: 2026-02-24 -- Completed 16-03-PLAN.md (extended TE profile display)
+Plan: 4 of 4 in current phase
+Status: Phase complete
+Last activity: 2026-02-24 -- Completed 16-04-PLAN.md (Phase 16 integration tests)
 
-Progress: [████████████████████████░░░░░░░░] 75% (3/4 plans in phase 16)
-Overall:  [████████████████████████████████████████████████████████████████████] 66/67 plans total
+Progress: [████████████████████████████████] 100% (4/4 plans in phase 16)
+Overall:  [████████████████████████████████████████████████████████████████████] 67/67 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 66
+- Total plans completed: 67
 - Average duration: 5.5 min
-- Total execution time: 6.51 hours
+- Total execution time: 6.58 hours
 
 **By Phase:**
 
@@ -46,11 +46,11 @@ Overall:  [███████████████████████
 | 14-live-session-governance-research | 4 | 28 min | 7.0 min |
 | 15-ddf-detection-substrate | 7 | 49 min | 7.0 min |
 | 16.1-topological-edge-generation | 4 | 22 min | 5.5 min |
-| 16-sacred-fire-intelligence-system | 3 | 14 min | 4.7 min |
+| 16-sacred-fire-intelligence-system | 4 | 18 min | 4.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 7 min, 5 min, 5 min, 6 min, 3 min
-- Trend: consistent (~5.2 min per plan)
+- Last 5 plans: 5 min, 5 min, 6 min, 3 min, 4 min
+- Trend: consistent (~4.6 min per plan)
 
 *Updated after each plan completion*
 
@@ -396,6 +396,10 @@ Recent decisions affecting current work:
 - Plan 16-03: Moved conn.close() after TE display to keep connection open for TE queries
 - Plan 16-03: All TE queries wrapped in try/except for graceful fallback on older DBs without transport_efficiency_sessions
 - Plan 16-03: 1466 tests passing (1456 baseline + 10 new TE profile display tests)
+- Plan 16-04: Integration tests organized by DDF requirement number (TestDDF06_*, TestDDF07_*, TestDDF08_*, TestDDF09_*) for traceability to roadmap success criteria
+- Plan 16-04: File-based DuckDB used for CLI tests because memory-review opens its own connection (in-memory DB not shareable)
+- Plan 16-04: CliRunner with stdin input for memory-review tests (input='a\n') tests actual CLI path
+- Plan 16-04: 1519 tests passing (1517 total + 2 pre-existing segmenter failures, zero Phase 16 regressions)
 
 ### Pending Todos
 
@@ -562,8 +566,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 16, Plan 03 COMPLETE. Next: 16-04-PLAN.md (pipeline Step 20 integration).
-Resume file: .planning/phases/16-sacred-fire-intelligence-system/16-04-PLAN.md
+Stopped at: Phase 16 COMPLETE. All 4 plans executed (schema, TE computation, CLI display, integration tests).
+Resume file: Next phase TBD
 
 ## Phase 15 Completion Summary
 
@@ -632,3 +636,19 @@ Phase 16.1 delivered topological edge-generation (all 4 plans):
 - **Full topology pipeline**: FlameEvent -> ConjunctiveFlameDetector -> EdgeGenerator -> EdgeWriter -> axis_edges -> FrontierChecker/CrossAxisVerifier -> PAG gate
 - **Key modules**: src/pipeline/ddf/topology/ (models.py, schema.py, writer.py, detector.py, generator.py, frontier.py, verifier.py), src/pipeline/cli/intelligence.py (edges subgroup)
 - **CLI**: `python -m src.pipeline.cli intelligence edges list|frontier|show`
+
+## Phase 16 Completion Summary
+
+Phase 16 delivered the Sacred Fire Intelligence System (all 4 plans):
+- **Plan 01 COMPLETE**: transport_efficiency_sessions DuckDB schema (12 columns), memory_candidates TE extensions (pre_te_avg, post_te_avg, te_delta) + review extensions (confidence, subject, session_id), memory-review CLI command with CCD-format MEMORY.md writes, 25 tests
+- **Plan 02 COMPLETE**: TE computation engine (compute_te_for_session, compute_fringe_drift, write_te_rows), backfill_trunk_quality (3+ newer sessions), backfill_te_delta (5+ post-acceptance AI sessions), Pipeline Step 20, 25 tests
+- **Plan 03 COMPLETE**: Extended intelligence profile CLI with TE breakdown display, fringe drift display, trunk quality status indicators, 10 tests
+- **Plan 04 COMPLETE**: 18 integration tests covering all 4 DDF requirements (DDF-06 TE computation, DDF-07 MEMORY.md closed loop, DDF-08 fringe drift, DDF-09 trunk quality backfill), full regression check (1517 passed, zero regressions)
+- **1519 tests** total (1517 passed + 2 pre-existing segmenter failures)
+- **DDF-06 verified**: TE composite computed per session for human and AI with unified formula
+- **DDF-07 verified**: Level 6 FlameEvent -> memory_candidates -> memory-review accept -> MEMORY.md CCD entry
+- **DDF-08 verified**: Fringe drift rate (0.0/1.0/None) per session+subject
+- **DDF-09 verified**: trunk_quality starts 0.5/pending, backfills to confirmed with 3+ downstream sessions; te_delta computed with 5+ post-acceptance AI sessions
+- **Terminal test**: End-to-end closed loop from FlameEvent through deposit, review, to persistent MEMORY.md entry
+- **Key modules**: src/pipeline/ddf/transport_efficiency.py, src/pipeline/cli/intelligence.py (memory-review command)
+- **CLI**: `python -m src.pipeline.cli intelligence memory-review [--db] [--memory-file]`

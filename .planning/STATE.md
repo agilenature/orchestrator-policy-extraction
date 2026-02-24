@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 15 (DDF Detection Substrate) — In progress. Plans 01-03, 05 complete. 3 plans remaining.
+**Current focus:** Phase 15 (DDF Detection Substrate) — In progress. Plans 01-05 complete. 2 plans remaining.
 
 ## Current Position
 
 Phase: 15 (DDF Detection Substrate)
-Plan: 4 of 7 in current phase
+Plan: 5 of 7 in current phase
 Status: In progress
-Last activity: 2026-02-24 -- Completed 15-05-PLAN.md (IntelligenceProfile aggregation)
+Last activity: 2026-02-24 -- Completed 15-04-PLAN.md (Epistemological origin, GeneralizationRadius, spiral tracking)
 
-Progress: [████████████████░░░░░░░░░░░░░░] 57% (4/7 plans in phase 15)
-Overall:  [███████████████████████████████████████████████████████████████░] 56/59 plans total
+Progress: [████████████████████░░░░░░░░░░] 71% (5/7 plans in phase 15)
+Overall:  [████████████████████████████████████████████████████████████████░] 57/59 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 56
-- Average duration: 5.5 min
-- Total execution time: 5.48 hours
+- Total plans completed: 57
+- Average duration: 5.6 min
+- Total execution time: 5.66 hours
 
 **By Phase:**
 
@@ -44,11 +44,11 @@ Overall:  [███████████████████████
 | 13.3-identification-transparency | 4 | 31 min | 7.8 min |
 | 14.1-premise-registry-premise-assertion-gate | 3 | 33 min | 11.0 min |
 | 14-live-session-governance-research | 4 | 28 min | 7.0 min |
-| 15-ddf-detection-substrate | 4 | 23 min | 5.8 min |
+| 15-ddf-detection-substrate | 5 | 34 min | 6.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 6 min, 6 min, 6 min, 7 min, 4 min
-- Trend: consistent (~6 min per plan)
+- Last 5 plans: 6 min, 6 min, 7 min, 4 min, 11 min
+- Trend: consistent (~7 min per plan)
 
 *Updated after each plan completion*
 
@@ -339,6 +339,15 @@ Recent decisions affecting current work:
 - Plan 15-03: Confidence formula: min(0.9, 0.3 * distinct_scope_prefixes)
 - Plan 15-03: deposit_level6 filters on marker_level >= 6 AND flood_confirmed = True (both required)
 - Plan 15-03: 1262 tests passing (1236 baseline + 26 new, excluding pre-existing segmenter failure)
+- Plan 15-04: Epistemological origin uses first-match cascade (reactive > principled > inductive > default principled) not weighted scoring
+- Plan 15-04: ESCALATE mode blocks reactive classification (escalation episodes are structural, not corrective)
+- Plan 15-04: GeneralizationRadius from COUNT(DISTINCT scope_path_prefix) in evidence_json, 'root' fallback for missing scope
+- Plan 15-04: Stagnation = radius==1 AND firing_count >= stagnation_min_firing_count (default 10)
+- Plan 15-04: Spiral detection skips first session from growth check (baseline, not growth event)
+- Plan 15-04: Spiral depth counts ascending levels (transitions + 1), so L1->L2->L3 = depth 3
+- Plan 15-04: Spiral promotion uses WisdomStore.upsert() for idempotent re-runs, lazy import for optional dependency
+- Plan 15-04: ConstraintStore backward compatibility: setdefault() in _load() for epistemological_origin/confidence
+- Plan 15-04: 1180 tests passing (1159 baseline + 39 new: 18 epistemological + 21 generalization/spiral, excluding pre-existing segmenter failure)
 - Plan 15-05: Spiral depth counts ascending transitions (N levels in streak = N-1 depth), not streak length
 - Plan 15-05: Python-side iteration for spiral depth (avoids complex DuckDB window functions)
 - Plan 15-05: AI profile uses human_id='ai' sentinel value for IntelligenceProfile model compatibility
@@ -510,7 +519,7 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 15 plan 05 complete (IntelligenceProfile aggregation). Plans 01-03, 05 complete. Ready for 15-04, 15-06, or 15-07.
+Stopped at: Phase 15 plan 04 complete (Epistemological origin, GeneralizationRadius, spiral tracking). Plans 01-05 complete. Ready for 15-06 or 15-07.
 Resume file: .planning/phases/15-ddf-detection-substrate/15-06-PLAN.md
 
 ## Phase 14 Completion Summary

@@ -146,3 +146,8 @@ def create_ddf_schema(conn: duckdb.DuckDBPyConnection) -> None:
     from src.pipeline.ddf.transport_efficiency import create_te_schema
 
     create_te_schema(conn)
+
+    # Phase 17: Assessment tables + extensions
+    from src.pipeline.assessment.schema import create_assessment_schema
+
+    create_assessment_schema(conn)

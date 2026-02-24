@@ -141,3 +141,8 @@ def create_ddf_schema(conn: duckdb.DuckDBPyConnection) -> None:
     from src.pipeline.ddf.topology.schema import create_topology_schema
 
     create_topology_schema(conn)
+
+    # Phase 16: Transport Efficiency tables + memory_candidates TE extensions
+    from src.pipeline.ddf.transport_efficiency import create_te_schema
+
+    create_te_schema(conn)

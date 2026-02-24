@@ -226,3 +226,95 @@ The ConstraintStore load time (9.0ms) is relevant only for non-bus mode (per-inv
 - **NATS:** Phase 15+ evolution path for cross-host governance only -- not needed for single-machine solo-developer workflow
 - **Redis Streams:** Not evaluated -- Unix socket performance eliminates the need
 - **Mattermost:** Phase 16 audit trail channel only -- never a transport layer
+
+---
+
+## 5. Synthesis: Decisions for Phase 15 + 16 Blueprint
+
+All four spike questions are resolved. The Phase 15 blueprint (plan 14-05) can proceed with unambiguous inputs.
+
+---
+
+### Decision 1: OPE pipeline IS the post-task memory ingestion layer
+
+**Finding:** `python -m src.pipeline.cli extract <worker_jsonl_path>` processes worker sessions correctly in ~3.3s. It produces 15 episodes with reaction labels, 131 constraint evaluations, 38 amnesia events, and 9 escalation episodes from a single 498-event session. The output maps directly to memory_candidates fields (ccd_axis from constraint text, scope_rule from scope_paths, flood_example from observation + outcome).
+
+**Phase 15+16 implication:**
+- No new "memory ingestion component" required
+- The stream processor's CONFIRMED_END handler triggers:
+  ```python
+  subprocess.run(["python", "-m", "src.pipeline.cli", "extract", worker_jsonl_path, "--db", shared_db])
+  ```
+- This produces fidelity=2 memory_candidates entries via existing ConstraintExtractor, EpisodePopulator, AmnesiaDetector
+- Pre-Phase 15 fix: update `orchestrator-episode.schema.json` to include `parent_episode_id`
+
+---
+
+### Decision 2: Real-time path = write-on-detect stubs; post-task path = enrichment
+
+**Finding:** Per-prompt heuristic scan produced 49 events flagged but at ~10-20% estimated precision (keyword matches on mentions, not violations). Full OPE pipeline produced 15 structured episodes with reaction labels, 131 constraint evaluations, and 38 amnesia events. The heuristic scanner cannot distinguish "constraint" as a word in documentation from a constraint violation. The OPE pipeline structurally separates these because episodes are defined by decision boundaries (O_DIR/O_CORR/O_GATE triggers), not keywords.
+
+**Phase 15+16 implication:**
+- **Phase 15 Wave 1 (real-time, load-bearing):** flame_events write-on-detect using keyword/regex heuristics. Produces memory_candidates entries with fidelity=1. Fields: ccd_axis (inferred from keyword category), scope_rule (stub -- session_id + timestamp only), session_id, origin, confidence. flood_example is LEFT EMPTY at write time -- to be filled by post-task enrichment. The ONE high-precision real-time signal is `constraint_violated` (matches against validated constraint store detection_hints, not raw keywords).
+- **Phase 15 Wave 4 (post-task, enrichment):** OPE pipeline runs at CONFIRMED_END. UPDATEs existing fidelity=1 entries with reaction_label, scope_paths, flood_example. Appends new fidelity=2 entries for episodes not caught by real-time scan. Dedup key: SHA-256(ccd_axis + scope_rule + session_id).
+- **Triggering:** Governing daemon CONFIRMED_END handler calls extract subprocess.
+
+---
+
+### Decision 3: DDF co-pilot user delivery = next-session SessionStart only
+
+**Finding:** PreToolUse stdout is protocol-only JSON. The `additionalContext` field is context-injected into the assistant's processing, not displayed to the user. PostToolUse stdout behavior is unspecified. SessionStart `additionalContext` IS confirmed user-visible (renders as session context text).
+
+**Phase 15+16 implication:**
+- **Phase 15 Wave 1:** Write-on-detect to memory_candidates ONLY (no user prompt). This is the terminal output per deposit-not-detect.
+- **Phase 15 Wave 2:** Governing daemon queues pending DDF interventions to `data/pending_interventions.jsonl` after write-on-detect.
+- **Phase 16 Wave 1:** SessionStart hook reads `pending_interventions.jsonl` and includes top-N pending interventions in `additionalContext` briefing (oldest-first ordering).
+- This is scaffolding; delivery fails gracefully if `pending_interventions.jsonl` is missing.
+- **Design option (Phase 15 Wave 2):** PreToolUse `additionalContext` can inject DDF context that influences assistant behavior without showing a user-visible prompt. The PAG hook already demonstrates this pattern. This is useful for "assistant-facing DDF hints" (e.g., injecting "the user previously identified X as the core axis" into context).
+
+---
+
+### Decision 4: Bus transport LOCKED -- Unix socket + uvicorn/starlette
+
+**Finding:** PolicyViolationChecker.check() takes 0.082ms with 332 active constraints. Total p99 for /api/check round-trip is approximately 1.6ms, which is 30x under the 50ms target.
+
+**Phase 15+16 implication:**
+- Phase 15 Wave 3 implements the bus exactly as specified in 14-02-PLAN.md
+- `httpx.Client(transport=httpx.HTTPTransport(uds="/tmp/ope-governance-bus.sock"))` is the client pattern for all hook scripts
+- Direct mode fallback (no bus): ~70-95ms, acceptable within 200ms PreToolUse budget
+- No NATS/Redis evaluation needed -- Unix socket performance eliminates the use case for Phase 14-15
+
+---
+
+### Phase 15 Wave Ordering (deposit-first mandate)
+
+Per deposit-not-detect governing axis from MEMORY.md and CLARIFICATIONS-ANSWERED.md Q5:
+
+| Wave | Content | Load-bearing? |
+|------|---------|---------------|
+| Wave 1 | flame_events schema + heuristic DDF detectors + write-on-detect to memory_candidates | LOAD-BEARING -- must complete first |
+| Wave 2 | PreToolUse + SessionStart hook scripts (LIVE-01, LIVE-02), standalone mode | LOAD-BEARING |
+| Wave 3 | Stream processor (LIVE-03) + bus (LIVE-04) + governing session (LIVE-05) | LOAD-BEARING |
+| Wave 4 | Post-task OPE trigger at CONFIRMED_END; memory_candidates enrichment | LOAD-BEARING |
+| Wave 5 | IntelligenceProfile CLI; TransportEfficiency metrics; SessionStart prompt delivery | SCAFFOLDING (deferrable) |
+
+**Phase 15 must encode Wave 1 as a hard prerequisite with no scaffolding in it.**
+
+---
+
+### Spike Pass/Fail Assessment
+
+| Criterion | Target | Result | Pass? |
+|-----------|--------|--------|-------|
+| OPE pipeline processes worker JSONL | Episodes extracted, no fatal errors | 15 episodes populated, 9 escalation stored, 0 fatal errors | PASS |
+| DDF boundary documented | Real-time vs post-task clear | Documented in section 2 with numeric evidence | PASS |
+| Bus transport p99 latency | < 50ms | ~1.6ms estimated (bus mode) | PASS |
+| Hook stdout visibility resolved | Clear finding | SessionStart only; PreToolUse = context injection | PASS |
+| No new memory ingestion component needed | extract CLI works | Confirmed -- existing CLI is the ingestion step | PASS |
+| memory_candidates fidelity model validated | Two-tier enrichment viable | fidelity=1 (real-time) + fidelity=2 (post-task UPDATE) | PASS |
+
+**Overall spike status:** PASS
+
+All four spike questions are resolved with empirical evidence. The OPE extract pipeline works as a post-task memory ingestion step (3.3s for a 498-event session). The heuristic scanner's low precision validates the two-tier architecture. The bus transport is 30x under the latency target. The hook stdout analysis resolves the DDF delivery channel question.
+
+**Ready for Phase 15 planning:** YES. All architectural decisions are resolved. Plan 14-05 has unambiguous inputs for the Phase 15+16 implementation blueprint.

@@ -253,7 +253,7 @@ Plans:
 **Depends on**: Phase 13.1 (cross-domain axis extraction complete)
 **Output type**: Analysis document + memory_candidates deposits (no implementation)
 **Success Criteria** (what must be TRUE):
-  1. Full causal chain map: 12 decision nodes (D1–D12), 9 transitions, 3 chain breaks identified
+  1. Full causal chain map: 12 decision nodes (D1-D12), 9 transitions, 3 chain breaks identified
   2. Epistemological completeness audit: every node scored against 5 properties; D10 (write-back) confirmed as 0/5 — entirely opaque
   3. Four push-required transitions identified: T1 (slice decomposition), T2 (decomposition→Engine 1), T7 (gate→canary), T8 (failure→write-back)
   4. CausalLinkV1 schema specified: link_id, parent_decision_id, child_decision_id, transition_trigger, propagated_constraints, observation_snapshot, captured_at
@@ -281,64 +281,6 @@ The architecture is two-layer, not one. **Agent B** (classification judge) and *
   7. At least one rejected verdict with non-empty opinion has produced a named spec-correction candidate — a record in `memory_candidates` (or `identification_review_log`) that identifies the specific pipeline component and heuristic that produced the wrong classification, so the fix target is unambiguous
   8. Accepted verdicts accumulate as trust evidence: each accepted verdict increments a `trust_score` field on the corresponding classification rule record; a rule with >= 10 accepted verdicts and 0 rejections carries `trust_level = established`
 
-**The 35 Identification Points (8 Layers):**
-
-*Layer 1 — Event filtering and actor assignment (2 points)*
-- L1-1: Record meaningfulness — is this JSONL record a meaningful event or noise to be filtered?
-- L1-2: Actor assignment — is the actor `orchestrator`, `tool`, `human`, or `environment`?
-
-*Layer 2 — Tagging (5 points)*
-- L2-1: Primary label — which of O_DIR / O_GATE / O_CORR / T_TEST / T_RISKY / T_GIT_COMMIT / X_PROPOSE / X_ASK / O_ESC / O_AXS / NOISE applies?
-- L2-2: Confidence score — how confident is the tagger in the primary label (0.0–1.0)?
-- L2-3: Secondary labels — which additional tags apply to this event?
-- L2-4: Mode inference — SUPERVISED / SEMI_SUPERVISED / AUTONOMOUS / ESCALATE for this event
-- L2-5: Risk assessment — LOW / MEDIUM / HIGH risk level for this action
-
-*Layer 3 — Segmentation (6 points)*
-- L3-1: Episode start — does this event open a new episode (start trigger)?
-- L3-2: Episode close — does this event close the current episode (end trigger)?
-- L3-3: Timeout expiry — is this boundary caused by 30-minute timeout rather than a trigger event?
-- L3-4: Episode supersede — does this start trigger supersede a currently open episode?
-- L3-5: Outcome determination — success / failure / committed / partial / unclear
-- L3-6: Complexity — simple / complex episode classification
-
-*Layer 4 — Episode population (7 points)*
-- L4-1: Observation extraction — what is the observation text (context before the decision)?
-- L4-2: Action extraction — what is the orchestrator action (mode, scope, gates, constraints)?
-- L4-3: Outcome extraction — what happened after this decision?
-- L4-4: Reaction label — approve / correct / redirect / block / question / none
-- L4-5: Reaction confidence — confidence in the reaction label (0.0–1.0)
-- L4-6: Episode mode — SUPERVISED / SEMI_SUPERVISED / AUTONOMOUS / ESCALATE for this episode
-- L4-7: Risk level — LOW / MEDIUM / HIGH for this episode
-
-*Layer 5 — Constraint extraction (5 points)*
-- L5-1: Constraint presence — does this episode contain an extractable constraint?
-- L5-2: Constraint text — what is the constraint text?
-- L5-3: Scope assignment — file-level / module-level / repo-wide
-- L5-4: Severity assignment — warning / requires_approval / forbidden
-- L5-5: Duplicate detection — is this constraint a duplicate of an existing one?
-
-*Layer 6 — Constraint evaluation (3 points)*
-- L6-1: Constraint honored — did this session honor this constraint (yes / no / not applicable)?
-- L6-2: Evidence extraction — what evidence supports the honor/violation determination?
-- L6-3: Amnesia detection — is this a known active constraint that the session forgot?
-
-*Layer 7 — Escalation detection (4 points)*
-- L7-1: Block event — was there a blocked path in this episode?
-- L7-2: Bypass event — was there an alternative path that bypassed authorization?
-- L7-3: Valid escalation sequence — does blocked → bypass constitute a valid O_ESC sequence?
-- L7-4: Constraint bypassed — which specific constraint was bypassed?
-
-*Layer 8 — Policy feedback (3 points)*
-- L8-1: Suppression — was this policy recommendation suppressed (conflicted with active constraint)?
-- L8-2: Surface decision — was this recommendation surfaced-and-blocked rather than silently suppressed?
-- L8-3: Duplicate detection — is this policy-generated constraint a duplicate of a human-sourced one?
-
-**Wave Breakdown:**
-- **Wave 1 (Terminal — Agent B collection):** `identification_reviews` schema with append-only enforcement; CCD format schema constraint on `memory_candidates`; IdentificationPoint model (35 points taxonomy); pool builder sourcing from real pipeline DuckDB artifacts; balanced layer sampler; `review next` CLI (sample → present five-field format → collect verdict+opinion → write)
-- **Wave 2 (Terminal — routing + accumulation):** Rejected verdict with opinion → `memory_candidates` spec-correction candidate naming the specific pipeline component and heuristic; accepted verdict → trust_score increment per classification rule; trust_level='established' at >= 10 accepts + 0 rejects
-- **Wave 3 (Harness — out-of-band oracle):** HarnessRunner enforcing 4 invariants (at-most-once verdict, layer coverage monotonicity, specification closure, delta-retrieval); metamorphic testing (same instance → equivalent verdict across sessions); N-version consistency (accepted memory_candidates entries have MEMORY.md counterparts); `review harness` CLI subcommand
-
 **Plans:** 4 plans in 3 waves
 
 Plans:
@@ -360,11 +302,10 @@ Plans:
   2. Architectural design for a real-time JSONL stream processor that tails live session files, runs detectors incrementally, and emits governance signals within < 200ms. Detectors are classified by boundary_dependency: EscalationDetector and PolicyViolationChecker are event_level (fire immediately per event); AmnesiaDetector is episode_level (deferred until CONFIRMED_END — a confirmed episode boundary, signaled by a subsequent start-trigger or 30-min TTL). The stream processor maintains a TENTATIVE_END / CONFIRMED_END state machine per session: end-triggers produce TENTATIVE_END; the next start-trigger or TTL produces CONFIRMED_END; a continuation event produces REOPENED. Episode_level signals buffer during TENTATIVE_END and flush on CONFIRMED_END. Only CONFIRMED_END episodes are written to DuckDB as training data.
   3. Inter-session coordination bus design: protocol, transport (local HTTP server vs Unix socket vs file-based), shared constraint state model, how parallel Claude Code sessions discover and signal each other
   4. "Governing session" pattern design: a dedicated Claude Code session that monitors all other active sessions, holds the full constraint store, and can broadcast blocks or briefings across the bus
-  5. DDF co-pilot architecture: when O_AXS (Axis Shift) is detected in a live session, the system (a) prompts the human to name the new axis, (b) triggers a Concretization Flood prompt, (c) drafts a candidate wisdom entity in CCD-quality format (axis + scope rule + one flood example) for immediate review and save — combating Prose Principle Lag before insights drift back into implicit knowledge. Three co-pilot intervention types are designed (from Binswanger logical architecture + Moroney Memory Affect System integration): (1) O_AXS Intervention — fires post-naming, prompts formal axis naming and Concretization Flood; (2) Fringe Intervention — fires on negative vague phenomenological language ("something feels off about...", "this doesn't sit right..."), prompts naming before awareness drifts back to Basement (Fringe Drift = insight loss with no JSONL trace); (3) Affect Spike Intervention — fires on positive valence shift before naming (sudden certainty increase, enthusiasm spike, acceleration of statement length — the affective Aha! moment when a Value Node activates), prompts "what just clicked for you?" to capture the positive breakthrough before it drifts. The Affect Spike Intervention is the symmetric positive counterpart to the Fringe Intervention: both fire pre-naming, both combat Drift, both deposit to memory_candidates on successful capture. The wisdom entity draft is offered as a MEMORY.md-candidate entry: structured as (CCD axis | scope rule | flood example) — the format that makes the AI retrieve by axis rather than by surface similarity
+  5. DDF co-pilot architecture
   6. A concrete Phase 15 implementation plan derived from the research — broken into executable waves with specific file targets, API contracts, and test strategies
-  7. **Constraint CCD architecture decision documented:** constraint data models specify `ccd_axis` and `epistemological_origin` fields; the SessionStart briefing format groups by CCD axis (algebraic, one principle covering N instances) rather than listing flat concretes — this is the architectural inflection from arithmetic to algebraic governance that enables exponential rather than linear compounding of the system's intelligence (see 14-CONTEXT.md)
-  8. **Policy Automatization Detector designed:** the governing session daemon includes a specification for tracking per-constraint activation/violation rates; constraints whose violation rate drops to near-zero over N sessions are graduated from the enforcement Desktop to the wisdom Library — the Desktop-clearing mechanism that frees governance capacity for higher-order principles as the system matures
-**Design brief:** `14-CONTEXT.md` — Binswanger exponential intelligence framework as architectural foundation (Crow/Desktop, Automatization, Trunk Indexing, Suspension Bridge)
+  7. **Constraint CCD architecture decision documented**
+  8. **Policy Automatization Detector designed**
 **Plans:** 4 plans in 2 waves
 
 Plans:
@@ -372,45 +313,14 @@ Plans:
 - [x] 14-02-PLAN.md — Inter-session bus design (LIVE-04) + governing session pattern (LIVE-05) + DDF co-pilot architecture (LIVE-06) + Policy Automatization Detector design (Wave 1)
 - [x] 14-03-PLAN.md — Phase 15 implementation blueprint: 5 waves, 9 plans, 33 file targets, 86 API contracts, ~125 tests (Wave 2)
 - [x] 14-04-PLAN.md — Spike validation: OPE pipeline as post-task memory layer (3.3s/498 events), bus transport LOCKED at 1.6ms p99, hook stdout resolved, two-tier fidelity model validated (Wave 2)
-  **Session file capture requires NO special mechanism** — Claude Code already writes every session to disk in real time:
-  - Full transcripts: `~/.claude/projects/<encoded-project-path>/<session-id>.jsonl` (encoded path = `/` replaced with `-`, prefixed)
-  - Sub-agent transcripts: `~/.claude/projects/<encoded-path>/agent-<agentId>.jsonl`
-  - Global index: `~/.claude/history.jsonl` (lightweight: timestamps, prompt text, project path, session ID)
-  - Also available: `~/.claude/todos/<session-id>-*.json`, `~/.claude/plans/`, `~/.claude/file-history/`
-  The orchestrator tracks the session ID when spawning a worker; after the worker exits, it reads the known path directly. `python -m src.pipeline.cli extract` already consumes these exact files — the entire OPE pipeline IS the post-task memory ingestion layer. Sub-agent JSONL files are also available for ingestion (relevant when workers spawn their own sub-agents).
-  Bus selection is the remaining spike question — three candidate families evaluated against the governing-session pattern:
-  A) **Chat-with-API** (Mattermost/Rocket.Chat self-hosted): human-readable channel monitoring, REST API for orchestrator/worker posting, good if humans want to watch agent coordination in real-time
-  B) **Lightweight message broker** (NATS or Redis Streams): pure machine-to-machine, subjects like `openclaw.tasks` / `openclaw.results` / `openclaw.status.<worker_id>`, zero chat overhead, Redis trivial to add (Docker); recommended if OPE pipeline is the only consumer of worker output
-  C) **Tiny local HTTP bus** (FastAPI + SQLite): `POST /tasks`, `GET /tasks/next`, `POST /results`; zero new dependencies beyond what OPE already has, full control over schema, swappable internals later; sweet spot for a hackable single-machine spike
-  Spike recommendation: start with **C** (local HTTP bus) for zero-dependency validation, with the bus interface abstracted so A or B can be swapped in for production without changing the Claude Code session scripts
 
 ---
 
 ### Phase 14.1: Premise Registry + Premise-Assertion Gate [INSERTED]
 
-**Goal**: Build the introspective layer that validates premise correctness at write-class tool call boundaries. The CLAUDE.md declaration protocol (prerequisite created 2026-02-23 at `~/.claude/CLAUDE.md`) makes AI premises explicit; the Premise Registry stores and tracks them; the PAG hook validates them before mutation. This closes the architectural gap between retrospective analysis (existing OPE pipeline, Phases 1–13) and real-time premise validation. Three temporal modes in one system: retrospective (past→present), introspective (present→present), projective (present→future via foil instantiation).
-
-**Architecture overview:**
-- **Retrospective** (existing OPE, Phases 1–13): Post-hoc. Extracts constraints, wisdom, escalation patterns from completed sessions.
-- **Introspective** (this phase): Real-time. Validates explicit PREMISE declarations against observable state at the write-class tool call boundary.
-- **Projective** (this phase): Predictive. Instantiates historical foil episodes — when a PREMISE declares a FOIL, the Registry looks up past sessions where the foil was active and estimates the first action-divergence node (where foil path and claim path diverge into different tool calls).
-
-**Depends on**: Phase 14 (PreToolUse hook contracts and infrastructure specified); CLAUDE.md Premise Declaration Protocol (✓ Complete 2026-02-23, `~/.claude/CLAUDE.md`)
-**Requirements**: PREMISE-01 (Registry table + CRUD), PREMISE-02 (PAG hook validation at write boundary), PREMISE-03 (foil instantiation + divergence detection), PREMISE-04 (staining from Layer 5 retrospective invalidation), PREMISE-05 (episode causal links), PREMISE-06 (derivation integrity — Begging the Question + Ad Ignorantiam detection)
-
-**Success Criteria** (what must be TRUE):
-1. `premise_registry` DuckDB table in `data/ope.db` with schema: (premise_id, claim, validated_by, validation_context, foil, distinguishing_prop, staleness_counter, staining_record, ground_truth_pointer, project_scope, session_id, foil_path_outcomes, divergence_patterns, parent_episode_links, **derivation_depth** INTEGER, **validation_calls_before_claim** INTEGER, **derivation_chain** JSONB). `derivation_depth=0` = circular reasoning (Begging the Question: Premise ID reappears in its own conclusion chain). `validation_calls_before_claim=0` on a positive factual PREMISE = Appeal to Ignorance (Ad Ignorantiam / RQR=0).
-2. PreToolUse hook extension reads PREMISE blocks from AI output at write-class tool calls (Edit, Write, Bash mutations); emits block signal when UNVALIDATED premise detected on high-risk mutation; emits PROJECTION_WARNING with foil_path_outcomes when foil has historical outcomes
-3. Foil instantiation query: given FOIL field, retrieves historical episodes where foil premise was active, identifies first action-divergence node — the earliest point where predicted tool calls under claim vs. foil differ — and returns as PROJECTION_WARNING with evidence
-4. Staining pipeline: when OPE Layer 5 (AmnesiaDetector, PolicyViolationChecker) retrospectively invalidates a premise, the Registry marks it stained with a ground_truth_pointer to the invalidation episode; stained premises trigger PROJECTION_WARNING on next write-class use regardless of current VALIDATED_BY
-5. Episode causal links: `episodes` table extended with `parent_episode_id` (nullable VARCHAR) linking each episode to the prior episode whose outcome became its observation — enabling backward causal traversal across the full episode graph (closes `causal-chain-completeness` CCD gap)
-
-**Key decisions already made (prerequisite):**
-- Write-class tool calls: Edit, Write, Bash (with mutations). Require explicit PREMISE declaration before execution.
-- Validation-class tool calls: Read, Grep, Glob, WebFetch. Produce evidence; never require PREMISE blocks.
-- PREMISE block format: `PREMISE: [claim] | VALIDATED_BY: [evidence or UNVALIDATED] | FOIL: [confusable] | [distinguishing property] | SCOPE: [validity context]`
-- Staleness rule: re-validate if any observable state that the claim depends on could have changed since VALIDATED_BY was obtained.
-
+**Goal**: Build the introspective layer that validates premise correctness at write-class tool call boundaries.
+**Depends on**: Phase 14 (PreToolUse hook contracts and infrastructure specified); CLAUDE.md Premise Declaration Protocol
+**Requirements**: PREMISE-01, PREMISE-02, PREMISE-03, PREMISE-04, PREMISE-05, PREMISE-06
 **Plans:** 3 plans in 3 waves
 
 Plans:
@@ -422,20 +332,9 @@ Plans:
 
 ### Phase 15: DDF Detection Substrate
 
-**Goal**: Implement the DDF as a deposit substrate for the AI's concept store. The detection machinery — `flame_events`, `ai_flame_events`, co-pilot interventions — is instrumental: it exists to trigger write-on-detect deposits to `memory_candidates`. Every session produces candidate entries from both human and AI reasoning; the IntelligenceProfile is the measurement surface; `memory_candidates` is the terminal output. The AI has no Raven cost function and therefore no selection pressure to file by essentials — this phase borrows the human's selection pressure (Values → Crow → axis identification) to build the AI's filing system. This is the deposit substrate that Phases 16-18 extend.
+**Goal**: Implement the DDF as a deposit substrate for the AI's concept store.
 **Depends on**: Phase 14 (live session infrastructure; O_AXS detection architecture designed)
-**Requirements**: DDF-01 (FlameEvent detection — human and AI), DDF-02 (IntelligenceProfile substrate), DDF-03 (Floating Abstraction detection), DDF-04 (Spiral Tracking), DDF-05 (Constraint epistemological origin)
-**Success Criteria** (what must be TRUE):
-  1. `O_AXS` is a valid episode mode produced by the tagger when it detects an Axis Shift — instruction granularity drops sharply AND a new unifying concept is introduced
-  2. `flame_events` DuckDB table records every DDF marker detection (Levels 0-7) for the **human**: session_id, human_id, prompt_number, marker_level, marker_type, evidence excerpt, quality_score, axis_identified, flood_confirmed, subject='human'
-  3. `ai_flame_events` DuckDB table records DDF markers detected in the **AI's own reasoning**: when the AI spontaneously introduces a new CCD (Level 2), performs causal isolation rather than symptom-matching (Level 3), or generates a Concretization Flood without human prompting (Level 6) — same schema as flame_events with subject='ai'. The AI is not only an observer of human cognition; its own reasoning patterns produce candidates for self-modification — ai_flame_events feed the same `memory_candidates` pipeline as human FlameEvents, and Phase 15 implements the write-on-detect deposit (not Phase 16)
-  4. Basic `IntelligenceProfile` per-human aggregate from flame_events: flame_frequency, avg_marker_level, spiral_depth, generalization_radius, flood_rate
-  5. Floating abstraction detection: `GeneralizationRadius` metric — constraints firing only on original hint patterns vs. novel contexts; stagnation flagged
-  6. Spiral tracking: constraints with ascending scope_paths auto-promoted to `project_wisdom` for review
-  7. Every constraint has `epistemological_origin` field: `reactive` | `principled` | `inductive`
-  8. `python -m src.pipeline.cli intelligence profile <human_id>` displays basic multi-dimensional gauge; `intelligence profile --ai` shows the AI's own marker profile across sessions
-  9. **False Integration marker** in `ai_flame_events` — fires when the AI applies one reasoning rule across two code entities that belong to different CCD axes (Package Deal fallacy). Signal: the AI generates a single PREMISE whose SCOPE field covers two entities with non-overlapping axes in the `premise_registry`. Detection requires CCD axis tagging of code entities; this is the only fallacy that requires entity-level axis annotation rather than derivation-chain structural observation.
-  10. **Causal Isolation Query** — Method of Difference check for Post Hoc Ergo Propter Hoc detection. When the AI claims a causal relationship from temporal sequence alone ("A caused B because B followed A"), the system constructs a counterfactual query using the foil instantiation mechanism from Phase 14.1: "In historical episodes where A was absent, did B still occur?" If yes → Post Hoc flagged. This is the only fallacy requiring active counterfactual reasoning against historical episodes, not structural observation of the current derivation.
+**Requirements**: DDF-01 through DDF-10
 **Plans:** 7 plans in 5 waves
 
 Plans:
@@ -449,40 +348,22 @@ Plans:
 
 ### Phase 16: Sacred Fire Intelligence System
 
-**Goal**: Build the second-order intelligence layer on top of Phase 15's detection substrate. This phase measures the *quality of the transport system* that produces FlameEvents — for both human and AI — and closes the review-and-export loop that Phase 15's write-on-detect mechanism opened. The MEMORY.md pipeline is the concrete mechanism by which the AI self-modifies across sessions: each validated CCD-format entry changes what it can retrieve in the next session, replacing surface-proximity retrieval with axis-guided retrieval. The AI self-modifies through this pipeline — detection is instrumental, the MEMORY.md deposit is the terminal act.
+**Goal**: Build the second-order intelligence layer on top of Phase 15's detection substrate.
 **Depends on**: Phase 15 (FlameEvent substrate in place; ai_flame_events operational; epistemological origin on constraints)
-**Requirements**: DDF-06 (TransportEfficiency — human and AI), DDF-07 (MEMORY.md auto-generation and closed loop), DDF-08 (Fringe Drift rate), DDF-09 (Level 0 Trunk Identification with downstream validation)
-**Success Criteria** (what must be TRUE):
-  1. **TransportEfficiency composite** computed per session for **both human and AI**: `raven_depth × crow_efficiency × (1/transport_speed) × trunk_quality`. For the human, these four sub-metrics are derived from FlameEvent patterns. For the AI, they are derived from ai_flame_events — measuring whether the AI retrieves from the right conceptual node, compresses well, transitions quickly from vague to named, and identifies genuine fundamentals rather than superficial similarities. The AI has a TransportEfficiency score that changes as MEMORY.md quality improves — this is the direct measure of the AI's self-improvement
-  2. **Level 0 (Trunk Identification)** fully implemented as a detection type for both subjects — fires when the human (or AI) rejects superficial similarity retrieval and names the causal fundamental. Downstream validation (N sessions later) determines trunk_quality: did the named trunk actually explain the most derivative facts?
-  3. **Fringe Drift rate** computed per session — proportion of detected Fringe signals that failed to produce a named concept within N prompts. Human Fringe signals are detected by the Phase 14 co-pilot; AI Fringe signals are detected when the AI produces hedged, vague reasoning before arriving at a named principle
-  4. **`memory_candidates` DuckDB table** — auto-drafted from every Level 6 FlameEvent (human or AI) with `flood_confirmed = true` and `epistemological_origin` in ('principled', 'inductive'). Entry format: `(ccd_axis | scope_rule | flood_example | subject | session_id | origin | confidence)`. This is the pipeline through which both human insights AND the AI's own conceptual breakthroughs become permanent upgrades to the AI's retrieval system
-  5. **MEMORY.md review CLI** — `python -m src.pipeline.cli intelligence memory-review` lists pending candidates from both human and AI sessions; human accepts/rejects/edits; accepted entries exported in structured CCD format to MEMORY.md. The MEMORY.md is explicitly the AI's concept store: each accepted entry is a new filing key that gives the AI axis-guided retrieval for all future sessions on this project
-  6. **The closed loop is operational and bidirectional**: Human session → FlameEvents → Level 6 Floods → memory_candidates → review → MEMORY.md upgrade → AI retrieves by axis next session → AI reasons at higher DDF level → human reaches higher DDF levels → richer FlameEvents → better memory_candidates. The AI improves itself not by retraining but by accumulating a better concept store
-  7. **AI TransportEfficiency trend** is tracked across sessions — before MEMORY.md entries are accepted vs. after. The delta is the empirical measure of how much each CCD-quality entry improves the AI's retrieval quality. This makes the MEMORY.md pipeline's value falsifiable and measurable
-  8. **IntelligenceProfile CLI extended** — `profile <human_id>` shows full TransportEfficiency breakdown; `profile --ai` shows AI's own TransportEfficiency trend, pending memory_candidates count, and accepted entries that produced measurable improvement
+**Requirements**: DDF-06 (TransportEfficiency), DDF-07 (MEMORY.md closed loop), DDF-08 (Fringe Drift rate), DDF-09 (Level 0 Trunk Identification)
 **Plans:** 4 plans in 3 waves
 
 Plans:
-- [ ] 16-01-PLAN.md — Data foundation (TE table + MC extensions) + MEMORY.md review CLI (Wave 1)
-- [ ] 16-02-PLAN.md — TE computation engine + fringe drift + backfill jobs + pipeline Step 20 (Wave 2)
-- [ ] 16-03-PLAN.md — Extended intelligence profile display: TE breakdown + AI trend + te_delta ranking (Wave 3)
-- [ ] 16-04-PLAN.md — Integration tests for all Phase 16 DDF requirements (Wave 3)
+- [x] 16-01-PLAN.md — Data foundation (TE table + MC extensions) + MEMORY.md review CLI (Wave 1)
+- [x] 16-02-PLAN.md — TE computation engine + fringe drift + backfill jobs + pipeline Step 20 (Wave 2)
+- [x] 16-03-PLAN.md — Extended intelligence profile display: TE breakdown + AI trend + te_delta ranking (Wave 3)
+- [x] 16-04-PLAN.md — Integration tests for all Phase 16 DDF requirements (Wave 3)
 
 ### Phase 16.1: Topological Edge-Generation [INSERTED]
 
-**Goal**: Build the edge layer of the AI's Causal Map by mapping conditional relationships between established CCD axis nodes. Phase 16 creates weighted Basement nodes (MEMORY.md filing keys with Gravity); Phase 16.1 connects those nodes with activation-conditioned edges, enabling cross-axis implication checking, Frontier Warning detection, and Trunk→Edge→Trunk traversal that eliminates Basement descent between established principles. Central architectural constraint: edges are NOT unconditional pointers — they are first-class knowledge artifacts stored with (axis_a | axis_b | relationship | activation_condition | evidence | abstraction_level), created only from conjunctive Flame events (Level ≥ 5 AND Δ ≥ 2 above baseline_marker_level) where both axes are simultaneously active. Pre-computing edges without activation conditions recreates the flat Basement problem at a higher level — this is the structural flaw the activation_condition requirement prevents.
-**Depends on**: Phase 16 (MEMORY.md populated with CCD-quality node entries; baseline_marker_level logged by PAG gate; flame_events operational)
-**Requirements**: TOPO-01 (axis_edges first-class schema), TOPO-02 (Frontier Warning in PAG gate), TOPO-03 (cross-axis Registry Verification), TOPO-04 (Edge retirement via trunk_quality), TOPO-05 (activation_condition mandatory enforcement)
-**Success Criteria** (what must be TRUE):
-  1. `axis_edges` DuckDB table stores conditional cross-axis relationships as first-class knowledge artifacts: (edge_id SHA-256[:16], axis_a, axis_b, relationship_text, activation_condition JSON, evidence JSON of flame_event_ids, abstraction_level int, status VARCHAR CHECK IN ('candidate','active','superseded'), created_session_id) — same structural discipline as memory_candidates, not a pointer table
-  2. Edges created ONLY from conjunctive Flame events: Level ≥ 5 AND Abstraction Delta ≥ 2 above baseline_marker_level, where both axes are simultaneously active in scope — prevents Stripe-level (Level 1-2) cross-axis noise from polluting the edge table. The conjunctive trigger (Level AND Delta) is enforced at write time, not at review time
-  3. Every edge carries a mandatory `activation_condition` — structurally prohibited from being null: {goal_type: list[str], scope_prefix: str, min_axes_simultaneously_active: int}. An edge without activation_condition is an unconditional cross-axis inference, which recreates the flat Basement problem at a higher level of abstraction. The system must reject edge candidates with null activation_condition
-  4. Frontier Warning fires from PAG gate when two or more CCD axes are simultaneously active in scope AND no recorded `active` edge exists for the axis pair: "Operating between [axis_a] and [axis_b] with no recorded relationship — Frontier territory. Geological Drill zone." This is a sensitivity increase, not a prohibition — the PAG gate prompts forced explication in uncharted terrain
-  5. Registry Verification extended to check new premises against recorded cross-axis edges filtered by activation_condition — catches implication errors that span axes (premise consistent with axis_a node but violating the recorded axis_a → axis_b relationship in the current activation context)
-  6. Edge retirement: when an active edge produces a pattern of Registry contradictions rather than Causal Isolation successes (trunk_quality degradation applied to edges, same mechanism as node retirement in Phase 16), edge status → 'superseded' and human prompted to define replacement. A broken cable actively distorts the topology — it is structurally worse than no cable, because it forces false contradictions in the PAG gate
-  7. `intelligence edges [axis_a] [axis_b]` CLI displays relationship, activation_condition, evidence, status for a specified axis pair; `intelligence edges --frontier` lists all simultaneously active axis pairs in the current session with no recorded active edge — the map's blank spaces made visible
-  8. End-to-end integration verified: Level 5+ event with two simultaneously active axes → EdgeRecord candidate deposited → human review → edge registered with activation_condition → second session with same axis pair in scope → Frontier Warning suppressed (edge found, activation_condition matched)
+**Goal**: Build the edge layer of the AI's Causal Map by mapping conditional relationships between established CCD axis nodes.
+**Depends on**: Phase 16 (MEMORY.md populated with CCD-quality node entries)
+**Requirements**: TOPO-01, TOPO-02, TOPO-03, TOPO-04, TOPO-05
 **Plans:** 4 plans in 3 waves
 
 Plans:
@@ -493,15 +374,9 @@ Plans:
 
 ### Phase 17: Candidate Assessment System
 
-**Goal**: Use the full IntelligenceProfile (Phase 15 FlameEvents + Phase 16 TransportEfficiency) to assess the epistemological quality of candidates for collaborating with AI. The AI participates as a calibrated collaborator — not a passive tool. Because the AI's own IntelligenceProfile is now known and its TransportEfficiency is measured, the assessment captures the human-AI system quality, not just the human in isolation. A scenario generator produces calibrated pile problems. An Assessment Report profiles how the candidate thinks *with* AI at every DDF level. **Phase 17 is also — and primarily — the highest-fidelity mechanism for generating novel axis-level insights that upgrade the AI itself**: forcing the AI to reason at DDF Levels 5–7 under calibrated challenge produces ai_flame_events at a density and depth that routine sessions cannot generate — every assessment session is simultaneously an AI self-improvement session, depositing candidates into memory_candidates that are qualitatively richer than those from ordinary work.
+**Goal**: Use the full IntelligenceProfile to assess the epistemological quality of candidates for collaborating with AI.
 **Depends on**: Phase 16 (TransportEfficiency and MEMORY.md pipeline complete; AI's own IntelligenceProfile operational)
 **Requirements**: ASSESS-01 (scenario generator), ASSESS-02 (live candidate session), ASSESS-03 (assessment report)
-**Success Criteria** (what must be TRUE):
-  1. Scenario generator pulls from the wisdom/episode database to construct pile problems calibrated by DDF level: Level 1-2 (one abstraction unlocks solution), Level 3-4 (fundamental identification required across 5+ symptoms), Level 5-7 (AI's framing must be rejected and reoriented from a contradiction the candidate must notice themselves)
-  2. Candidate sessions run in isolated Claude Code environments with live DDF detection via Phase 14/15 infrastructure; the AI enters the session with its current IntelligenceProfile loaded — it is a known, calibrated collaborator, not a black box
-  3. Assessment Report produced at session end: FlameEvent timeline with evidence quotes, level distribution (Levels 0-7 including Trunk Identifications), axis quality scores, flood rate, spiral evidence within session, `TransportEfficiency` score with all four sub-scores, Fringe Drift rate, AI contribution profile (at what DDF level did the AI reason during this session — was it following or leading?), comparison against IntelligenceProfile population baseline
-  4. Scenario bank seeded from OPE project's own historical dead ends and breakthroughs — the system assesses against challenges it has genuinely lived
-  5. Transparency: candidate knows they are in an AI-assisted coding session being assessed for epistemological quality — how they think *with* AI. The assessment rewards intellectual independence from AI suggestions (Level 5 requires rejecting the AI's framing). Candidates who adopt AI vocabulary without forming their own CCDs score at Level 1-2 regardless of output quality
 **Plans:** 4 plans in 4 waves
 
 Plans:
@@ -512,7 +387,7 @@ Plans:
 
 ### Phase 18: Bridge-Warden Structural Integrity Detection
 
-**Goal**: Implement the Suspension Bridge dimension of the DDF — detecting not whether the human or AI is ascending to abstraction (Phase 15) but whether the knowledge structure being built is structurally sound. The human dimension measures structural reasoning quality. The AI dimension is the self-correction mechanism: floating cables detected in the AI's own reasoning become correction candidates in the `memory_candidates` pipeline, actively changing what the AI will assert in the next session — not just flagging the weakness but closing the loop on it. Together with Phases 15-16, this produces a three-dimensional picture: Ignition (upward) × Integrity (downward) × Transport (the mechanism connecting them).
+**Goal**: Implement the Suspension Bridge dimension of the DDF — detecting not whether the human or AI is ascending to abstraction (Phase 15) but whether the knowledge structure being built is structurally sound. The human dimension measures structural reasoning quality. The AI dimension is the self-correction mechanism: floating cables detected in the AI's own reasoning become correction candidates in the `memory_candidates` pipeline, actively changing what the AI will assert in the next session — not just flagging the weakness but closing the loop on it. Together with Phases 15-16, this produces a three-dimensional picture: Ignition (upward) x Integrity (downward) x Transport (the mechanism connecting them).
 **Depends on**: Phase 16 (Sacred Fire Intelligence complete; TransportEfficiency and MEMORY.md pipeline in place)
 **Theory basis**: Binswanger's Suspension Bridge analogy (Chapter 6, *How We Know*); CTT Op-8 (Top-Down Tension)
 **Requirements**: BRIDGE-01 (StructuralEvent detection — human and AI), BRIDGE-02 (StructuralIntegrityScore), BRIDGE-03 (CTT Op-8 validation), BRIDGE-04 (three-dimensional profile)
@@ -521,9 +396,15 @@ Plans:
   2. **AI structural detection**: the AI's own responses are assessed for structural integrity — does the AI's Main Cable principle pass Op-8 (is it load-bearing, does it constrain instances, is it independently detectable)? When the AI produces a floating cable, it is flagged as an AI-level amnesia precursor — a principle the AI is carrying that will fail in novel situations
   3. CTT Op-8 (Top-Down Tension) implemented as a validation layer: every Main Cable detection (human or AI) triggers Op-8. The AI's principles that fail Op-8 are returned to the MEMORY.md pipeline as candidates for correction — the AI's own structural weaknesses become inputs to its self-improvement loop
   4. `StructuralIntegrityScore` computed per session for both human and AI — ratio of grounded abstractions, load-bearing principles, respected hierarchical sequences, and spiral reinforcement events
-  5. **Three-dimensional IntelligenceProfile**: Ignition axis (Phase 15 FlameEvents) × Transport axis (Phase 16 TransportEfficiency) × Integrity axis (Phase 18 StructuralEvents) — the complete characterization of how a human-AI system thinks together
+  5. **Three-dimensional IntelligenceProfile**: Ignition axis (Phase 15 FlameEvents) x Transport axis (Phase 16 TransportEfficiency) x Integrity axis (Phase 18 StructuralEvents) — the complete characterization of how a human-AI system thinks together
   6. Phase 17 assessment scenarios extended with structural integrity dimension: candidates assessed not just for CCD identification (upward) but for whether they ground abstractions, string load-bearing principles, and respect dependencies (downward) — and whether they notice when the AI's principles are floating cables
-**Plans:** ~4 plans in 3 waves (to be specified after Phase 17)
+**Plans:** 4 plans in 3 waves
+
+Plans:
+- [ ] 18-01-PLAN.md — Schema + models + StructuralConfig + IntelligenceProfile extension + writer (Wave 1)
+- [ ] 18-02-PLAN.md — Four signal detectors + StructuralIntegrityComputer + Op-8 depositor + pipeline Step 21 (Wave 2)
+- [ ] 18-03-PLAN.md — Integration tests for BRIDGE-01 through BRIDGE-03 (Wave 2)
+- [ ] 18-04-PLAN.md — 3D IntelligenceProfile extension + CLI bridge subcommand (Wave 3)
 
 ## Progress
 
@@ -554,4 +435,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 16. Sacred Fire Intelligence System | 4/4 | ✓ Complete | 2026-02-24 |
 | 16.1. Topological Edge-Generation [INSERTED] | 4/4 | ✓ Complete | 2026-02-24 |
 | 17. Candidate Assessment System | 4/4 | ✓ Complete | 2026-02-24 |
-| 18. Bridge-Warden Structural Integrity Detection | —/— | ⬜ Pending | — |
+| 18. Bridge-Warden Structural Integrity Detection | 0/4 | ⬜ Planning | — |

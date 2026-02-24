@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 17 (Candidate Assessment System) — In progress. Plans 01-03 complete. Next: Plan 04 (reporting + assessment dashboard).
+**Current focus:** Phase 17 (Candidate Assessment System) — COMPLETE. All 4 plans executed.
 
 ## Current Position
 
 Phase: 17 (Candidate Assessment System)
-Plan: 3 of 4 in current phase
-Status: In progress
-Last activity: 2026-02-24 -- Completed 17-03-PLAN.md (Session Runner + Observer + Rejection Detector)
+Plan: 4 of 4 in current phase
+Status: Phase complete
+Last activity: 2026-02-24 -- Completed 17-04-PLAN.md (Report Generator + Terminal Deposit)
 
-Progress: [████████████████████████░░░░░░░░] 75% (3/4 plans in phase 17)
-Overall:  [██████████████████████████████████████████████████████████████████████░░] 70/71 plans total
+Progress: [████████████████████████████████] 100% (4/4 plans in phase 17)
+Overall:  [██████████████████████████████████████████████████████████████████████████] 71/71 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 70
+- Total plans completed: 71
 - Average duration: 5.5 min
-- Total execution time: 7.08 hours
+- Total execution time: 7.26 hours
 
 **By Phase:**
 
@@ -48,10 +48,10 @@ Overall:  [███████████████████████
 | 16.1-topological-edge-generation | 4 | 22 min | 5.5 min |
 | 16-sacred-fire-intelligence-system | 4 | 18 min | 4.5 min |
 
-| 17-candidate-assessment-system | 3 | 30 min | 10.0 min |
+| 17-candidate-assessment-system | 4 | 41 min | 10.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 3 min, 4 min, 10 min, 8 min, 12 min
+- Last 5 plans: 4 min, 10 min, 8 min, 12 min, 11 min
 - Trend: steady execution pace
 
 *Updated after each plan completion*
@@ -419,6 +419,11 @@ Recent decisions affecting current work:
 - Plan 17-03: Observer uses lazy imports for PipelineRunner/load_config to avoid circular dependencies
 - Plan 17-03: assessment_session_id IS NULL filter added to all 5 IntelligenceProfile flame_events queries
 - Plan 17-03: 1558 tests passing (1518 baseline + 40 new, excluding pre-existing segmenter failure)
+- Plan 17-04: Direct INSERT into memory_candidates (not deposit_to_memory_candidates) for terminal deposit -- that function lacks source_type, fidelity, confidence
+- Plan 17-04: DELETE+INSERT for idempotent upsert matching project-wide DuckDB convention
+- Plan 17-04: Auto-calibration deposits proposal to memory_candidates for human review (never auto-updates project_wisdom.ddf_target_level)
+- Plan 17-04: math.erf for percentile rank computation (no scipy dependency)
+- Plan 17-04: 1615 tests passing (1593 baseline + 22 new, excluding pre-existing segmenter failure)
 
 ### Pending Todos
 
@@ -585,8 +590,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 17 Plan 03 COMPLETE. Session Runner + Observer + Rejection Detector.
-Resume file: .planning/phases/17-candidate-assessment-system/17-04-PLAN.md
+Stopped at: Phase 17 COMPLETE. All 4 plans executed. Terminal deposit mechanism operational.
+Resume file: N/A (Phase 17 complete)
 
 ## Phase 15 Completion Summary
 
@@ -671,3 +676,18 @@ Phase 16 delivered the Sacred Fire Intelligence System (all 4 plans):
 - **Terminal test**: End-to-end closed loop from FlameEvent through deposit, review, to persistent MEMORY.md entry
 - **Key modules**: src/pipeline/ddf/transport_efficiency.py, src/pipeline/cli/intelligence.py (memory-review command)
 - **CLI**: `python -m src.pipeline.cli intelligence memory-review [--db] [--memory-file]`
+
+## Phase 17 Completion Summary
+
+Phase 17 delivered the Candidate Assessment System (all 4 plans):
+- **Plan 01 COMPLETE**: Assessment schema (assessment_te_sessions, assessment_baselines, ALTER TABLE extensions), ScenarioSpec/AssessmentSession/AssessmentReport Pydantic models, 16 tests
+- **Plan 02 COMPLETE**: ScenarioGenerator (wisdom-to-scenario with handicap templates), CLI annotate-scenarios + list-scenarios, 18 tests
+- **Plan 03 COMPLETE**: AssessmentSessionRunner (Actor lifecycle), AssessmentObserver (pipeline bridging), RejectionDetector (outcome-gated L5+ classification), 3-metric TE computation, 40 tests
+- **Plan 04 COMPLETE**: AssessmentReporter (comprehensive markdown reports), terminal deposit (source_type='simulation_review', fidelity=3, confidence=0.85), auto-calibration proposals, CLI report command, 22 tests
+- **1615 tests** total (1593 baseline + 22 new Plan 04 tests, excluding pre-existing segmenter failure)
+- **Terminal deposit mechanism**: Assessment sessions produce CCD-quality memory_candidates entries that appear in the memory-review queue
+- **3-metric TE**: raven_depth * crow_efficiency * trunk_quality (no transport_speed for short sessions)
+- **Auto-calibration**: Deposits proposals for human review when last 3 ratios consistently too easy (>1.3) or too hard (<0.5)
+- **Production isolation**: assessment_session_id IS NULL filter on all 5 IntelligenceProfile queries
+- **Key modules**: src/pipeline/assessment/ (schema.py, models.py, scenario_generator.py, session_runner.py, observer.py, rejection_detector.py, te_assessment.py, reporter.py), src/pipeline/cli/assess.py
+- **CLI**: `python -m src.pipeline.cli intelligence assess annotate-scenarios|list-scenarios|run|calibrate|report`

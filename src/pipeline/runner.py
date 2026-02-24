@@ -872,7 +872,38 @@ class PipelineRunner:
             logger.warning("DDF spiral promotion failed: {}", e)
             warnings.append(f"DDF spiral promotion failed: {e}")
 
-        # Step 20: Compute stats
+        # Step 20: TransportEfficiency computation + backfill (Phase 16)
+        ddf_te_count = 0
+        ddf_trunk_backfill = 0
+        ddf_te_delta_backfill = 0
+        try:
+            from src.pipeline.ddf.transport_efficiency import (
+                compute_te_for_session as _compute_te,
+                write_te_rows as _write_te,
+                backfill_trunk_quality as _backfill_trunk,
+                backfill_te_delta as _backfill_delta,
+            )
+
+            te_rows = _compute_te(self._conn, session_id)
+            if te_rows:
+                ddf_te_count = _write_te(self._conn, te_rows)
+                logger.info("Step 20: Computed {} TE rows", ddf_te_count)
+
+            # Run backfill jobs (may update rows from earlier sessions)
+            ddf_trunk_backfill = _backfill_trunk(self._conn)
+            ddf_te_delta_backfill = _backfill_delta(self._conn)
+            if ddf_trunk_backfill > 0 or ddf_te_delta_backfill > 0:
+                logger.info(
+                    "Step 20: Backfilled {} trunk_quality rows, {} te_delta entries",
+                    ddf_trunk_backfill, ddf_te_delta_backfill,
+                )
+        except ImportError:
+            pass  # TE module not available
+        except Exception as e:
+            logger.warning("TransportEfficiency computation failed: {}", e)
+            warnings.append(f"TransportEfficiency computation failed: {e}")
+
+        # Step 21: Compute stats
         tag_distribution = self._compute_tag_distribution(tagged_events)
         outcome_distribution = seg_stats.get("by_outcome", {})
         duration_s = time.monotonic() - t0
@@ -906,6 +937,9 @@ class PipelineRunner:
             "ddf_causal_isolation": ddf_causal_isolation,
             "ddf_metrics_count": ddf_metrics_count,
             "ddf_spiral_promotions": ddf_spiral_promotions,
+            "ddf_te_count": ddf_te_count,
+            "ddf_trunk_backfill": ddf_trunk_backfill,
+            "ddf_te_delta_backfill": ddf_te_delta_backfill,
             "errors": errors,
             "warnings": warnings,
             "duration_seconds": round(duration_s, 2),

@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 16.1 (Topological Edge-Generation) — In progress. Plan 01 complete (data foundation).
+**Current focus:** Phase 16.1 (Topological Edge-Generation) — In progress. Plans 01-02 complete (data foundation + detector/generator).
 
 ## Current Position
 
 Phase: 16.1 (Topological Edge-Generation)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-24 -- Completed 16.1-01-PLAN.md (topology data foundation)
+Last activity: 2026-02-24 -- Completed 16.1-02-PLAN.md (conjunctive detector + edge generator)
 
-Progress: [████████░░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans in phase 16.1)
-Overall:  [██████████████████████████████████████████████████████████████████░] 60/63 plans total
+Progress: [████████████████░░░░░░░░░░░░░░] 50% (2/4 plans in phase 16.1)
+Overall:  [█████████████████████████████████████████████████████████████████░░] 61/63 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 60
+- Total plans completed: 61
 - Average duration: 5.5 min
-- Total execution time: 5.98 hours
+- Total execution time: 6.08 hours
 
 **By Phase:**
 
@@ -45,10 +45,10 @@ Overall:  [███████████████████████
 | 14.1-premise-registry-premise-assertion-gate | 3 | 33 min | 11.0 min |
 | 14-live-session-governance-research | 4 | 28 min | 7.0 min |
 | 15-ddf-detection-substrate | 7 | 49 min | 7.0 min |
-| 16.1-topological-edge-generation | 1 | 4 min | 4.0 min |
+| 16.1-topological-edge-generation | 2 | 10 min | 5.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min, 11 min, 9 min, 6 min, 4 min
+- Last 5 plans: 4 min, 11 min, 9 min, 4 min, 6 min
 - Trend: consistent (~7 min per plan)
 
 *Updated after each plan completion*
@@ -366,6 +366,10 @@ Recent decisions affecting current work:
 - Plan 16.1-01: EdgeWriter validates activation_condition non-emptiness at write time as defense-in-depth
 - Plan 16.1-01: axis_edges dropped before ai_flame_events view in drop_schema (dependency order)
 - Plan 16.1-01: 1231 tests passing (1219 baseline + 12 new, excluding pre-existing segmenter failure)
+- Plan 16.1-02: Baseline computed from events PRIOR to current event (prevents self-inflation)
+- Plan 16.1-02: 5-minute window check is caller responsibility; detector checks axes count only
+- Plan 16.1-02: For N axes, generate C(N,2) pairs with sorted axis names for deterministic edge_id
+- Plan 16.1-02: 1379 tests passing (1364 baseline + 15 new, excluding pre-existing segmenter failure)
 
 ### Pending Todos
 
@@ -532,8 +536,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 16.1 Plan 01 complete (topology data foundation). Plans 02-04 remain.
-Resume file: .planning/phases/16.1-topological-edge-generation/16.1-02-PLAN.md
+Stopped at: Phase 16.1 Plan 02 complete (conjunctive detector + edge generator). Plans 03-04 remain.
+Resume file: .planning/phases/16.1-topological-edge-generation/16.1-03-PLAN.md
 
 ## Phase 15 Completion Summary
 

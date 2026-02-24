@@ -502,7 +502,13 @@ Plans:
   3. Assessment Report produced at session end: FlameEvent timeline with evidence quotes, level distribution (Levels 0-7 including Trunk Identifications), axis quality scores, flood rate, spiral evidence within session, `TransportEfficiency` score with all four sub-scores, Fringe Drift rate, AI contribution profile (at what DDF level did the AI reason during this session — was it following or leading?), comparison against IntelligenceProfile population baseline
   4. Scenario bank seeded from OPE project's own historical dead ends and breakthroughs — the system assesses against challenges it has genuinely lived
   5. Transparency: candidate knows they are in an AI-assisted coding session being assessed for epistemological quality — how they think *with* AI. The assessment rewards intellectual independence from AI suggestions (Level 5 requires rejecting the AI's framing). Candidates who adopt AI vocabulary without forming their own CCDs score at Level 1-2 regardless of output quality
-**Plans:** ~4 plans in 3 waves (to be specified after Phase 16)
+**Plans:** 4 plans in 4 waves
+
+Plans:
+- [ ] 17-01-PLAN.md — Schema + Models + Session Launch Spike (Wave 1)
+- [ ] 17-02-PLAN.md — Scenario Generator + Annotation CLI (Wave 2)
+- [ ] 17-03-PLAN.md — Session Runner + Observer + Rejection Detector (Wave 3)
+- [ ] 17-04-PLAN.md — Report Generator + Terminal Deposit (Wave 4)
 
 ### Phase 18: Bridge-Warden Structural Integrity Detection
 
@@ -547,5 +553,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 15. DDF Detection Substrate (human + AI) | 7/7 | ✓ Complete | 2026-02-24 |
 | 16. Sacred Fire Intelligence System | 4/4 | ✓ Complete | 2026-02-24 |
 | 16.1. Topological Edge-Generation [INSERTED] | 4/4 | ✓ Complete | 2026-02-24 |
-| 17. Candidate Assessment System | —/— | ⬜ Pending | — |
+| 17. Candidate Assessment System | 0/4 | ⬜ In Progress | — |
 | 18. Bridge-Warden Structural Integrity Detection | —/— | ⬜ Pending | — |

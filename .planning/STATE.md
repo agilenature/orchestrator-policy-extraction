@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 15 (DDF Detection Substrate) — In progress. Plans 01-02 complete. 5 plans remaining.
+**Current focus:** Phase 15 (DDF Detection Substrate) — In progress. Plans 01-03 complete. 4 plans remaining.
 
 ## Current Position
 
 Phase: 15 (DDF Detection Substrate)
-Plan: 2 of 7 in current phase
+Plan: 3 of 7 in current phase
 Status: In progress
-Last activity: 2026-02-24 -- Completed 15-02-PLAN.md (Tier 1 detectors L0-L2, OAxsDetector, writer, deposit)
+Last activity: 2026-02-24 -- Completed 15-03-PLAN.md (Tier 2 FlameEventExtractor, CausalIsolationRecorder, FalseIntegrationDetector)
 
-Progress: [████████░░░░░░░░░░░░░░░░░░░░░░] 29% (2/7 plans in phase 15)
-Overall:  [█████████████████████████████████████████████████████████████░░] 54/59 plans total
+Progress: [████████████░░░░░░░░░░░░░░░░░░] 43% (3/7 plans in phase 15)
+Overall:  [██████████████████████████████████████████████████████████████░] 55/59 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 54
+- Total plans completed: 55
 - Average duration: 5.5 min
-- Total execution time: 5.29 hours
+- Total execution time: 5.41 hours
 
 **By Phase:**
 
@@ -44,10 +44,10 @@ Overall:  [███████████████████████
 | 13.3-identification-transparency | 4 | 31 min | 7.8 min |
 | 14.1-premise-registry-premise-assertion-gate | 3 | 33 min | 11.0 min |
 | 14-live-session-governance-research | 4 | 28 min | 7.0 min |
-| 15-ddf-detection-substrate | 2 | 12 min | 6.0 min |
+| 15-ddf-detection-substrate | 3 | 19 min | 6.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 8 min, 6 min, 6 min, 6 min, 6 min
+- Last 5 plans: 6 min, 6 min, 6 min, 6 min, 7 min
 - Trend: consistent (~6 min per plan)
 
 *Updated after each plan completion*
@@ -331,6 +331,14 @@ Recent decisions affecting current work:
 - Plan 15-02: write_flame_events uses INSERT OR REPLACE for idempotent DuckDB writes
 - Plan 15-02: detect_markers filters by actor=human_orchestrator and event_type in (user_msg, human_msg, message)
 - Plan 15-02: 1236 tests passing (1227 baseline + 30 new: 18 tier1 + 12 writer, excluding pre-existing segmenter failure)
+- Plan 15-03: FlameEventExtractor enriches Tier 1 stubs to L3-7 using episode scope paths, outcomes, reactions
+- Plan 15-03: L6+ upgrades unconditionally set flood_confirmed=True (required for deposit path)
+- Plan 15-03: AI marker detection: assertive causal -> L2 subject='ai', concretization flood (3+) -> L6 subject='ai' flood_confirmed=True
+- Plan 15-03: CausalIsolationRecorder reads premise_registry.foil_path_outcomes; ALL events use subject='ai'
+- Plan 15-03: FalseIntegrationDetector dual output: always writes hypothesis, flame event only above threshold (default 0.6)
+- Plan 15-03: Confidence formula: min(0.9, 0.3 * distinct_scope_prefixes)
+- Plan 15-03: deposit_level6 filters on marker_level >= 6 AND flood_confirmed = True (both required)
+- Plan 15-03: 1262 tests passing (1236 baseline + 26 new, excluding pre-existing segmenter failure)
 
 ### Pending Todos
 
@@ -497,8 +505,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 15 plan 02 complete (Tier 1 detectors, writer, deposit). Ready for 15-03.
-Resume file: .planning/phases/15-ddf-detection-substrate/15-03-PLAN.md
+Stopped at: Phase 15 plan 03 complete (Tier 2 FlameEventExtractor, CausalIsolationRecorder, FalseIntegrationDetector). Ready for 15-04.
+Resume file: .planning/phases/15-ddf-detection-substrate/15-04-PLAN.md
 
 ## Phase 14 Completion Summary
 

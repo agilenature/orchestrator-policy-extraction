@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 17 (Candidate Assessment System) — In progress. Plan 01 complete (schema+spike). Next: Plan 02 (scenario generator+CLI).
+**Current focus:** Phase 17 (Candidate Assessment System) — In progress. Plans 01-02 complete. Next: Plan 03 (session launcher).
 
 ## Current Position
 
 Phase: 17 (Candidate Assessment System)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-24 -- Completed 17-01-PLAN.md (Schema + Models + Session Launch Spike)
+Last activity: 2026-02-24 -- Completed 17-02-PLAN.md (Scenario Generator + Annotation CLI)
 
-Progress: [████████░░░░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans in phase 17)
-Overall:  [█████████████████████████████████████████████████████████████████████░] 68/71 plans total
+Progress: [████████████████░░░░░░░░░░░░░░░░] 50% (2/4 plans in phase 17)
+Overall:  [██████████████████████████████████████████████████████████████████████░] 69/71 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 68
+- Total plans completed: 69
 - Average duration: 5.5 min
-- Total execution time: 6.75 hours
+- Total execution time: 6.88 hours
 
 **By Phase:**
 
@@ -48,11 +48,11 @@ Overall:  [███████████████████████
 | 16.1-topological-edge-generation | 4 | 22 min | 5.5 min |
 | 16-sacred-fire-intelligence-system | 4 | 18 min | 4.5 min |
 
-| 17-candidate-assessment-system | 1 | 10 min | 10.0 min |
+| 17-candidate-assessment-system | 2 | 18 min | 9.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min, 6 min, 3 min, 4 min, 10 min
-- Trend: 17-01 spike exploration added ~5 min overhead
+- Last 5 plans: 6 min, 3 min, 4 min, 10 min, 8 min
+- Trend: steady execution pace
 
 *Updated after each plan completion*
 
@@ -408,6 +408,11 @@ Recent decisions affecting current work:
 - Plan 17-01: source_type validated in Pydantic only (not DuckDB CHECK) per DuckDB ALTER TABLE limitation
 - Plan 17-01: Assessment dir encoding: all slashes replaced with dashes (/tmp/foo -> -tmp-foo)
 - Plan 17-01: 1533 tests passing (1517 baseline + 16 new, excluding pre-existing segmenter failures)
+- Plan 17-02: ScenarioGenerator uses default RuntimeError template when no scenario_seed provided
+- Plan 17-02: L5-L7 handicap uses generic wrong-cause template (configuration handling / parameter ordering)
+- Plan 17-02: list-scenarios opens DB read-only with graceful error when assessment schema columns missing
+- Plan 17-02: assess group nested under intelligence_group (access: `intelligence assess <command>`)
+- Plan 17-02: 1518 tests passing (1500 baseline + 18 new, excluding pre-existing segmenter failure)
 
 ### Pending Todos
 
@@ -574,8 +579,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 17 Plan 01 COMPLETE. Schema + Models + Session Launch Spike.
-Resume file: .planning/phases/17-candidate-assessment-system/17-02-PLAN.md
+Stopped at: Phase 17 Plan 02 COMPLETE. Scenario Generator + Annotation CLI.
+Resume file: .planning/phases/17-candidate-assessment-system/17-03-PLAN.md
 
 ## Phase 15 Completion Summary
 

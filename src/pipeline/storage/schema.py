@@ -404,6 +404,11 @@ def create_schema(conn: duckdb.DuckDBPyConnection) -> None:
 
     create_premise_schema(conn)
 
+    # Phase 15: DDF Detection Substrate tables
+    from src.pipeline.ddf.schema import create_ddf_schema
+
+    create_ddf_schema(conn)
+
 
 def drop_schema(conn: duckdb.DuckDBPyConnection) -> None:
     """Drop all pipeline tables (for testing).
@@ -414,6 +419,10 @@ def drop_schema(conn: duckdb.DuckDBPyConnection) -> None:
     Args:
         conn: DuckDB connection to drop tables from.
     """
+    conn.execute("DROP VIEW IF EXISTS ai_flame_events")
+    conn.execute("DROP TABLE IF EXISTS constraint_metrics")
+    conn.execute("DROP TABLE IF EXISTS axis_hypotheses")
+    conn.execute("DROP TABLE IF EXISTS flame_events")
     conn.execute("DROP TABLE IF EXISTS premise_registry")
     conn.execute("DROP TABLE IF EXISTS policy_error_events")
     conn.execute("DROP TABLE IF EXISTS stability_outcomes")

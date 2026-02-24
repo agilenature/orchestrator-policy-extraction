@@ -324,6 +324,17 @@ gate_patterns:
 
   protected_paths: []  # Implicit - triggered by risk model
 
+# Phase 15: DDF Detection Substrate
+ddf:
+  o_axs:
+    granularity_drop_ratio: 0.5
+    prior_prompts_window: 4
+    novel_concept_min_occurrences: 2
+    novel_concept_message_window: 3
+  false_integration_confidence_threshold: 0.6
+  epistemological_default: "principled"
+  stagnation_min_firing_count: 10
+
 # Constraint Extraction Patterns (preserved from existing config)
 constraint_patterns:
   forbidden:

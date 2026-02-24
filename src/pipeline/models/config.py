@@ -211,6 +211,24 @@ class PolicyFeedbackConfig(BaseModel):
     rolling_window_sessions: int = 100
 
 
+class OAxsConfig(BaseModel):
+    """O_AXS detection thresholds (Phase 15)."""
+
+    granularity_drop_ratio: float = 0.5
+    prior_prompts_window: int = 4
+    novel_concept_min_occurrences: int = 2
+    novel_concept_message_window: int = 3
+
+
+class DDFConfig(BaseModel):
+    """DDF Detection Substrate settings (Phase 15)."""
+
+    o_axs: OAxsConfig = Field(default_factory=OAxsConfig)
+    false_integration_confidence_threshold: float = 0.6
+    epistemological_default: str = "principled"
+    stagnation_min_firing_count: int = 10
+
+
 class GitCommands(BaseModel):
     """Git command patterns for tagging."""
 
@@ -274,6 +292,7 @@ class PipelineConfig(BaseModel):
     feedback: PolicyFeedbackConfig = Field(
         default_factory=PolicyFeedbackConfig
     )
+    ddf: DDFConfig = Field(default_factory=DDFConfig)
 
     # Preserved from existing config (used by downstream components)
     mode_inference: dict[str, Any] = Field(default_factory=dict)

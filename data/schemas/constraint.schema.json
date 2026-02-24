@@ -103,6 +103,19 @@
     "source_excerpt": {
       "type": "string",
       "description": "Original text excerpt from the source document"
+    },
+    "epistemological_origin": {
+      "type": "string",
+      "enum": ["reactive", "principled", "inductive"],
+      "default": "principled",
+      "description": "How this constraint was derived: reactive (from correction), principled (proactively stated), or inductive (pattern across instances)"
+    },
+    "epistemological_confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "default": 1.0,
+      "description": "Confidence in the epistemological_origin classification (0.0-1.0)"
     }
   }
 }

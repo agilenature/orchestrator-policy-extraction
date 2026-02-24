@@ -259,6 +259,9 @@ class ConstraintStore:
         """Load existing constraints from JSON file.
 
         Returns empty list if file doesn't exist or contains invalid data.
+        Applies backward-compatible defaults for fields added in Phase 15:
+        epistemological_origin defaults to 'principled', epistemological_confidence
+        defaults to 1.0.
         """
         if not self._path.exists():
             return []
@@ -271,6 +274,10 @@ class ConstraintStore:
                     self._path,
                 )
                 return []
+            # Apply backward-compatible defaults for Phase 15 fields
+            for constraint in data:
+                constraint.setdefault("epistemological_origin", "principled")
+                constraint.setdefault("epistemological_confidence", 1.0)
             return data
         except (json.JSONDecodeError, OSError) as e:
             logger.warning(

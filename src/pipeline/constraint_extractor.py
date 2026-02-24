@@ -28,6 +28,7 @@ import hashlib
 import re
 from datetime import datetime, timezone
 
+from src.pipeline.ddf.epistemological import classify_epistemological_origin
 from src.pipeline.models.config import PipelineConfig
 
 
@@ -112,6 +113,9 @@ class ConstraintExtractor:
 
         created_at = episode.get("timestamp", "")
 
+        # Classify epistemological origin from the source episode
+        origin, confidence = classify_epistemological_origin(episode)
+
         return {
             "constraint_id": constraint_id,
             "text": text,
@@ -128,6 +132,8 @@ class ConstraintExtractor:
             ],
             "type": "behavioral_constraint",
             "status_history": [{"status": "active", "changed_at": created_at}] if created_at else [],
+            "epistemological_origin": origin,
+            "epistemological_confidence": confidence,
         }
 
     def _normalize_text(self, message: str) -> str:

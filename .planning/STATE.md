@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 16 (Sacred Fire Intelligence System) — In progress. Plan 01 complete (data foundation + memory-review CLI).
+**Current focus:** Phase 16 (Sacred Fire Intelligence System) — In progress. Plan 02 complete (TE computation engine + pipeline Step 20).
 
 ## Current Position
 
 Phase: 16 (Sacred Fire Intelligence System)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-24 -- Completed 16-01-PLAN.md (TE schema + memory-review CLI)
+Last activity: 2026-02-24 -- Completed 16-02-PLAN.md (TE computation engine + pipeline Step 20)
 
-Progress: [████████░░░░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans in phase 16)
-Overall:  [████████████████████████████████████████████████████████████████████] 64/67 plans total
+Progress: [████████████████░░░░░░░░░░░░░░░░] 50% (2/4 plans in phase 16)
+Overall:  [████████████████████████████████████████████████████████████████████] 65/67 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 64
+- Total plans completed: 65
 - Average duration: 5.5 min
-- Total execution time: 6.36 hours
+- Total execution time: 6.46 hours
 
 **By Phase:**
 
@@ -46,11 +46,11 @@ Overall:  [███████████████████████
 | 14-live-session-governance-research | 4 | 28 min | 7.0 min |
 | 15-ddf-detection-substrate | 7 | 49 min | 7.0 min |
 | 16.1-topological-edge-generation | 4 | 22 min | 5.5 min |
-| 16-sacred-fire-intelligence-system | 1 | 5 min | 5.0 min |
+| 16-sacred-fire-intelligence-system | 2 | 11 min | 5.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min, 6 min, 7 min, 5 min, 5 min
-- Trend: consistent (~5.4 min per plan)
+- Last 5 plans: 6 min, 7 min, 5 min, 5 min, 6 min
+- Trend: consistent (~5.8 min per plan)
 
 *Updated after each plan completion*
 
@@ -387,6 +387,11 @@ Recent decisions affecting current work:
 - Plan 16-01: Accept flow writes CCD format entry and updates status to 'validated' (matches CHECK constraint)
 - Plan 16-01: Dedup check is case-insensitive substring match of ccd_axis in full MEMORY.md text
 - Plan 16-01: 1431 tests passing (1406 baseline + 25 new: 10 schema + 15 CLI)
+- Plan 16-02: DuckDB returns decimal.Decimal for SQL literal 0.5; all sub-metrics cast to float() before multiplication
+- Plan 16-02: te_id = SHA-256("session_id:subject")[:16] for deterministic idempotent writes
+- Plan 16-02: backfill_trunk_quality: no Level 0 events = keep 0.5 value but mark confirmed (not perpetually pending)
+- Plan 16-02: Pipeline Step 20 (TE computation + backfill) inserted between Step 19 (spiral promotion) and Step 21 (stats)
+- Plan 16-02: 1456 tests passing (1431 baseline + 25 new TE computation tests)
 
 ### Pending Todos
 
@@ -553,8 +558,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 16, Plan 01 COMPLETE. Next: 16-02-PLAN.md (TE computation pipeline).
-Resume file: .planning/phases/16-sacred-fire-intelligence-system/16-02-PLAN.md
+Stopped at: Phase 16, Plan 02 COMPLETE. Next: 16-03-PLAN.md (IntelligenceProfile extended).
+Resume file: .planning/phases/16-sacred-fire-intelligence-system/16-03-PLAN.md
 
 ## Phase 15 Completion Summary
 

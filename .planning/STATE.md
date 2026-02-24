@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 15 (DDF Detection Substrate) — In progress. Plans 01-03 complete. 4 plans remaining.
+**Current focus:** Phase 15 (DDF Detection Substrate) — In progress. Plans 01-03, 05 complete. 3 plans remaining.
 
 ## Current Position
 
 Phase: 15 (DDF Detection Substrate)
-Plan: 3 of 7 in current phase
+Plan: 4 of 7 in current phase
 Status: In progress
-Last activity: 2026-02-24 -- Completed 15-03-PLAN.md (Tier 2 FlameEventExtractor, CausalIsolationRecorder, FalseIntegrationDetector)
+Last activity: 2026-02-24 -- Completed 15-05-PLAN.md (IntelligenceProfile aggregation)
 
-Progress: [████████████░░░░░░░░░░░░░░░░░░] 43% (3/7 plans in phase 15)
-Overall:  [██████████████████████████████████████████████████████████████░] 55/59 plans total
+Progress: [████████████████░░░░░░░░░░░░░░] 57% (4/7 plans in phase 15)
+Overall:  [███████████████████████████████████████████████████████████████░] 56/59 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 55
+- Total plans completed: 56
 - Average duration: 5.5 min
-- Total execution time: 5.41 hours
+- Total execution time: 5.48 hours
 
 **By Phase:**
 
@@ -44,10 +44,10 @@ Overall:  [███████████████████████
 | 13.3-identification-transparency | 4 | 31 min | 7.8 min |
 | 14.1-premise-registry-premise-assertion-gate | 3 | 33 min | 11.0 min |
 | 14-live-session-governance-research | 4 | 28 min | 7.0 min |
-| 15-ddf-detection-substrate | 3 | 19 min | 6.3 min |
+| 15-ddf-detection-substrate | 4 | 23 min | 5.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 6 min, 6 min, 6 min, 6 min, 7 min
+- Last 5 plans: 6 min, 6 min, 6 min, 7 min, 4 min
 - Trend: consistent (~6 min per plan)
 
 *Updated after each plan completion*
@@ -339,6 +339,11 @@ Recent decisions affecting current work:
 - Plan 15-03: Confidence formula: min(0.9, 0.3 * distinct_scope_prefixes)
 - Plan 15-03: deposit_level6 filters on marker_level >= 6 AND flood_confirmed = True (both required)
 - Plan 15-03: 1262 tests passing (1236 baseline + 26 new, excluding pre-existing segmenter failure)
+- Plan 15-05: Spiral depth counts ascending transitions (N levels in streak = N-1 depth), not streak length
+- Plan 15-05: Python-side iteration for spiral depth (avoids complex DuckDB window functions)
+- Plan 15-05: AI profile uses human_id='ai' sentinel value for IntelligenceProfile model compatibility
+- Plan 15-05: avg_marker_level rounded to 4 decimal places to avoid floating-point display noise
+- Plan 15-05: 1153 tests passing (1141 baseline + 12 new, excluding pre-existing segmenter failure)
 
 ### Pending Todos
 
@@ -505,8 +510,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 15 plan 03 complete (Tier 2 FlameEventExtractor, CausalIsolationRecorder, FalseIntegrationDetector). Ready for 15-04.
-Resume file: .planning/phases/15-ddf-detection-substrate/15-04-PLAN.md
+Stopped at: Phase 15 plan 05 complete (IntelligenceProfile aggregation). Plans 01-03, 05 complete. Ready for 15-04, 15-06, or 15-07.
+Resume file: .planning/phases/15-ddf-detection-substrate/15-06-PLAN.md
 
 ## Phase 14 Completion Summary
 

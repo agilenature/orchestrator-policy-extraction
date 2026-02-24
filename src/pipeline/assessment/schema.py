@@ -75,6 +75,8 @@ ASSESSMENT_TE_INDEXES: list[str] = [
 ASSESSMENT_ALTER_EXTENSIONS: list[tuple[str, str, str]] = [
     ("memory_candidates", "source_type", "VARCHAR DEFAULT 'production'"),
     ("flame_events", "assessment_session_id", "VARCHAR"),
+    ("flame_events", "ccd_axis", "VARCHAR"),
+    ("flame_events", "differential", "VARCHAR"),
     ("project_wisdom", "scenario_seed", "TEXT"),
     ("project_wisdom", "ddf_target_level", "INTEGER"),
 ]

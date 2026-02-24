@@ -6,17 +6,17 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 17 (Candidate Assessment System) — COMPLETE. All 4 plans executed.
+**Current focus:** Phase 18 (Bridge-Warden Structural Integrity Detection) — next phase. Phase 17 complete and verified.
 
 ## Current Position
 
-Phase: 17 (Candidate Assessment System)
-Plan: 4 of 4 in current phase
-Status: Phase complete
-Last activity: 2026-02-24 -- Completed 17-04-PLAN.md (Report Generator + Terminal Deposit)
+Phase: 18 (Bridge-Warden Structural Integrity Detection)
+Plan: 0 of ~4 in current phase
+Status: Phase pending — ready to plan
+Last activity: 2026-02-24 -- Phase 17 gap closure (rejection_detector ccd_axis/differential columns added to ASSESSMENT_ALTER_EXTENSIONS; live DB migrated)
 
-Progress: [████████████████████████████████] 100% (4/4 plans in phase 17)
-Overall:  [██████████████████████████████████████████████████████████████████████████] 71/71 plans total
+Progress: [████████████████████████████████] 100% (4/4 plans in phase 17 — COMPLETE)
+Overall:  [██████████████████████████████████████████████████████████████████████████] 71/71 plans total (Phase 18 not yet planned)
 
 ## Performance Metrics
 
@@ -424,6 +424,7 @@ Recent decisions affecting current work:
 - Plan 17-04: Auto-calibration deposits proposal to memory_candidates for human review (never auto-updates project_wisdom.ddf_target_level)
 - Plan 17-04: math.erf for percentile rank computation (no scipy dependency)
 - Plan 17-04: 1615 tests passing (1593 baseline + 22 new, excluding pre-existing segmenter failure)
+- Plan 17-gap: rejection_detector.py queried ccd_axis and differential from flame_events -- columns absent from FLAME_EVENTS_DDL; tests masked this via manual fixture ALTER TABLE. Fix: added both columns to ASSESSMENT_ALTER_EXTENSIONS in assessment/schema.py (idempotent ALTER TABLE applied at schema chain time). Live ope.db migrated via create_ddf_schema(). 19 tests passing post-fix.
 
 ### Pending Todos
 

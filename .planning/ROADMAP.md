@@ -505,10 +505,10 @@ Plans:
 **Plans:** 4 plans in 4 waves
 
 Plans:
-- [ ] 17-01-PLAN.md — Schema + Models + Session Launch Spike (Wave 1)
-- [ ] 17-02-PLAN.md — Scenario Generator + Annotation CLI (Wave 2)
-- [ ] 17-03-PLAN.md — Session Runner + Observer + Rejection Detector (Wave 3)
-- [ ] 17-04-PLAN.md — Report Generator + Terminal Deposit (Wave 4)
+- [x] 17-01-PLAN.md — Schema + Models + Session Launch Spike (Wave 1)
+- [x] 17-02-PLAN.md — Scenario Generator + Annotation CLI (Wave 2)
+- [x] 17-03-PLAN.md — Session Runner + Observer + Rejection Detector (Wave 3)
+- [x] 17-04-PLAN.md — Report Generator + Terminal Deposit (Wave 4)
 
 ### Phase 18: Bridge-Warden Structural Integrity Detection
 
@@ -553,5 +553,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 15. DDF Detection Substrate (human + AI) | 7/7 | ✓ Complete | 2026-02-24 |
 | 16. Sacred Fire Intelligence System | 4/4 | ✓ Complete | 2026-02-24 |
 | 16.1. Topological Edge-Generation [INSERTED] | 4/4 | ✓ Complete | 2026-02-24 |
-| 17. Candidate Assessment System | 0/4 | ⬜ In Progress | — |
+| 17. Candidate Assessment System | 4/4 | ✓ Complete | 2026-02-24 |
 | 18. Bridge-Warden Structural Integrity Detection | —/— | ⬜ Pending | — |

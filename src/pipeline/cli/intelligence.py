@@ -70,9 +70,8 @@ def profile(human_id: str, db: str, show_ai: bool) -> None:
         else:
             ip = compute_intelligence_profile(conn, human_id)
 
-        conn.close()
-
         if ip is None:
+            conn.close()
             click.echo(f"No flame events found for human_id: {human_id}")
             sys.exit(0)
 
@@ -87,6 +86,11 @@ def profile(human_id: str, db: str, show_ai: bool) -> None:
         click.echo(f"Spiral Depth:     {ip.spiral_depth}")
         flood_pct = f"{ip.flood_rate * 100:.0f}" if ip.flood_rate else "0"
         click.echo(f"Flood Rate:       {ip.flood_rate:.2f} ({flood_pct}%)")
+
+        # TE breakdown display (Phase 16, Plan 03)
+        _display_te_metrics(conn, human_id, show_ai)
+
+        conn.close()
 
     except SystemExit:
         raise
@@ -624,6 +628,158 @@ def _handle_edit(
     except Exception as e:
         click.echo(f"Edit failed: {e}")
         return None
+
+
+def _display_te_metrics(
+    conn,
+    human_id: str,
+    show_ai: bool,
+) -> None:
+    """Display TransportEfficiency metrics after the IntelligenceProfile display.
+
+    Queries transport_efficiency_sessions for the subject and displays:
+    - TE breakdown (4 sub-metrics + composite + fringe drift)
+    - TE trend (last 10 sessions with pending/confirmed counts)
+    - For AI: te_delta ranking of accepted memory entries
+
+    Gracefully skips if transport_efficiency_sessions table doesn't exist.
+
+    Args:
+        conn: Open DuckDB connection (read-only).
+        human_id: Human ID or "ai".
+        show_ai: Whether to display AI-specific metrics.
+    """
+    try:
+        is_ai = show_ai or human_id == "ai"
+        subject_filter = "ai" if is_ai else "human"
+
+        # Query last 10 TE sessions
+        if is_ai:
+            te_rows = conn.execute(
+                "SELECT raven_depth, crow_efficiency, transport_speed, "
+                "trunk_quality, composite_te, trunk_quality_status, "
+                "fringe_drift_rate "
+                "FROM transport_efficiency_sessions "
+                "WHERE subject = 'ai' "
+                "ORDER BY created_at DESC "
+                "LIMIT 10"
+            ).fetchall()
+        else:
+            te_rows = conn.execute(
+                "SELECT raven_depth, crow_efficiency, transport_speed, "
+                "trunk_quality, composite_te, trunk_quality_status, "
+                "fringe_drift_rate "
+                "FROM transport_efficiency_sessions "
+                "WHERE human_id = ? AND subject = 'human' "
+                "ORDER BY created_at DESC "
+                "LIMIT 10",
+                [human_id],
+            ).fetchall()
+
+        if not te_rows:
+            click.echo("\nTransportEfficiency: not yet computed")
+            return
+
+        # Display latest session's TE breakdown
+        latest = te_rows[0]
+        raven_d, crow_e, trans_s, trunk_q, comp_te, tq_status, fringe_dr = latest
+
+        click.echo(f"\nTransportEfficiency (last session):")
+        click.echo(f"  Raven Depth:      {raven_d:.3f}")
+        click.echo(f"  Crow Efficiency:  {crow_e:.3f}")
+        click.echo(f"  Transport Speed:  {trans_s:.3f}")
+        click.echo(f"  Trunk Quality:    {trunk_q:.3f} ({tq_status})")
+        click.echo(f"  Composite TE:     {comp_te:.4f}")
+
+        # Fringe drift: show latest + average of recent
+        if fringe_dr is not None:
+            fringe_values = [
+                r[6] for r in te_rows if r[6] is not None
+            ]
+            avg_fringe = (
+                sum(fringe_values) / len(fringe_values)
+                if fringe_values
+                else 0.0
+            )
+            click.echo(
+                f"  Fringe Drift:     {fringe_dr:.1f} "
+                f"(avg recent: {avg_fringe:.2f})"
+            )
+        else:
+            click.echo(f"  Fringe Drift:     N/A")
+
+        # TE trend (last 10 sessions)
+        trend_values = [f"{r[4]:.4f}" for r in te_rows]
+
+        # Pending vs confirmed counts
+        pending_count = conn.execute(
+            "SELECT COUNT(*) FROM transport_efficiency_sessions "
+            "WHERE subject = ? AND trunk_quality_status = 'pending'",
+            [subject_filter],
+        ).fetchone()[0]
+        confirmed_count = conn.execute(
+            "SELECT COUNT(*) FROM transport_efficiency_sessions "
+            "WHERE subject = ? AND trunk_quality_status = 'confirmed'",
+            [subject_filter],
+        ).fetchone()[0]
+
+        click.echo(
+            f"\nTE Trend (last {len(te_rows)} sessions):"
+        )
+        click.echo(f"  {' '.join(trend_values)}")
+        click.echo(
+            f"  ({pending_count} pending, {confirmed_count} confirmed)"
+        )
+
+        # AI-specific: te_delta ranking
+        if is_ai:
+            _display_te_delta_ranking(conn)
+
+    except Exception:
+        # Graceful fallback: table may not exist on older DBs
+        click.echo("\nTransportEfficiency: not yet computed")
+
+
+def _display_te_delta_ranking(conn) -> None:
+    """Display te_delta ranking for AI profile.
+
+    Shows validated memory_candidates ranked by TE impact,
+    plus count of entries pending backfill.
+
+    Args:
+        conn: Open DuckDB connection (read-only).
+    """
+    try:
+        # Validated candidates with te_delta
+        ranked = conn.execute(
+            "SELECT ccd_axis, te_delta, pre_te_avg, post_te_avg "
+            "FROM memory_candidates "
+            "WHERE status = 'validated' AND te_delta IS NOT NULL "
+            "ORDER BY te_delta DESC"
+        ).fetchall()
+
+        # Count pending backfill
+        pending_backfill_row = conn.execute(
+            "SELECT COUNT(*) FROM memory_candidates "
+            "WHERE status = 'validated' AND te_delta IS NULL"
+        ).fetchone()
+        pending_backfill = pending_backfill_row[0] if pending_backfill_row else 0
+
+        if ranked:
+            click.echo("\nTop Memory Entries by TE Impact:")
+            for i, (axis, delta, pre_avg, post_avg) in enumerate(ranked, 1):
+                sign = "+" if delta >= 0 else ""
+                click.echo(
+                    f"  {i}. {axis} ({sign}{delta:.4f} TE delta)"
+                )
+
+        if pending_backfill > 0:
+            click.echo(f"  [{pending_backfill} entries pending backfill]")
+        elif not ranked:
+            click.echo("\nTop Memory Entries by TE Impact: none yet")
+
+    except Exception:
+        pass  # memory_candidates may not have te_delta column yet
 
 
 def _setup_logging() -> None:

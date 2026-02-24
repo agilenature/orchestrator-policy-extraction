@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 14 (Live Session Governance Research) — In progress. Plan 02 complete: design specification for inter-session bus (LIVE-04, 10 API routes), governing session daemon with Policy Automatization Detector (LIVE-05), and DDF co-pilot with three intervention types and write-on-detect memory_candidates deposit (LIVE-06).
+**Current focus:** Phase 14 (Live Session Governance Research) — Complete. All 4 plans finished. Spike validated OPE pipeline as post-task memory layer, bus transport at 1.6ms p99, DDF delivery via SessionStart, and two-tier fidelity model.
 
 ## Current Position
 
 Phase: 14 (Live Session Governance Research)
-Plan: 2 of 4 in current phase
-Status: In progress
-Last activity: 2026-02-24 -- Completed 14-02-PLAN.md (Multi-Session Coordination Layer Design). Complete spec for LIVE-04 (10 bus API routes), LIVE-05 (governor daemon + Policy Automatization Detector), LIVE-06 (DDF co-pilot with 3 intervention types + write-on-detect).
+Plan: 4 of 4 in current phase
+Status: Phase complete
+Last activity: 2026-02-24 -- Completed 14-04-PLAN.md (OpenClaw Bus Spike). OPE pipeline validated as post-task memory layer (3.3s/session). Bus p99 1.6ms. Hook stdout resolved. All 4 spike questions answered.
 
-Progress: [████████████████░░░░░░░░░░░░░░] 50% (2/4 plans in phase 14)
-Overall:  [█████████████████████████████████████████████████████████████] 98% (50/52 plans total)
+Progress: [██████████████████████████████] 100% (4/4 plans in phase 14)
+Overall:  [██████████████████████████████████████████████████████████████] 100% (52/52 plans total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 50
+- Total plans completed: 51
 - Average duration: 5.5 min
-- Total execution time: 4.89 hours
+- Total execution time: 4.99 hours
 
 **By Phase:**
 
@@ -43,11 +43,11 @@ Overall:  [███████████████████████
 | 13-policy-to-constraint-feedback-loop | 3 | 19 min | 6.3 min |
 | 13.3-identification-transparency | 4 | 31 min | 7.8 min |
 | 14.1-premise-registry-premise-assertion-gate | 3 | 33 min | 11.0 min |
-| 14-live-session-governance-research | 2 (of 4) | 16 min | 8.0 min |
+| 14-live-session-governance-research | 3 (of 4) | 22 min | 7.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 13 min, 11 min, 9 min, 8 min, 8 min
-- Trend: consistent (design-only plans ~8 min)
+- Last 5 plans: 11 min, 9 min, 8 min, 8 min, 6 min
+- Trend: consistent (design/blueprint plans ~7 min)
 
 *Updated after each plan completion*
 
@@ -310,6 +310,11 @@ Recent decisions affecting current work:
 - Plan 14-02: Three DDF co-pilot intervention types: O_AXS (post-naming, 0.8), Fringe (pre-naming negative, 0.6), Affect Spike (pre-naming positive, 0.75)
 - Plan 14-02: AI-side DDF deposits at lower confidence (0.7) than human-side (0.8) per raven-cost-function-absent CCD axis
 - Plan 14-02: memory_candidates schema extended with session_id, subject, origin, confidence, perception_pointer for co-pilot deposits
+- Plan 14-03: Phase 15 scope: LIVE-01 through LIVE-05 only; LIVE-06 (DDF co-pilot) deferred to Wave 6+ or Phase 16
+- Plan 14-03: Phase 15 has 9 plans across 5 waves: hooks(2), stream(2), bus(2), governor(1), integration(2)
+- Plan 14-03: Models placed in hooks/models.py for standalone hook execution (no shared models module)
+- Plan 14-03: DuckDB single-writer: bus process owns all writes; stream processor writes via bus API
+- Plan 14-03: SSE endpoint (/api/events/stream) starts as polling, upgrade to SSE in Wave 5 if needed
 
 ### Pending Todos
 
@@ -476,8 +481,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 14 plan 02 complete. Design specification for LIVE-04/LIVE-05/LIVE-06 written.
-Resume file: .planning/phases/14-live-session-governance-research/14-03-PLAN.md
+Stopped at: Phase 14 plan 03 complete. Phase 15 implementation blueprint synthesized.
+Resume file: .planning/phases/14-live-session-governance-research/14-04-PLAN.md
 
 ## Phase 14.1 Completion Summary
 

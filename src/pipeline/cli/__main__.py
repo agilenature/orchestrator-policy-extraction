@@ -22,6 +22,8 @@ Usage:
     python -m src.pipeline.cli review trust [options]
     python -m src.pipeline.cli review harness [options]
     python -m src.pipeline.cli review stats [options]
+    python -m src.pipeline.cli intelligence profile <human_id> [options]
+    python -m src.pipeline.cli intelligence stagnant [options]
 """
 
 import click
@@ -29,6 +31,7 @@ import click
 from src.pipeline.cli.audit import audit_group
 from src.pipeline.cli.extract import main as extract_cmd
 from src.pipeline.cli.govern import govern_group
+from src.pipeline.cli.intelligence import intelligence_group
 from src.pipeline.cli.train import train_group
 from src.pipeline.cli.validate import validate_group
 from src.pipeline.cli.review import review_group
@@ -48,6 +51,7 @@ cli.add_command(audit_group, name="audit")
 cli.add_command(wisdom_group, name="wisdom")
 cli.add_command(govern_group, name="govern")
 cli.add_command(review_group, name="review")
+cli.add_command(intelligence_group, name="intelligence")
 
 if __name__ == "__main__":
     cli()

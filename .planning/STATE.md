@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 14 (Live Session Governance Research) — Complete. All 4 plans finished. Spike validated OPE pipeline as post-task memory layer, bus transport at 1.6ms p99, DDF delivery via SessionStart, and two-tier fidelity model.
+**Current focus:** Phase 15 (DDF Detection Substrate) — In progress. Plan 01 complete (schema + models). 6 plans remaining.
 
 ## Current Position
 
-Phase: 14 (Live Session Governance Research)
-Plan: 4 of 4 in current phase
-Status: Phase complete
-Last activity: 2026-02-24 -- Completed 14-04-PLAN.md (OpenClaw Bus Spike). OPE pipeline validated as post-task memory layer (3.3s/session). Bus p99 1.6ms. Hook stdout resolved. All 4 spike questions answered.
+Phase: 15 (DDF Detection Substrate)
+Plan: 1 of 7 in current phase
+Status: In progress
+Last activity: 2026-02-24 -- Completed 15-01-PLAN.md (DDF schema + models + config + tests)
 
-Progress: [██████████████████████████████] 100% (4/4 plans in phase 14)
-Overall:  [██████████████████████████████████████████████████████████████] 100% (52/52 plans total)
+Progress: [████░░░░░░░░░░░░░░░░░░░░░░░░░░] 14% (1/7 plans in phase 15)
+Overall:  [████████████████████████████████████████████████████████████░░] 53/59 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 52
+- Total plans completed: 53
 - Average duration: 5.5 min
-- Total execution time: 5.09 hours
+- Total execution time: 5.19 hours
 
 **By Phase:**
 
@@ -44,10 +44,11 @@ Overall:  [███████████████████████
 | 13.3-identification-transparency | 4 | 31 min | 7.8 min |
 | 14.1-premise-registry-premise-assertion-gate | 3 | 33 min | 11.0 min |
 | 14-live-session-governance-research | 4 | 28 min | 7.0 min |
+| 15-ddf-detection-substrate | 1 | 6 min | 6.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 9 min, 8 min, 8 min, 6 min, 6 min
-- Trend: consistent (design/spike plans ~7 min)
+- Last 5 plans: 8 min, 8 min, 6 min, 6 min, 6 min
+- Trend: consistent (~6 min per plan)
 
 *Updated after each plan completion*
 
@@ -487,8 +488,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 14 complete (all 4 plans). All architectural decisions resolved for Phase 15.
-Resume file: Phase 15 planning (not yet created)
+Stopped at: Phase 15 plan 01 complete (DDF schema + models + config + tests). Ready for 15-02.
+Resume file: .planning/phases/15-ddf-detection-substrate/15-02-PLAN.md
 
 ## Phase 14 Completion Summary
 

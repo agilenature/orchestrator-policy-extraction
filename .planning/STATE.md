@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 16.1 (Topological Edge-Generation) — COMPLETE. All 4 plans executed (data foundation + detector/generator + PAG extensions + CLI/integration tests).
+**Current focus:** Phase 16 (Sacred Fire Intelligence System) — In progress. Plan 01 complete (data foundation + memory-review CLI).
 
 ## Current Position
 
-Phase: 16.1 (Topological Edge-Generation)
-Plan: 4 of 4 in current phase
-Status: Phase complete
-Last activity: 2026-02-24 -- Completed 16.1-04-PLAN.md (CLI subcommands + 15 end-to-end integration tests)
+Phase: 16 (Sacred Fire Intelligence System)
+Plan: 1 of 4 in current phase
+Status: In progress
+Last activity: 2026-02-24 -- Completed 16-01-PLAN.md (TE schema + memory-review CLI)
 
-Progress: [████████████████████████████████] 100% (4/4 plans in phase 16.1)
-Overall:  [████████████████████████████████████████████████████████████████████] 63/63 plans total
+Progress: [████████░░░░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans in phase 16)
+Overall:  [████████████████████████████████████████████████████████████████████] 64/67 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 63
+- Total plans completed: 64
 - Average duration: 5.5 min
-- Total execution time: 6.28 hours
+- Total execution time: 6.36 hours
 
 **By Phase:**
 
@@ -46,10 +46,11 @@ Overall:  [███████████████████████
 | 14-live-session-governance-research | 4 | 28 min | 7.0 min |
 | 15-ddf-detection-substrate | 7 | 49 min | 7.0 min |
 | 16.1-topological-edge-generation | 4 | 22 min | 5.5 min |
+| 16-sacred-fire-intelligence-system | 1 | 5 min | 5.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 9 min, 4 min, 6 min, 7 min, 5 min
-- Trend: consistent (~6 min per plan)
+- Last 5 plans: 4 min, 6 min, 7 min, 5 min, 5 min
+- Trend: consistent (~5.4 min per plan)
 
 *Updated after each plan completion*
 
@@ -380,6 +381,12 @@ Recent decisions affecting current work:
 - Plan 16.1-04: Nested Click subgroup pattern: @parent_group.group(name='edges') for n-level CLI hierarchy
 - Plan 16.1-04: FrontierChecker goal_type filtering tested explicitly (edge goal_type=['refactor'] does NOT suppress for goal_type='document')
 - Plan 16.1-04: 1406 tests passing (1391 baseline + 15 new integration tests, excluding pre-existing segmenter failure)
+- Plan 16-01: transport_efficiency_sessions DDL has 12 columns: te_id, session_id, human_id, subject, raven_depth, crow_efficiency, transport_speed, trunk_quality, composite_te, trunk_quality_status, fringe_drift_rate, created_at
+- Plan 16-01: memory_candidates extended with 6 new ALTER TABLE columns: pre_te_avg, post_te_avg, te_delta (TE tracking) + confidence, subject, session_id (review CLI)
+- Plan 16-01: memory-review CLI uses _memory_review_impl() with injectable input_fn for test isolation
+- Plan 16-01: Accept flow writes CCD format entry and updates status to 'validated' (matches CHECK constraint)
+- Plan 16-01: Dedup check is case-insensitive substring match of ccd_axis in full MEMORY.md text
+- Plan 16-01: 1431 tests passing (1406 baseline + 25 new: 10 schema + 15 CLI)
 
 ### Pending Todos
 
@@ -546,8 +553,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 16.1 COMPLETE (all 4 plans). Next phase TBD.
-Resume file: N/A (phase complete)
+Stopped at: Phase 16, Plan 01 COMPLETE. Next: 16-02-PLAN.md (TE computation pipeline).
+Resume file: .planning/phases/16-sacred-fire-intelligence-system/16-02-PLAN.md
 
 ## Phase 15 Completion Summary
 

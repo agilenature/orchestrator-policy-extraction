@@ -8,7 +8,8 @@ The hook intercepts write-class tool calls (Edit, Write, Bash) and:
 2. Parses PREMISE blocks from the text
 3. Stages parsed premises to premise_staging.jsonl
 4. Checks for warnings (UNVALIDATED on high-risk, stained premises,
-   foil instantiation, Ad Ignorantiam)
+   foil instantiation, Ad Ignorantiam, frontier warnings,
+   cross-axis verification)
 5. Emits additionalContext warnings as appropriate
 6. Always exits 0 (allow) -- Phase 14.1 does NOT block
 
@@ -233,6 +234,174 @@ def _check_ad_ignorantiam(
     return warnings
 
 
+def _extract_axes_from_premises(premises: list, conn) -> list[str]:
+    """Extract CCD axis names mentioned across all premises.
+
+    Matches premise claim and scope text against known CCD axes
+    from the memory_candidates table.
+
+    Args:
+        premises: List of ParsedPremise objects.
+        conn: DuckDB connection (read-only).
+
+    Returns:
+        List of matching CCD axis names.
+    """
+    try:
+        axes_rows = conn.execute(
+            "SELECT DISTINCT ccd_axis FROM memory_candidates"
+        ).fetchall()
+    except Exception:
+        return []
+
+    known_axes = [row[0] for row in axes_rows]
+    if not known_axes:
+        return []
+
+    found: set[str] = set()
+    for premise in premises:
+        claim = premise.claim if hasattr(premise, "claim") else str(premise)
+        scope = premise.scope if hasattr(premise, "scope") else ""
+        text = (claim + " " + (scope or "")).lower()
+        for axis in known_axes:
+            if axis.lower() in text:
+                found.add(axis)
+
+    return list(found)
+
+
+def _extract_axes_from_single_premise(premise, conn) -> list[str]:
+    """Extract CCD axis names from a single premise.
+
+    Args:
+        premise: A ParsedPremise object.
+        conn: DuckDB connection (read-only).
+
+    Returns:
+        List of matching CCD axis names.
+    """
+    try:
+        axes_rows = conn.execute(
+            "SELECT DISTINCT ccd_axis FROM memory_candidates"
+        ).fetchall()
+    except Exception:
+        return []
+
+    known_axes = [row[0] for row in axes_rows]
+    found: set[str] = set()
+    claim = premise.claim if hasattr(premise, "claim") else str(premise)
+    scope = premise.scope if hasattr(premise, "scope") else ""
+    text = (claim + " " + (scope or "")).lower()
+    for axis in known_axes:
+        if axis.lower() in text:
+            found.add(axis)
+
+    return list(found)
+
+
+def _check_frontier_warning(
+    premises: list, session_id: str, cwd: str
+) -> list[str]:
+    """Check for Frontier Warnings: axis pairs with no recorded edge.
+
+    Uses READ-ONLY DuckDB. Wrapped in try/except (fail-open).
+
+    Args:
+        premises: List of ParsedPremise objects.
+        session_id: Current session ID.
+        cwd: Current working directory.
+
+    Returns:
+        List of FRONTIER_WARNING strings.
+    """
+    warnings: list[str] = []
+
+    db_path = Path("data/ope.db")
+    if not db_path.exists():
+        return warnings
+
+    try:
+        import duckdb
+
+        conn = duckdb.connect(str(db_path), read_only=True)
+        try:
+            tables = conn.execute(
+                "SELECT table_name FROM information_schema.tables "
+                "WHERE table_name = 'axis_edges'"
+            ).fetchall()
+            if not tables:
+                return warnings
+
+            from src.pipeline.ddf.topology.frontier import FrontierChecker
+
+            checker = FrontierChecker(conn)
+            active_axes = _extract_axes_from_premises(premises, conn)
+            if len(active_axes) >= 2:
+                warnings = checker.check_frontier(active_axes)
+        finally:
+            conn.close()
+    except Exception as e:
+        logger.debug("Frontier warning check failed (fail-open): %s", e)
+
+    return warnings
+
+
+def _check_cross_axis(
+    premises: list, session_id: str, cwd: str
+) -> list[str]:
+    """Check premise claims against recorded cross-axis edges.
+
+    Uses READ-ONLY DuckDB. Wrapped in try/except (fail-open).
+
+    Args:
+        premises: List of ParsedPremise objects.
+        session_id: Current session ID.
+        cwd: Current working directory.
+
+    Returns:
+        List of CROSS_AXIS_WARNING strings.
+    """
+    warnings: list[str] = []
+
+    db_path = Path("data/ope.db")
+    if not db_path.exists():
+        return warnings
+
+    try:
+        import duckdb
+
+        conn = duckdb.connect(str(db_path), read_only=True)
+        try:
+            tables = conn.execute(
+                "SELECT table_name FROM information_schema.tables "
+                "WHERE table_name = 'axis_edges'"
+            ).fetchall()
+            if not tables:
+                return warnings
+
+            from src.pipeline.ddf.topology.verifier import CrossAxisVerifier
+
+            verifier = CrossAxisVerifier(conn)
+            for premise in premises:
+                active_axes = _extract_axes_from_single_premise(premise, conn)
+                if len(active_axes) >= 2:
+                    pair_warnings = verifier.verify_premise(
+                        premise_axes=active_axes,
+                        premise_claim=(
+                            premise.claim
+                            if hasattr(premise, "claim")
+                            else str(premise)
+                        ),
+                    )
+                    warnings.extend(pair_warnings)
+        finally:
+            conn.close()
+    except Exception as e:
+        logger.debug("Cross-axis check failed (fail-open): %s", e)
+
+    return warnings
+
+
 def main() -> None:
     """PAG PreToolUse hook entry point.
 
@@ -338,6 +507,14 @@ def main() -> None:
     # 4. Ad Ignorantiam detection (RQR=0)
     ad_warnings = _check_ad_ignorantiam(all_premises, validation_calls)
     additional_context.extend(ad_warnings)
+
+    # 5. Phase 16.1: Frontier Warning check
+    frontier_warnings = _check_frontier_warning(all_premises, session_id, cwd)
+    additional_context.extend(frontier_warnings)
+
+    # 6. Phase 16.1: Cross-axis verification check
+    cross_axis_warnings = _check_cross_axis(all_premises, session_id, cwd)
+    additional_context.extend(cross_axis_warnings)
 
     # Emit response
     if additional_context:

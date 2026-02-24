@@ -129,7 +129,12 @@ class PipelineRunner:
         12. Extract constraints from correct/block episodes
         13. Escalation detection
         14. Session constraint evaluation (decision durability)
-        15. Compute and return stats
+        15. DDF Tier 1 flame event detection (L0-2 markers + O_AXS)
+        16. DDF Tier 2 LLM enrichment (L3-7)
+        17. Deposit Level 6 to memory_candidates
+        18. DDF-09 False Integration + DDF-10 Causal Isolation
+        19. GeneralizationRadius + spiral promotion
+        20. Compute and return stats
 
         Args:
             jsonl_path: Path to the JSONL session file.
@@ -687,7 +692,187 @@ class PipelineRunner:
             logger.warning("Premise staining failed: {}", e)
             warnings.append(f"Premise staining failed: {e}")
 
-        # Step 15: Compute stats
+        # Step 15: DDF Tier 1 flame event detection (markers L0-2 + O_AXS)
+        ddf_tier1_count = 0
+        o_axs_count = 0
+        try:
+            from src.pipeline.ddf.tier1.markers import detect_markers as _detect_markers
+            from src.pipeline.ddf.tier1.o_axs import OAxsDetector as _OAxsDetector
+            from src.pipeline.ddf.writer import write_flame_events as _write_flame_events
+            from src.pipeline.ddf.schema import create_ddf_schema as _create_ddf_schema
+
+            _create_ddf_schema(self._conn)
+
+            # Tier 1 L0-2 markers from human messages
+            tier1_events = _detect_markers(all_session_events, session_id)
+
+            # O_AXS detection (per-session state)
+            o_axs_detector = _OAxsDetector(self._config.ddf.o_axs)
+            for event_dict in all_session_events:
+                actor = event_dict.get("actor", "")
+                text = ""
+                payload = event_dict.get("payload", {})
+                if isinstance(payload, dict):
+                    text = payload.get("common", {}).get("text", "")
+                elif isinstance(payload, str):
+                    import json as _json2
+                    try:
+                        p = _json2.loads(payload)
+                        text = p.get("common", {}).get("text", "") if isinstance(p, dict) else ""
+                    except Exception:
+                        text = ""
+                detected, evidence = o_axs_detector.detect(text, actor)
+                if detected:
+                    from src.pipeline.ddf.models import FlameEvent as _FlameEvent
+                    o_axs_event = _FlameEvent(
+                        flame_event_id=_FlameEvent.make_id(session_id, o_axs_count, "o_axs"),
+                        session_id=session_id,
+                        human_id="default_human",
+                        prompt_number=o_axs_count,
+                        marker_level=2,  # O_AXS is Level 2 (assertive identification)
+                        marker_type="o_axs",
+                        evidence_excerpt=str(evidence)[:500] if evidence else None,
+                        axis_identified=evidence.get("novel_concept") if evidence else None,
+                        subject="human",
+                        detection_source="stub",
+                    )
+                    tier1_events.append(o_axs_event)
+                    o_axs_count += 1
+
+            if tier1_events:
+                _write_flame_events(self._conn, tier1_events)
+                ddf_tier1_count = len(tier1_events)
+                logger.info("Step 15: Detected {} Tier 1 flame events ({} O_AXS)", ddf_tier1_count, o_axs_count)
+        except ImportError:
+            pass  # DDF module not available
+        except Exception as e:
+            logger.warning("DDF Tier 1 detection failed: {}", e)
+            warnings.append(f"DDF Tier 1 detection failed: {e}")
+
+        # Step 16: DDF Tier 2 LLM enrichment (L3-7)
+        ddf_tier2_count = 0
+        try:
+            from src.pipeline.ddf.tier2.flame_extractor import FlameEventExtractor as _FlameExtractor
+            from src.pipeline.ddf.writer import write_flame_events as _write_flame_events2
+
+            extractor = _FlameExtractor(self._config, self._conn)
+            enriched = extractor.enrich_tier1(session_id, valid_episodes)
+
+            # Build tagged_events as dicts for AI marker detection
+            tagged_event_dicts = []
+            for te in tagged_events:
+                te_dict = {
+                    "actor": te.event.actor,
+                    "payload": te.event.payload if isinstance(te.event.payload, dict) else {},
+                }
+                # Wrap payload in common.text format if not already
+                if "common" not in te_dict["payload"]:
+                    te_dict["payload"] = {"common": {"text": ""}}
+                tagged_event_dicts.append(te_dict)
+
+            ai_markers = extractor.detect_ai_markers(session_id, valid_episodes, tagged_event_dicts)
+
+            all_tier2 = enriched + ai_markers
+            if all_tier2:
+                _write_flame_events2(self._conn, all_tier2)
+                ddf_tier2_count = len(all_tier2)
+                logger.info("Step 16: Enriched/detected {} Tier 2 flame events", ddf_tier2_count)
+        except ImportError:
+            pass
+        except Exception as e:
+            logger.warning("DDF Tier 2 enrichment failed: {}", e)
+            warnings.append(f"DDF Tier 2 enrichment failed: {e}")
+
+        # Step 17: Deposit Level 6 to memory_candidates
+        ddf_deposits = 0
+        try:
+            from src.pipeline.ddf.tier2.flame_extractor import FlameEventExtractor as _FlameExtractor2
+            extractor2 = _FlameExtractor2(self._config, self._conn)
+            # Read all Level 6+ flood-confirmed events not yet deposited
+            all_flame = self._conn.execute(
+                "SELECT * FROM flame_events WHERE session_id = ? AND marker_level >= 6 AND flood_confirmed = TRUE AND deposited_to_candidates = FALSE",
+                [session_id],
+            ).fetchall()
+            if all_flame:
+                from src.pipeline.ddf.models import FlameEvent as _FE2
+                flame_events_to_deposit = []
+                # Get column names from DESCRIBE
+                cols_result = self._conn.execute("DESCRIBE flame_events").fetchall()
+                cols = [row[0] for row in cols_result]
+                for row in all_flame:
+                    row_dict = dict(zip(cols, row))
+                    fe = _FE2(**{k: v for k, v in row_dict.items() if k in _FE2.model_fields})
+                    flame_events_to_deposit.append(fe)
+                ddf_deposits = extractor2.deposit_level6(self._conn, flame_events_to_deposit)
+                if ddf_deposits > 0:
+                    logger.info("Step 17: Deposited {} Level 6 events to memory_candidates", ddf_deposits)
+        except ImportError:
+            pass
+        except Exception as e:
+            logger.warning("DDF deposit failed: {}", e)
+            warnings.append(f"DDF deposit failed: {e}")
+
+        # Step 18: DDF-09 False Integration + DDF-10 Causal Isolation
+        ddf_false_integration = 0
+        ddf_causal_isolation = 0
+        try:
+            from src.pipeline.ddf.tier2.false_integration import FalseIntegrationDetector as _FID
+            from src.pipeline.ddf.tier2.causal_isolation import CausalIsolationRecorder as _CIR
+            from src.pipeline.ddf.writer import write_flame_events as _write_flame_events3
+
+            # False Integration (DDF-09)
+            fid = _FID(self._config, self._conn)
+            fi_events, fi_hypotheses = fid.detect(session_id, valid_episodes)
+            if fi_events:
+                _write_flame_events3(self._conn, fi_events)
+                ddf_false_integration = len(fi_events)
+
+            # Causal Isolation (DDF-10)
+            cir = _CIR(self._conn)
+            ci_events = cir.record(session_id)
+            if ci_events:
+                _write_flame_events3(self._conn, ci_events)
+                ddf_causal_isolation = len(ci_events)
+
+            if ddf_false_integration > 0 or ddf_causal_isolation > 0:
+                logger.info("Step 18: {} false integration, {} causal isolation markers", ddf_false_integration, ddf_causal_isolation)
+        except ImportError:
+            pass
+        except Exception as e:
+            logger.warning("DDF-09/DDF-10 detection failed: {}", e)
+            warnings.append(f"DDF-09/DDF-10 detection failed: {e}")
+
+        # Step 19: GeneralizationRadius + epistemological origin + spiral promotion
+        ddf_metrics_count = 0
+        ddf_spiral_promotions = 0
+        try:
+            from src.pipeline.ddf.generalization import compute_all_metrics as _compute_all, write_constraint_metrics as _write_metrics
+
+            metrics = _compute_all(self._conn, self._config)
+            if metrics:
+                ddf_metrics_count = _write_metrics(self._conn, metrics)
+                logger.info("Step 19: Computed {} constraint metrics", ddf_metrics_count)
+        except ImportError:
+            pass
+        except Exception as e:
+            logger.warning("DDF metrics computation failed: {}", e)
+            warnings.append(f"DDF metrics computation failed: {e}")
+
+        # DDF-06 terminal act: promote spiral candidates to project_wisdom
+        try:
+            from src.pipeline.ddf.spiral import promote_spirals_to_wisdom as _promote_spirals
+            from pathlib import Path as _Path
+            db_path = _Path(self._db_path) if self._db_path != ":memory:" else _Path("data/ope.db")
+            ddf_spiral_promotions = _promote_spirals(self._conn, db_path)
+            if ddf_spiral_promotions > 0:
+                logger.info("Step 19: Promoted {} spiral candidates to project_wisdom", ddf_spiral_promotions)
+        except ImportError:
+            pass
+        except Exception as e:
+            logger.warning("DDF spiral promotion failed: {}", e)
+            warnings.append(f"DDF spiral promotion failed: {e}")
+
+        # Step 20: Compute stats
         tag_distribution = self._compute_tag_distribution(tagged_events)
         outcome_distribution = seg_stats.get("by_outcome", {})
         duration_s = time.monotonic() - t0
@@ -713,6 +898,14 @@ class PipelineRunner:
             "escalation_constraints_generated": escalation_constraints_generated,
             "constraint_evals": eval_count,
             "amnesia_events_detected": amnesia_count,
+            "ddf_tier1_count": ddf_tier1_count,
+            "ddf_tier2_count": ddf_tier2_count,
+            "ddf_deposits": ddf_deposits,
+            "ddf_o_axs_count": o_axs_count,
+            "ddf_false_integration": ddf_false_integration,
+            "ddf_causal_isolation": ddf_causal_isolation,
+            "ddf_metrics_count": ddf_metrics_count,
+            "ddf_spiral_promotions": ddf_spiral_promotions,
             "errors": errors,
             "warnings": warnings,
             "duration_seconds": round(duration_s, 2),
@@ -954,6 +1147,14 @@ class PipelineRunner:
             "escalation_constraints_generated": 0,
             "constraint_evals": 0,
             "amnesia_events_detected": 0,
+            "ddf_tier1_count": 0,
+            "ddf_tier2_count": 0,
+            "ddf_deposits": 0,
+            "ddf_o_axs_count": 0,
+            "ddf_false_integration": 0,
+            "ddf_causal_isolation": 0,
+            "ddf_metrics_count": 0,
+            "ddf_spiral_promotions": 0,
             "errors": [error_msg],
             "warnings": [],
             "duration_seconds": 0,

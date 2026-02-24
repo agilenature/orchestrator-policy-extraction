@@ -6,8 +6,10 @@ decision-point episode boundaries based on locked decisions:
 - Q3: Flat episodes with complexity metadata (interruption_count, context_switches)
 - Q4: 30-second timeout (configurable via config.episode_timeout_seconds)
 
-Start triggers: O_DIR, O_GATE, O_CORR
-End triggers: T_TEST, T_RISKY, T_GIT_COMMIT, X_PROPOSE, X_ASK, timeout, superseded, stream_end
+Start triggers: O_DIR, O_GATE, O_CORR, O_AXS
+End triggers: T_TEST, T_RISKY, T_GIT_COMMIT, X_PROPOSE, timeout, superseded, stream_end
+Note: X_ASK is NOT an end trigger — it is structurally mid-episode (a question within an
+episode, never a boundary). Including X_ASK as an end trigger produces false-positive splits.
 
 Exports:
     EpisodeSegmenter: Main segmenter class
@@ -24,10 +26,13 @@ from src.pipeline.models.events import TaggedEvent
 from src.pipeline.models.segments import EpisodeSegment
 
 # Start triggers open new episodes
-START_TRIGGERS = {"O_DIR", "O_GATE", "O_CORR"}
+START_TRIGGERS = {"O_DIR", "O_GATE", "O_CORR", "O_AXS"}
 
 # End triggers close open episodes (T_LINT explicitly excluded per Q2)
-END_TRIGGERS = {"T_TEST", "T_RISKY", "T_GIT_COMMIT", "X_PROPOSE", "X_ASK"}
+# X_ASK explicitly excluded: it is structurally mid-episode (a question within an episode,
+# never a boundary). Including it produces false-positive episode splits where one episode
+# should span the question and its resolution.
+END_TRIGGERS = {"T_TEST", "T_RISKY", "T_GIT_COMMIT", "X_PROPOSE"}
 
 
 class EpisodeSegmenter:
@@ -262,7 +267,8 @@ class EpisodeSegmenter:
         - T_TEST with unknown result -> 'test_executed'
         - T_RISKY -> 'risky_action'
         - T_GIT_COMMIT -> 'committed'
-        - X_PROPOSE, X_ASK -> 'executor_handoff'
+        - X_PROPOSE -> 'executor_handoff'
+        Note: X_ASK is not an end trigger and will never appear here.
         """
         tag = self._get_primary_label(event)
 
@@ -272,7 +278,7 @@ class EpisodeSegmenter:
             return "risky_action"
         elif tag == "T_GIT_COMMIT":
             return "committed"
-        elif tag in ("X_PROPOSE", "X_ASK"):
+        elif tag == "X_PROPOSE":
             return "executor_handoff"
         else:
             return "unknown"

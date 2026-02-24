@@ -45,6 +45,7 @@ def compute_spiral_depth_for_human(
         FROM flame_events
         WHERE subject = 'human'
           AND human_id = ?
+          AND (assessment_session_id IS NULL)
         ORDER BY session_id, created_at
         """,
         [human_id],
@@ -95,6 +96,7 @@ def _compute_ai_spiral_depth(conn: duckdb.DuckDBPyConnection) -> int:
         SELECT session_id, marker_level
         FROM flame_events
         WHERE subject = 'ai'
+          AND (assessment_session_id IS NULL)
         ORDER BY session_id, created_at
         """
     ).fetchall()
@@ -157,6 +159,7 @@ def compute_intelligence_profile(
         FROM flame_events
         WHERE subject = 'human'
           AND human_id = ?
+          AND (assessment_session_id IS NULL)
         GROUP BY human_id
         """,
         [human_id],
@@ -206,6 +209,7 @@ def compute_ai_profile(
             COUNT(DISTINCT session_id) AS session_count
         FROM flame_events
         WHERE subject = 'ai'
+          AND (assessment_session_id IS NULL)
         """
     ).fetchone()
 
@@ -244,6 +248,7 @@ def list_available_humans(
         FROM flame_events
         WHERE subject = 'human'
           AND human_id IS NOT NULL
+          AND (assessment_session_id IS NULL)
         ORDER BY human_id
         """
     ).fetchall()

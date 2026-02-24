@@ -439,13 +439,13 @@ Plans:
 **Plans:** 7 plans in 5 waves
 
 Plans:
-- [ ] 15-01-PLAN.md — DDF schema + models + config + O_AXS classification (Wave 1)
-- [ ] 15-02-PLAN.md — Tier 1 markers (L0-2 + O_AXS) + writer + deposit function (Wave 1)
-- [ ] 15-03-PLAN.md — Tier 2 enrichment: FlameEventExtractor + CausalIsolation + FalseIntegration (Wave 2)
-- [ ] 15-04-PLAN.md — Epistemological origin + GeneralizationRadius + spiral tracking (Wave 3)
-- [ ] 15-05-PLAN.md — IntelligenceProfile aggregation (Wave 3)
-- [ ] 15-06-PLAN.md — Pipeline runner integration + segmenter O_AXS + intelligence CLI (Wave 4)
-- [ ] 15-07-PLAN.md — Integration tests for all 10 DDF requirements (Wave 5)
+- [x] 15-01-PLAN.md — DDF schema + models + config + O_AXS classification (Wave 1)
+- [x] 15-02-PLAN.md — Tier 1 markers (L0-2 + O_AXS) + writer + deposit function (Wave 1)
+- [x] 15-03-PLAN.md — Tier 2 enrichment: FlameEventExtractor + CausalIsolation + FalseIntegration (Wave 2)
+- [x] 15-04-PLAN.md — Epistemological origin + GeneralizationRadius + spiral tracking (Wave 3)
+- [x] 15-05-PLAN.md — IntelligenceProfile aggregation (Wave 3)
+- [x] 15-06-PLAN.md — Pipeline runner integration + segmenter O_AXS + intelligence CLI (Wave 4)
+- [x] 15-07-PLAN.md — Integration tests for all 10 DDF requirements (Wave 5)
 
 ### Phase 16: Sacred Fire Intelligence System
 

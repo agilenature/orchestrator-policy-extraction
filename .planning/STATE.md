@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 15 (DDF Detection Substrate) — In progress. Plans 01-06 complete. 1 plan remaining.
+**Current focus:** Phase 15 (DDF Detection Substrate) — COMPLETE. All 7 plans executed. All 10 DDF requirements verified.
 
 ## Current Position
 
 Phase: 15 (DDF Detection Substrate)
-Plan: 6 of 7 in current phase
-Status: In progress
-Last activity: 2026-02-24 -- Completed 15-06-PLAN.md (Pipeline integration + Intelligence CLI)
+Plan: 7 of 7 in current phase
+Status: Phase complete
+Last activity: 2026-02-24 -- Completed 15-07-PLAN.md (DDF integration tests)
 
-Progress: [█████████████████████████░░░░░] 86% (6/7 plans in phase 15)
-Overall:  [█████████████████████████████████████████████████████████████████░] 58/59 plans total
+Progress: [██████████████████████████████] 100% (7/7 plans in phase 15)
+Overall:  [██████████████████████████████████████████████████████████████████] 59/59 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 58
+- Total plans completed: 59
 - Average duration: 5.6 min
-- Total execution time: 5.81 hours
+- Total execution time: 5.91 hours
 
 **By Phase:**
 
@@ -44,10 +44,10 @@ Overall:  [███████████████████████
 | 13.3-identification-transparency | 4 | 31 min | 7.8 min |
 | 14.1-premise-registry-premise-assertion-gate | 3 | 33 min | 11.0 min |
 | 14-live-session-governance-research | 4 | 28 min | 7.0 min |
-| 15-ddf-detection-substrate | 6 | 43 min | 7.2 min |
+| 15-ddf-detection-substrate | 7 | 49 min | 7.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 6 min, 7 min, 4 min, 11 min, 9 min
+- Last 5 plans: 7 min, 4 min, 11 min, 9 min, 6 min
 - Trend: consistent (~7 min per plan)
 
 *Updated after each plan completion*
@@ -358,6 +358,9 @@ Recent decisions affecting current work:
 - Plan 15-06: CLI profile opens DuckDB read-only; create_ddf_schema wrapped in try/except for compatibility
 - Plan 15-06: Step 19 spiral promotion uses self._db_path with `:memory:` fallback to data/ope.db
 - Plan 15-06: 1201 tests passing (1180 baseline + 21 new, excluding pre-existing segmenter failure)
+- Plan 15-07: Integration tests organized by DDF requirement number for traceability (TestDDF01 through TestDDF10)
+- Plan 15-07: File-based DuckDB used only where structurally required (WisdomStore, CLI); all others in-memory
+- Plan 15-07: 1219 tests passing (1201 baseline + 18 new, excluding pre-existing segmenter failure)
 
 ### Pending Todos
 
@@ -524,8 +527,31 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-24
-Stopped at: Phase 15 plan 06 complete (Pipeline integration + Intelligence CLI). Plans 01-06 complete. Ready for 15-07.
-Resume file: .planning/phases/15-ddf-detection-substrate/15-07-PLAN.md
+Stopped at: Phase 15 COMPLETE. All 7 plans executed. All 10 DDF requirements verified by integration tests.
+Resume file: N/A -- Phase 15 complete. All 59 plans across 15 phases delivered.
+
+## Phase 15 Completion Summary
+
+Phase 15 delivered the DDF Detection Substrate (all 7 plans, all 10 DDF requirements verified):
+- **Plan 01 COMPLETE**: DDF DuckDB schema (flame_events, ai_flame_events view, axis_hypotheses, constraint_metrics), FlameEvent/AxisHypothesis/ConstraintMetric/IntelligenceProfile frozen Pydantic models, DDFConfig with OAxsConfig, 12 tests
+- **Plan 02 COMPLETE**: Tier 1 marker detectors (L0 trunk, L1 causal, L2 assertive), OAxsDetector (dual-signal), write_flame_events (idempotent), deposit_to_memory_candidates (soft dedup), 30 tests
+- **Plan 03 COMPLETE**: Tier 2 FlameEventExtractor (L3-7 enrichment, AI markers), CausalIsolationRecorder (premise_registry), FalseIntegrationDetector (dual axis_hypotheses + flame_events output), 26 tests
+- **Plan 04 COMPLETE**: Epistemological origin classification (reactive/principled/inductive), GeneralizationRadius (scope_path prefix counting), stagnation detection, spiral tracking, project_wisdom promotion, 39 tests
+- **Plan 05 COMPLETE**: IntelligenceProfile aggregation (per-human, per-AI), spiral depth computation (Python-side), list_available_humans, 12 tests
+- **Plan 06 COMPLETE**: Pipeline Steps 15-19 (Tier 1, Tier 2, deposit, false integration, metrics+spirals), O_AXS start trigger, intelligence CLI (profile + stagnant), 21 tests
+- **Plan 07 COMPLETE**: 18 integration tests covering all 10 DDF requirements end-to-end, module import smoke test
+- **1219 tests** passing (1201 baseline + 18 new Plan 07 tests, excluding pre-existing segmenter failure)
+- **DDF-01**: O_AXS valid episode mode (segmenter START_TRIGGERS + OAxsDetector)
+- **DDF-02**: flame_events human markers with detection_source (stub/opeml)
+- **DDF-03**: ai_flame_events view + Level 6 write-on-detect deposit to memory_candidates
+- **DDF-04**: IntelligenceProfile for human and AI subjects (6 aggregate metrics)
+- **DDF-05**: GeneralizationRadius + stagnation detection (floating abstraction flagging)
+- **DDF-06**: Spiral tracking + project_wisdom promotion (ascending scope diversity -> breakthrough)
+- **DDF-07**: Epistemological origin on all constraints (reactive/principled/inductive classification)
+- **DDF-08**: Intelligence CLI profile display
+- **DDF-09**: False integration detection (Package Deal fallacy proxy)
+- **DDF-10**: Causal isolation markers from premise_registry (Post Hoc detection)
+- **Key modules**: src/pipeline/ddf/ (models, schema, writer, deposit, tier1/, tier2/, epistemological, generalization, spiral, intelligence_profile), src/pipeline/cli/intelligence.py
 
 ## Phase 14 Completion Summary
 

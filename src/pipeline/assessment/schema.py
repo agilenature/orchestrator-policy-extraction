@@ -113,3 +113,15 @@ def create_assessment_schema(conn: duckdb.DuckDBPyConnection) -> None:
             )
         except Exception:
             pass  # Column already exists (idempotent)
+
+    # Refresh ai_flame_events view after ALTER TABLE on flame_events.
+    # DuckDB caches view column types at creation time; adding columns
+    # via ALTER TABLE causes a schema mismatch on SELECT * views.
+    # CREATE OR REPLACE VIEW is idempotent and re-captures all columns.
+    try:
+        conn.execute(
+            "CREATE OR REPLACE VIEW ai_flame_events AS "
+            "SELECT * FROM flame_events WHERE subject = 'ai'"
+        )
+    except Exception:
+        pass  # flame_events may not exist in standalone schema tests

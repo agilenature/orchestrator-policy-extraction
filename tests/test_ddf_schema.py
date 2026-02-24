@@ -42,14 +42,19 @@ def conn():
 
 
 def test_create_ddf_schema_creates_flame_events(conn):
-    """Verify flame_events exists with all 16 columns."""
+    """Verify flame_events exists with all expected columns.
+
+    The base DDL defines 16 columns; Phase 17 adds assessment_session_id
+    via ALTER TABLE in create_assessment_schema (called by the schema chain).
+    """
     cols = conn.execute(
         "SELECT column_name FROM information_schema.columns "
         "WHERE table_name = 'flame_events' ORDER BY ordinal_position"
     ).fetchall()
     col_names = [c[0] for c in cols]
 
-    expected = [
+    # Base 16 columns from Phase 15 DDL
+    expected_base = [
         "flame_event_id",
         "session_id",
         "human_id",
@@ -67,8 +72,12 @@ def test_create_ddf_schema_creates_flame_events(conn):
         "session_event_ref",
         "created_at",
     ]
-    assert col_names == expected
-    assert len(col_names) == 16
+    for col in expected_base:
+        assert col in col_names, f"Missing base column: {col}"
+
+    # Phase 17 extension column
+    assert "assessment_session_id" in col_names
+    assert len(col_names) == 17
 
 
 # ── Test 2: ai_flame_events view filters subject='ai' ──

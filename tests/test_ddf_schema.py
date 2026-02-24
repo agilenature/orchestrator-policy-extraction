@@ -75,9 +75,11 @@ def test_create_ddf_schema_creates_flame_events(conn):
     for col in expected_base:
         assert col in col_names, f"Missing base column: {col}"
 
-    # Phase 17 extension column
+    # Phase 17 extension columns
     assert "assessment_session_id" in col_names
-    assert len(col_names) == 17
+    assert "ccd_axis" in col_names
+    assert "differential" in col_names
+    assert len(col_names) == 19
 
 
 # ── Test 2: ai_flame_events view filters subject='ai' ──

@@ -151,3 +151,8 @@ def create_ddf_schema(conn: duckdb.DuckDBPyConnection) -> None:
     from src.pipeline.assessment.schema import create_assessment_schema
 
     create_assessment_schema(conn)
+
+    # Phase 18: Structural Integrity tables
+    from src.pipeline.ddf.structural.schema import create_structural_schema
+
+    create_structural_schema(conn)

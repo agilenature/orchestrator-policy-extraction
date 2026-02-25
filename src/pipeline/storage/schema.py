@@ -419,6 +419,7 @@ def drop_schema(conn: duckdb.DuckDBPyConnection) -> None:
     Args:
         conn: DuckDB connection to drop tables from.
     """
+    conn.execute("DROP TABLE IF EXISTS structural_events")
     conn.execute("DROP TABLE IF EXISTS axis_edges")
     conn.execute("DROP VIEW IF EXISTS ai_flame_events")
     conn.execute("DROP TABLE IF EXISTS constraint_metrics")

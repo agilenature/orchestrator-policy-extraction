@@ -50,12 +50,14 @@ def detect_gravity_checks(
     """
     config = DDFConfig().structural
 
-    # Build assessment filter clause
+    # Build assessment filter clauses: aliased (f.) for main queries, bare for sub-queries
     if assessment_session_id is None:
-        assess_clause = "AND f.assessment_session_id IS NULL"
+        assess_clause_f = "AND f.assessment_session_id IS NULL"
+        assess_clause = "AND assessment_session_id IS NULL"
         assess_params: list = []
     else:
-        assess_clause = "AND f.assessment_session_id = ?"
+        assess_clause_f = "AND f.assessment_session_id = ?"
+        assess_clause = "AND assessment_session_id = ?"
         assess_params = [assessment_session_id]
 
     # Find all L5+ events
@@ -67,7 +69,7 @@ def detect_gravity_checks(
                f.flood_confirmed
         FROM flame_events f
         WHERE f.session_id = ? AND f.marker_level >= 5
-          {assess_clause}
+          {assess_clause_f}
         ORDER BY f.prompt_number
         """,
         [session_id] + assess_params,
@@ -147,12 +149,12 @@ def detect_main_cables(
     Returns:
         List of StructuralEvent objects (one per L5+ event).
     """
-    # Build assessment filter clause
+    # Build assessment filter clause (aliased for main query)
     if assessment_session_id is None:
-        assess_clause = "AND f.assessment_session_id IS NULL"
+        assess_clause_f = "AND f.assessment_session_id IS NULL"
         assess_params: list = []
     else:
-        assess_clause = "AND f.assessment_session_id = ?"
+        assess_clause_f = "AND f.assessment_session_id = ?"
         assess_params = [assessment_session_id]
 
     # Find all L5+ events
@@ -164,7 +166,7 @@ def detect_main_cables(
                f.flood_confirmed
         FROM flame_events f
         WHERE f.session_id = ? AND f.marker_level >= 5
-          {assess_clause}
+          {assess_clause_f}
         ORDER BY f.prompt_number
         """,
         [session_id] + assess_params,
@@ -240,12 +242,14 @@ def detect_dependency_sequencing(
     Returns:
         List of StructuralEvent objects (one per new axis introduction).
     """
-    # Build assessment filter clause
+    # Build assessment filter clauses: aliased (f.) for main queries, bare for sub-queries
     if assessment_session_id is None:
-        assess_clause = "AND f.assessment_session_id IS NULL"
+        assess_clause_f = "AND f.assessment_session_id IS NULL"
+        assess_clause = "AND assessment_session_id IS NULL"
         assess_params: list = []
     else:
-        assess_clause = "AND f.assessment_session_id = ?"
+        assess_clause_f = "AND f.assessment_session_id = ?"
+        assess_clause = "AND assessment_session_id = ?"
         assess_params = [assessment_session_id]
 
     # Find all L5+ events ordered by prompt_number
@@ -256,7 +260,7 @@ def detect_dependency_sequencing(
                COALESCE(f.ccd_axis, f.axis_identified) AS axis
         FROM flame_events f
         WHERE f.session_id = ? AND f.marker_level >= 5
-          {assess_clause}
+          {assess_clause_f}
         ORDER BY f.prompt_number
         """,
         [session_id] + assess_params,

@@ -11,6 +11,7 @@ payload, never 500. Sessions must never be blocked by bus errors.
 
 from __future__ import annotations
 
+import hashlib
 import os
 from datetime import datetime, timezone
 
@@ -126,13 +127,77 @@ def create_app(
             return JSONResponse(CheckResponse().model_dump())
 
     async def push_link(request: Request) -> JSONResponse:
-        """Accept a causal push link (stub -- full handler in Plan 20-03)."""
+        """Accept and persist a causal push link to the push_links table.
+
+        Required: parent_decision_id, child_decision_id, transition_trigger,
+        migration_run_id. Optional: link_id (auto-generated if absent),
+        repo_boundary, captured_at. Fails open: DuckDB write errors return
+        200 with warning. Returns 400 only for missing required fields.
+        """
+        body: dict = {}
         try:
             body = await request.json()
-            link_id = body.get("link_id", "")
-            return JSONResponse({"status": "accepted", "link_id": link_id})
         except Exception:
-            return JSONResponse({"status": "accepted", "link_id": ""})
+            return JSONResponse(
+                {"status": "error", "detail": "invalid JSON body"},
+                status_code=400,
+            )
+
+        required = [
+            "parent_decision_id",
+            "child_decision_id",
+            "transition_trigger",
+            "migration_run_id",
+        ]
+        missing = [f for f in required if not body.get(f)]
+        if missing:
+            return JSONResponse(
+                {
+                    "status": "error",
+                    "detail": f"missing required fields: {', '.join(missing)}",
+                },
+                status_code=400,
+            )
+
+        parent_id = body["parent_decision_id"]
+        child_id = body["child_decision_id"]
+        trigger = body["transition_trigger"]
+        run_id = body["migration_run_id"]
+        repo_boundary = body.get("repo_boundary", None)
+
+        link_id = body.get("link_id", "")
+        if not link_id:
+            raw = f"link:{parent_id}:{child_id}:{trigger}"
+            link_id = hashlib.sha256(raw.encode()).hexdigest()[:16]
+
+        captured_at = body.get(
+            "captured_at", datetime.now(timezone.utc).isoformat()
+        )
+
+        try:
+            conn.execute(
+                "INSERT OR REPLACE INTO push_links "
+                "(link_id, parent_decision_id, child_decision_id, "
+                "transition_trigger, repo_boundary, migration_run_id, "
+                "captured_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                [
+                    link_id,
+                    parent_id,
+                    child_id,
+                    trigger,
+                    repo_boundary,
+                    run_id,
+                    captured_at,
+                ],
+            )
+        except Exception:
+            return JSONResponse({
+                "status": "accepted",
+                "link_id": link_id,
+                "warning": "push link accepted but DuckDB write failed",
+            })
+
+        return JSONResponse({"status": "accepted", "link_id": link_id})
 
     return Starlette(routes=[
         Route("/api/register", register, methods=["POST"]),

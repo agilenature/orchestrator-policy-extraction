@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 20 (Causal Chain Completion) — In progress. 4/5 plans done. Wave 2 Plans 03+04 complete.
+**Current focus:** Phase 20 (Causal Chain Completion) — Complete. All 5/5 plans done. All 6 structural gaps verified.
 
 ## Current Position
 
-Phase: 20 (Causal Chain Completion) — In progress
-Plan: 4 of 5 in current phase (Wave 2: Plans 03+04 complete)
-Status: In progress
-Last activity: 2026-02-25 -- Completed 20-04-PLAN.md (repo-scoped constraint filtering in GovernorDaemon + /api/check wiring)
+Phase: 20 (Causal Chain Completion) — Complete
+Plan: 5 of 5 in current phase (all waves complete)
+Status: Phase complete
+Last activity: 2026-02-25 -- Completed 20-05-PLAN.md (integration tests for all 6 structural gaps)
 
-Progress: [████████████████████████░░░░░░░░░] 80% (4/5 plans in phase 20)
-Overall:  [██████████████████████████████████████████████████████████████████████████████████░] 85/86 plans total
+Progress: [████████████████████████████████] 100% (5/5 plans in phase 20)
+Overall:  [██████████████████████████████████████████████████████████████████████████████████████] 86/86 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 85 (75 plans + 1 gap closure + 5 Phase 19 + 4 Phase 20)
+- Total plans completed: 86 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20)
 - Average duration: 5.5 min
-- Total execution time: 8.24 hours
+- Total execution time: 8.33 hours
 
 **By Phase:**
 
@@ -53,11 +53,11 @@ Overall:  [███████████████████████
 
 | 19-control-plane-integration | 5/5 | 24 min | 4.8 min |
 
-| 20-causal-chain-completion | 4/5 | 14 min | 3.5 min |
+| 20-causal-chain-completion | 5/5 | 19 min | 3.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 7 min, 2 min, 4 min, 3 min, 2 min
-- Trend: Phase 20 in progress. Wave 2 Plans 03+04 complete. Plan 05 (Wave 3) next.
+- Last 5 plans: 2 min, 4 min, 3 min, 2 min, 5 min
+- Trend: Phase 20 complete. All 6 structural gaps verified by integration tests.
 
 *Updated after each plan completion*
 
@@ -469,6 +469,8 @@ Recent decisions affecting current work:
 - Plan 20-04: repo_scope convention: list[str] on constraint dicts; absent/None/[] = universal (delivered to all), non-empty = scoped to matching repos only
 - Plan 20-04: _filter_by_repo as @staticmethod (pure function, no daemon instance state)
 - Plan 20-04: Backward compatible: repo=None skips filtering entirely; existing callers unaffected
+- Plan 20-05: duckdb.connect(db_path) without read_only=True for verification reads (consistent with Plans 01/03)
+- Plan 20-05: Sync test moved out of @pytest.mark.asyncio class to eliminate pytest warning
 
 ### Pending Todos
 
@@ -635,9 +637,9 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Phase 20, Plan 04 complete. Plans 01-04 delivered (schema + BUS_REGISTRATION_FAILED + push-link handler + repo-scoped constraint filtering).
-Next action: Phase 20 Plan 05 (backward traversal query) -- Wave 3.
-Resume file: .planning/phases/20-causal-chain-completion/20-05-PLAN.md
+Stopped at: Phase 20 complete. All 5 plans delivered, all 6 structural gaps verified by integration tests.
+Next action: Post-OpenClaw activation or new phase planning.
+Resume file: N/A (phase complete)
 
 ## Phase 15 Completion Summary
 
@@ -771,3 +773,21 @@ Phase 19 delivered Control Plane Integration (all 5 plans, 3 waves):
 - **Key modules**: src/pipeline/live/bus/ (server.py, schema.py, models.py), src/pipeline/live/governor/ (daemon.py, briefing.py), src/pipeline/live/stream/ (processor.py, state_machine.py), src/pipeline/live/hooks/ (session_start.py, premise_gate.py extended), src/pipeline/cli/bus.py
 - **Cross-project**: PROGRAM-SEQUENCE.md updated; MT Step 7 (repo creation) now READY; bus must be operational before MT sessions register OPE_RUN_ID
 - **Project milestone**: All 81 plans across 19 phases complete. OPE pipeline fully operational from JSONL ingestion through governance bus delivery.
+
+## Phase 20 Completion Summary
+
+Phase 20 delivered Causal Chain Completion (all 5 plans, all 6 structural gaps verified):
+- **Plan 01 COMPLETE (Wave 1)**: bus_sessions extended (5 new columns: repo, project_dir, transcript_path, event_count, outcome), push_links table (7 columns), /api/push-link stub, CheckResponse.epistemological_signals field, 13 tests
+- **Plan 02 COMPLETE (Wave 1)**: BUS_REGISTRATION_FAILED event emission to JSONL staging when bus unreachable, openclaw_unavailable flag in register payload when OPE_RUN_ID absent, repo/project_dir/transcript_path in register payload, 10 tests
+- **Plan 03 COMPLETE (Wave 2)**: Full /api/push-link handler with DuckDB persistence, auto-generated link_id (SHA-256), validation (400 for missing required fields), idempotent INSERT OR REPLACE, 10 tests
+- **Plan 04 COMPLETE (Wave 2)**: GovernorDaemon.get_briefing(repo=) repo scope filtering, _filter_by_repo() with universal/scoped rules, /api/check wired to pass repo to daemon, 8 tests
+- **Plan 05 COMPLETE (Wave 3)**: 14 integration tests across 6 gap-numbered classes (TestGap1-TestGap6), full regression check (1843 passed, 2 pre-existing failures)
+- **1845 tests** total (1843 passed + 2 pre-existing segmenter failures, zero Phase 20 regressions)
+- **Gap 1 verified**: bus_sessions stores repo/project_dir/transcript_path; deregister stores event_count/outcome
+- **Gap 2 verified**: push_links table with T1 round-trip, T7/T8 coexistence, cross-run isolation
+- **Gap 3 verified**: BUS_REGISTRATION_FAILED emitted when bus unavailable with session_id + run_id + attempted_at
+- **Gap 4 verified**: GovernorDaemon filters constraints by repo scope (migration-workbox not delivered to platform-core)
+- **Gap 5 verified**: openclaw_unavailable: true in register payload when OPE_RUN_ID absent
+- **Gap 6 verified**: /api/check response includes epistemological_signals: []
+- **Key modules**: src/pipeline/live/bus/ (server.py, schema.py, models.py), src/pipeline/live/governor/daemon.py, src/pipeline/live/hooks/session_start.py
+- **Project milestone**: All 86 plans across 20 phases complete. Causal chain infrastructure ready for post-OpenClaw activation.

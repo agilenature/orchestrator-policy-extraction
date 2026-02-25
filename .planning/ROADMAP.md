@@ -385,6 +385,30 @@ Plans:
 - [x] 17-03-PLAN.md — Session Runner + Observer + Rejection Detector (Wave 3)
 - [x] 17-04-PLAN.md — Report Generator + Terminal Deposit (Wave 4)
 
+### Phase 20: Causal Chain Completion
+
+**Goal**: Close the 6 structural gaps identified by Phase 19's gap analysis against `GOVERNING-ORCHESTRATOR-ARCHITECTURE.md`. Three gaps are load-bearing (causal chain silently breaks without them): incomplete bus registration schema (missing `repo`/`project_dir`/`transcript_path` fields), absent push links at T1/T7/T8 transitions (the only mechanism for cross-repo backward traversal), and silent `BUS_REGISTRATION_FAILED` (degraded sessions are invisible to the governing orchestrator). Three gaps are important: GovernorDaemon delivers all constraints regardless of repo scope, no `openclaw_unavailable` flag distinguishes pre/post-OpenClaw artifacts, and epistemological integrity signals (EGS/SDI/RRR) are not routed through the bus. This phase closes all six.
+**Depends on**: Phase 19 (Governance Bus operational; bus_sessions + governance_signals tables exist; /api/register, /api/deregister, /api/check endpoints live)
+**Governing violations closed**: `causal-chain-completeness` (push links at T1/T7/T8), `ground-truth-pointer` (BUS_REGISTRATION_FAILED + repo field), `deposit-not-detect` (EGS/SDI/RRR signals through bus)
+**Requirements**: LIVE-04 (inter-session bus — causal chain extension), LIVE-05 (governing daemon — scope filter)
+**Success Criteria** (what must be TRUE):
+  1. `bus_sessions` schema has `repo`, `project_dir`, `transcript_path` columns; `/api/register` accepts and stores them; `/api/deregister` accepts and stores `event_count`, `outcome`
+  2. `push_links` DuckDB table exists with schema `(link_id, parent_decision_id, child_decision_id, transition_trigger, repo_boundary, migration_run_id, captured_at)`; `/api/push-link` POST endpoint writes to it; T1 push link round-trip test passes
+  3. `session_start.py` emits `BUS_REGISTRATION_FAILED` event to its own JSONL (appended via `append_to_staging`) when bus is unavailable; event carries `session_id`, `run_id`, `attempted_at`
+  4. `session_start.py` sets `openclaw_unavailable: true` in the register payload when `OPE_RUN_ID` env var is absent (locally-generated fallback)
+  5. `GovernorDaemon.get_briefing(session_id, run_id, repo=None)` filters constraints to those whose scope includes the repo (or all constraints when scope is absent/universal); a `migration-workbox`-scoped constraint is not delivered to a `platform-core` session
+  6. `/api/check` response includes `epistemological_signals` list (stubbed empty for now) — field exists in `CheckResponse` model, enabling post-OpenClaw activation without schema change
+**Plans:** 5 plans in 3 waves
+
+Plans:
+- [ ] 20-01-PLAN.md — Bus schema extension: bus_sessions + push_links table + /api/push-link endpoint + deregister event_count/outcome (Wave 1)
+- [ ] 20-02-PLAN.md — BUS_REGISTRATION_FAILED event emission + openclaw_unavailable flag in session_start.py (Wave 1)
+- [ ] 20-03-PLAN.md — /api/push-link handler + push link round-trip tests (Wave 2)
+- [ ] 20-04-PLAN.md — GovernorDaemon repo scope filter + epistemological_signals stub in CheckResponse (Wave 2)
+- [ ] 20-05-PLAN.md — Integration tests: repo-field registration + push link T1 round-trip + BUS_REGISTRATION_FAILED + scope filter + openclaw_unavailable (Wave 3)
+
+---
+
 ### Phase 19: Control Plane Integration
 
 **Goal**: Build the OPE Governance Bus (Unix socket server + stream processor + governing daemon) and wire it to the PAG hook — transforming OPE from a post-hoc analyzer into a prospective governor. Establish OPE's structural position in the SEMF three-plane architecture by resolving two active CCD violations: `run-id-dissolves-repo-boundary` (every session is currently an epistemological island with no cross-repo causal chain) and `identity-firewall × bootstrap-circularity` (Claude's builder-role and operator-role must be structurally separated by OpenClaw's Control Plane to prevent the governance system from validating its own constraints).
@@ -435,7 +459,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.3 -> 14 -> 14.1 -> 15 -> 16 -> 16.1 -> 17 -> 18 -> 19
+Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.3 -> 14 -> 14.1 -> 15 -> 16 -> 16.1 -> 17 -> 18 -> 19 -> 20
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -462,4 +486,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 16.1. Topological Edge-Generation [INSERTED] | 4/4 | ✓ Complete | 2026-02-24 |
 | 17. Candidate Assessment System | 4/4 | ✓ Complete | 2026-02-24 |
 | 18. Bridge-Warden Structural Integrity Detection | 5/5 | ✓ Complete | 2026-02-25 |
-| 19. Control Plane Integration | 0/5 | ○ Planned | — |
+| 19. Control Plane Integration | 5/5 | ✓ Complete | 2026-02-25 |
+| 20. Causal Chain Completion | 0/5 | ○ Planned | — |

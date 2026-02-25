@@ -1,9 +1,9 @@
-"""Starlette server scaffold for the OPE Governance Bus.
+"""Starlette server for the OPE Governance Bus.
 
 Exposes three session-facing endpoints over a Unix socket:
 - POST /api/register   — register a session with session_id + run_id
 - POST /api/deregister — mark a session as deregistered
-- POST /api/check      — stub returning empty constraints/interventions
+- POST /api/check      — return active constraints and interventions
 
 The server fails open: DuckDB write failures return 200 with empty
 payload, never 500. Sessions must never be blocked by bus errors.
@@ -22,6 +22,7 @@ from starlette.routing import Route
 
 from .models import CheckResponse
 from .schema import create_bus_schema
+from ..governor.daemon import GovernorDaemon
 
 SOCKET_PATH = os.environ.get("OPE_BUS_SOCKET", "/tmp/ope-governance-bus.sock")
 
@@ -34,8 +35,8 @@ def create_app(
 
     Args:
         db_path: Path to DuckDB database file.
-        daemon: Optional governing daemon with get_briefing() method.
-               Injected by 19-03 when the daemon is running.
+        daemon: Optional GovernorDaemon instance. If None, a default
+               GovernorDaemon is created that reads constraints.json.
 
     Returns:
         Configured Starlette app with /api/register, /api/deregister,
@@ -43,6 +44,8 @@ def create_app(
     """
     conn = duckdb.connect(db_path)
     create_bus_schema(conn)
+
+    _daemon = daemon if daemon is not None else GovernorDaemon(db_path=db_path)
 
     async def register(request: Request) -> JSONResponse:
         """Register a session on the governance bus.
@@ -95,24 +98,22 @@ def create_app(
     async def check(request: Request) -> JSONResponse:
         """Check for active constraints and interventions.
 
-        Stub implementation: returns empty constraints and interventions.
-        The governing daemon (19-03) will implement this fully by
-        injecting a daemon object with get_briefing().
+        Calls the GovernorDaemon to read active constraints from
+        constraints.json and return a severity-ordered briefing.
+        Fails open: any error returns empty constraints/interventions.
         """
-        if daemon is not None:
-            try:
-                body = await request.json()
-                briefing = daemon.get_briefing(
-                    body.get("session_id", ""),
-                    body.get("run_id", ""),
-                )
-                return JSONResponse({
-                    "constraints": briefing.constraints,
-                    "interventions": briefing.interventions,
-                })
-            except Exception:
-                pass  # Fail open to stub response
-        return JSONResponse(CheckResponse().model_dump())
+        try:
+            body = await request.json()
+            briefing = _daemon.get_briefing(
+                body.get("session_id", ""),
+                body.get("run_id", ""),
+            )
+            return JSONResponse({
+                "constraints": briefing.constraints,
+                "interventions": briefing.interventions,
+            })
+        except Exception:
+            return JSONResponse(CheckResponse().model_dump())
 
     return Starlette(routes=[
         Route("/api/register", register, methods=["POST"]),

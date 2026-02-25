@@ -18,6 +18,7 @@ from src.pipeline.live.bus.models import (
     CheckResponse,
 )
 from src.pipeline.live.bus.server import create_app
+from src.pipeline.live.governor.daemon import GovernorDaemon
 
 
 # ---------------------------------------------------------------------------
@@ -34,9 +35,17 @@ def db():
 
 
 @pytest.fixture
-def app():
-    """Starlette app backed by in-memory DuckDB."""
-    return create_app(db_path=":memory:")
+def app(tmp_path):
+    """Starlette app backed by in-memory DuckDB with isolated daemon.
+
+    Uses a non-existent constraints path so /api/check returns empty
+    constraints (daemon fail-open behavior) without reading real data.
+    """
+    daemon = GovernorDaemon(
+        db_path=":memory:",
+        constraints_path=str(tmp_path / "nonexistent" / "constraints.json"),
+    )
+    return create_app(db_path=":memory:", daemon=daemon)
 
 
 @pytest.fixture

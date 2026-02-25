@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 18 (Bridge-Warden Structural Integrity Detection) — COMPLETE. All 4/4 plans + gap closure (18-05) done. Project complete.
+**Current focus:** Phase 19 (Control Plane Integration) — IN PROGRESS. 1/5 plans complete. Wave 1 Plan 02 next (parallel eligible).
 
 ## Current Position
 
-Phase: 18 (Bridge-Warden Structural Integrity Detection)
-Plan: 5 of 5 in current phase (4 plans + 1 gap closure)
-Status: COMPLETE -- all phases finished, gap closure 18-05 done
-Last activity: 2026-02-25 -- Completed 18-05-PLAN.md (assessment structural integrity gap closure)
+Phase: 19 (Control Plane Integration)
+Plan: 1 of 5 in current phase (Wave 1: Plan 01 done, Plan 02 next; Wave 2: Plans 03+04; Wave 3: Plan 05)
+Status: In progress — Wave 1 Plan 01 complete
+Last activity: 2026-02-25 -- Completed 19-01-PLAN.md (Bus Foundation: DuckDB schema + Pydantic models + Starlette server)
 
-Progress: [████████████████████████████████] 100% (5/5 plans in phase 18)
-Overall:  [████████████████████████████████████████████████████████████████████████████] 76/76 plans total (75 plans + 1 gap closure)
+Progress: [██████░░░░░░░░░░░░░░░░░░░░░░░░░░] 20% (1/5 plans in phase 19)
+Overall:  [█████████████████████████████████████████████████████████████████████████████] 77/81 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 76 (75 plans + 1 gap closure)
+- Total plans completed: 77 (75 plans + 1 gap closure + 1 Phase 19)
 - Average duration: 5.5 min
-- Total execution time: 7.84 hours
+- Total execution time: 7.91 hours
 
 **By Phase:**
 
@@ -51,9 +51,11 @@ Overall:  [███████████████████████
 | 17-candidate-assessment-system | 4 | 41 min | 10.3 min |
 | 18-bridge-warden-structural-integrity | 5/5 | 35 min | 7.0 min |
 
+| 19-control-plane-integration | 1/5 | 4 min | 4.0 min |
+
 **Recent Trend:**
-- Last 5 plans: 4 min, 11 min, 4 min, 9 min, 7 min
-- Trend: steady execution pace, project complete (including gap closure)
+- Last 5 plans: 11 min, 4 min, 9 min, 7 min, 4 min
+- Trend: steady execution pace, Phase 19 in progress
 
 *Updated after each plan completion*
 
@@ -610,8 +612,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Phase 18 Plan 05 (gap closure) complete. All phases complete. Project finished.
-Resume file: N/A -- project complete (76/76 plans executed, including 18-05 gap closure)
+Stopped at: Phase 19-01 complete. Wave 1 Plan 02 (stream processor wiring) next.
+Resume file: .planning/phases/19-control-plane-integration/19-02-PLAN.md
 
 ## Phase 15 Completion Summary
 

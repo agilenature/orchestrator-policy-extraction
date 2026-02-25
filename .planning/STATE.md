@@ -6,22 +6,22 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 20 (Causal Chain Completion) — In progress. 2/5 plans done. Wave 1 underway.
+**Current focus:** Phase 20 (Causal Chain Completion) — In progress. 3/5 plans done. Wave 1 underway.
 
 ## Current Position
 
 Phase: 20 (Causal Chain Completion) — In progress
-Plan: 2 of 5 in current phase (Wave 1: Plans 01-03)
+Plan: 3 of 5 in current phase (Wave 1: Plans 01-03)
 Status: In progress
-Last activity: 2026-02-25 -- Completed 20-02-PLAN.md (BUS_REGISTRATION_FAILED event + openclaw_unavailable flag)
+Last activity: 2026-02-25 -- Completed 20-01-PLAN.md (bus schema extension + push_links DDL + push-link stub route)
 
-Progress: [████████████░░░░░░░░░░░░░░░░░░░░] 40% (2/5 plans in phase 20)
-Overall:  [████████████████████████████████████████████████████████████████████████████████░░] 83/86 plans total
+Progress: [███████████████████░░░░░░░░░░░░░░] 60% (3/5 plans in phase 20)
+Overall:  [█████████████████████████████████████████████████████████████████████████████████░░] 84/86 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 83 (75 plans + 1 gap closure + 5 Phase 19 + 2 Phase 20)
+- Total plans completed: 84 (75 plans + 1 gap closure + 5 Phase 19 + 3 Phase 20)
 - Average duration: 5.5 min
 - Total execution time: 8.19 hours
 
@@ -53,11 +53,11 @@ Overall:  [███████████████████████
 
 | 19-control-plane-integration | 5/5 | 24 min | 4.8 min |
 
-| 20-causal-chain-completion | 2/5 | 5 min | 2.5 min |
+| 20-causal-chain-completion | 3/5 | 9 min | 3.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min, 3 min, 5 min, 7 min, 2 min
-- Trend: Phase 20 in progress. Wave 1 plans 01-02 complete.
+- Last 5 plans: 3 min, 5 min, 7 min, 2 min, 4 min
+- Trend: Phase 20 in progress. Wave 1 plans 01-03 in progress (01 + 02 complete, 03 next).
 
 *Updated after each plan completion*
 
@@ -628,8 +628,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Phase 20, Plan 02 complete. Plans 01-02 delivered (schema extensions + BUS_REGISTRATION_FAILED event).
-Next action: Phase 20 Plan 03 (decision artifact linkage) or remaining Wave 1 plans.
+Stopped at: Phase 20, Plan 01 complete. Plans 01-03 delivered (schema extension + push_links DDL + BUS_REGISTRATION_FAILED event + push-link stub).
+Next action: Phase 20 Plan 03 (push link handler implementation) or Plan 04/05 (Wave 2-3).
 Resume file: .planning/phases/20-causal-chain-completion/20-03-PLAN.md
 
 ## Phase 15 Completion Summary

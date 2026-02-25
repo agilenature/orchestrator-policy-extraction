@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 18 (Bridge-Warden Structural Integrity Detection) — in progress. Plan 01 complete.
+**Current focus:** Phase 18 (Bridge-Warden Structural Integrity Detection) — in progress. Plans 01-02 complete.
 
 ## Current Position
 
 Phase: 18 (Bridge-Warden Structural Integrity Detection)
-Plan: 1 of ~4 in current phase
+Plan: 2 of ~4 in current phase
 Status: In progress
-Last activity: 2026-02-25 -- Completed 18-01-PLAN.md (structural schema foundation: models, DDL, writer, config, tests)
+Last activity: 2026-02-25 -- Completed 18-02-PLAN.md (structural detectors, computer, Op-8, pipeline Step 21)
 
-Progress: [████████░░░░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans in phase 18)
-Overall:  [██████████████████████████████████████████████████████████████████████████░░░] 72/75 plans total
+Progress: [████████████████░░░░░░░░░░░░░░░░] 50% (2/4 plans in phase 18)
+Overall:  [██████████████████████████████████████████████████████████████████████████░░] 73/75 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 72
+- Total plans completed: 73
 - Average duration: 5.5 min
-- Total execution time: 7.33 hours
+- Total execution time: 7.51 hours
 
 **By Phase:**
 
@@ -49,10 +49,10 @@ Overall:  [███████████████████████
 | 16-sacred-fire-intelligence-system | 4 | 18 min | 4.5 min |
 
 | 17-candidate-assessment-system | 4 | 41 min | 10.3 min |
-| 18-bridge-warden-structural-integrity | 1/4 | 4 min | 4.0 min |
+| 18-bridge-warden-structural-integrity | 2/4 | 15 min | 7.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 10 min, 8 min, 12 min, 11 min, 4 min
+- Last 5 plans: 8 min, 12 min, 11 min, 4 min, 11 min
 - Trend: steady execution pace
 
 *Updated after each plan completion*
@@ -426,6 +426,12 @@ Recent decisions affecting current work:
 - Plan 17-04: math.erf for percentile rank computation (no scipy dependency)
 - Plan 17-04: 1615 tests passing (1593 baseline + 22 new, excluding pre-existing segmenter failure)
 - Plan 17-gap: rejection_detector.py queried ccd_axis and differential from flame_events -- columns absent from FLAME_EVENTS_DDL; tests masked this via manual fixture ALTER TABLE. Fix: added both columns to ASSESSMENT_ALTER_EXTENSIONS in assessment/schema.py (idempotent ALTER TABLE applied at schema chain time). Live ope.db migrated via create_ddf_schema(). 19 tests passing post-fix.
+- Plan 18-02: Main Cable detector uses axis_edges presence only (flame_events lacks generalization_radius column)
+- Plan 18-02: Spiral reinforcement queries project_wisdom.metadata JSON (no source_session_id column on table)
+- Plan 18-02: Assessment filter dual clause: assess_clause_f (aliased f.) for main queries, assess_clause (bare) for sub-queries
+- Plan 18-02: Op-8 deposits: INSERT OR REPLACE with SHA-256("op8:{session_id}:{axis}")[:16] for idempotent dedup
+- Plan 18-02: Pipeline Step 21 (structural analysis) after Step 20 (TE), renumbered stats to Step 22
+- Plan 18-02: 1645 tests passing (1619 baseline + 26 new, excluding pre-existing segmenter failure)
 
 ### Pending Todos
 
@@ -592,8 +598,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Phase 18 Plan 01 complete. Schema foundation for structural integrity detection.
-Resume file: .planning/phases/18-bridge-warden-structural-integrity/18-02-PLAN.md
+Stopped at: Phase 18 Plan 02 complete. Structural detectors, computer, Op-8, pipeline Step 21.
+Resume file: .planning/phases/18-bridge-warden-structural-integrity/18-03-PLAN.md
 
 ## Phase 15 Completion Summary
 

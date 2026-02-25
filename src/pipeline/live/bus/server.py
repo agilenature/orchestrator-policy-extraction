@@ -117,6 +117,7 @@ def create_app(
             briefing = _daemon.get_briefing(
                 body.get("session_id", ""),
                 body.get("run_id", ""),
+                repo=body.get("repo", None),
             )
             return JSONResponse({
                 "constraints": briefing.constraints,

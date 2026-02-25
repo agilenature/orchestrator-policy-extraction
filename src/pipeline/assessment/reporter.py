@@ -171,6 +171,42 @@ class AssessmentReporter:
                 1 for r in rejections if r["rejection_type"] == "stubbornness"
             )
 
+        # 9.5 Structural integrity (Phase 18 gap closure)
+        structural_integrity_score = None
+        structural_event_count_val = 0
+        floating_cable_count_val = 0
+        try:
+            from src.pipeline.ddf.structural.computer import (
+                compute_structural_integrity,
+            )
+
+            # Compute for human subject in this assessment session
+            human_result = compute_structural_integrity(
+                self._conn,
+                session_id,
+                "human",
+                assessment_session_id=session_id,
+            )
+            structural_integrity_score = human_result.integrity_score
+            structural_event_count_val = human_result.structural_event_count
+
+            # Count floating cables (AI main_cable failures in this assessment)
+            fc_row = self._conn.execute(
+                """
+                SELECT COUNT(*) FROM structural_events
+                WHERE session_id = ? AND assessment_session_id = ?
+                  AND subject = 'ai' AND signal_type = 'main_cable'
+                  AND signal_passed = false
+                """,
+                [session_id, session_id],
+            ).fetchone()
+            floating_cable_count_val = fc_row[0] if fc_row else 0
+        except Exception:
+            logger.debug(
+                "Structural integrity data not available for session %s",
+                session_id,
+            )
+
         # 10. Build AssessmentReport
         report_id = AssessmentReport.make_id(session_id)
         return AssessmentReport(
@@ -195,6 +231,9 @@ class AssessmentReporter:
             rejections_detected=rejections_detected,
             rejections_level5=rejections_level5,
             stubbornness_indicators=stubbornness_indicators,
+            structural_integrity_score=structural_integrity_score,
+            structural_event_count=structural_event_count_val,
+            floating_cable_count=floating_cable_count_val,
         )
 
     def _compute_percentile(
@@ -429,6 +468,20 @@ class AssessmentReporter:
         lines.append(f"- Fringe Drift Rate: {report.fringe_drift_rate}")
         lines.append("")
 
+        # Structural Integrity
+        lines.append("## Structural Integrity")
+        lines.append("")
+        lines.append(
+            f"- Integrity Score: {report.structural_integrity_score}"
+        )
+        lines.append(
+            f"- Structural Events: {report.structural_event_count}"
+        )
+        lines.append(
+            f"- Floating Cables (AI): {report.floating_cable_count}"
+        )
+        lines.append("")
+
         # Population Comparison
         lines.append("## Population Comparison")
         lines.append("")
@@ -493,13 +546,16 @@ class AssessmentReporter:
             f"Assessment session measuring candidate {report.candidate_id} "
             f"on scenario {report.scenario_id}. "
             f"Candidate TE ratio: {report.candidate_ratio}. "
-            f"L5 rejections: {report.rejections_level5}."
+            f"L5 rejections: {report.rejections_level5}. "
+            f"Structural integrity: {report.structural_integrity_score}. "
+            f"Floating cables: {report.floating_cable_count}."
         )
         flood_example = (
             f"Session {report.session_id}: "
             f"{report.flame_event_count} flame events, "
             f"level distribution {report.level_distribution}, "
-            f"candidate TE {report.candidate_te}."
+            f"candidate TE {report.candidate_te}, "
+            f"structural integrity {report.structural_integrity_score}."
         )
 
         try:

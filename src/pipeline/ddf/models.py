@@ -165,3 +165,5 @@ class IntelligenceProfile(BaseModel, frozen=True):
     spiral_depth: int = 0
     flood_rate: float = 0.0
     session_count: int = 0
+    integrity_score: Optional[float] = None
+    structural_event_count: Optional[int] = None

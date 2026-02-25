@@ -220,6 +220,21 @@ class OAxsConfig(BaseModel):
     novel_concept_message_window: int = 3
 
 
+class StructuralConfig(BaseModel):
+    """Structural integrity detection settings (Phase 18).
+
+    Weights for the four structural signal types that compose
+    the overall integrity_score. Weights should sum to ~1.0.
+    """
+
+    gravity_window: int = 3
+    gravity_weight: float = 0.30
+    main_cable_weight: float = 0.40
+    dependency_weight: float = 0.20
+    spiral_weight: float = 0.10
+    neutral_fallback: float = 0.5
+
+
 class DDFConfig(BaseModel):
     """DDF Detection Substrate settings (Phase 15)."""
 
@@ -227,6 +242,7 @@ class DDFConfig(BaseModel):
     false_integration_confidence_threshold: float = 0.6
     epistemological_default: str = "principled"
     stagnation_min_firing_count: int = 10
+    structural: StructuralConfig = Field(default_factory=StructuralConfig)
 
 
 class GitCommands(BaseModel):

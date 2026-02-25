@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 18 (Bridge-Warden Structural Integrity Detection) — in progress. Plans 01-02 complete.
+**Current focus:** Phase 18 (Bridge-Warden Structural Integrity Detection) — in progress. Plans 01-03 complete.
 
 ## Current Position
 
 Phase: 18 (Bridge-Warden Structural Integrity Detection)
-Plan: 2 of ~4 in current phase
+Plan: 3 of ~4 in current phase
 Status: In progress
-Last activity: 2026-02-25 -- Completed 18-02-PLAN.md (structural detectors, computer, Op-8, pipeline Step 21)
+Last activity: 2026-02-25 -- Completed 18-03-PLAN.md (integration tests for BRIDGE-01 through BRIDGE-03)
 
-Progress: [████████████████░░░░░░░░░░░░░░░░] 50% (2/4 plans in phase 18)
-Overall:  [██████████████████████████████████████████████████████████████████████████░░] 73/75 plans total
+Progress: [████████████████████████░░░░░░░░] 75% (3/4 plans in phase 18)
+Overall:  [███████████████████████████████████████████████████████████████████████████░] 74/75 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 73
+- Total plans completed: 74
 - Average duration: 5.5 min
-- Total execution time: 7.51 hours
+- Total execution time: 7.58 hours
 
 **By Phase:**
 
@@ -49,10 +49,10 @@ Overall:  [███████████████████████
 | 16-sacred-fire-intelligence-system | 4 | 18 min | 4.5 min |
 
 | 17-candidate-assessment-system | 4 | 41 min | 10.3 min |
-| 18-bridge-warden-structural-integrity | 2/4 | 15 min | 7.5 min |
+| 18-bridge-warden-structural-integrity | 3/4 | 19 min | 6.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 8 min, 12 min, 11 min, 4 min, 11 min
+- Last 5 plans: 12 min, 11 min, 4 min, 11 min, 4 min
 - Trend: steady execution pace
 
 *Updated after each plan completion*
@@ -432,6 +432,10 @@ Recent decisions affecting current work:
 - Plan 18-02: Op-8 deposits: INSERT OR REPLACE with SHA-256("op8:{session_id}:{axis}")[:16] for idempotent dedup
 - Plan 18-02: Pipeline Step 21 (structural analysis) after Step 20 (TE), renumbered stats to Step 22
 - Plan 18-02: 1645 tests passing (1619 baseline + 26 new, excluding pre-existing segmenter failure)
+- Plan 18-03: Integration tests organized by bridge contract (TestBridge01, TestBridge02, TestBridge03) with shared _run_detect_and_write helper
+- Plan 18-03: Assessment isolation test verifies assessment_session_id IS NULL filtering through evidence string inspection
+- Plan 18-03: End-to-end chain test: mixed grounded + floating events -> detect -> write -> compute -> deposit -> verify memory_candidates
+- Plan 18-03: 1663 tests passing (1645 baseline + 18 new integration tests, excluding pre-existing segmenter failure)
 
 ### Pending Todos
 
@@ -598,8 +602,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Phase 18 Plan 02 complete. Structural detectors, computer, Op-8, pipeline Step 21.
-Resume file: .planning/phases/18-bridge-warden-structural-integrity/18-03-PLAN.md
+Stopped at: Phase 18 Plan 03 complete. Integration tests for BRIDGE-01, BRIDGE-02, BRIDGE-03.
+Resume file: .planning/phases/18-bridge-warden-structural-integrity/18-04-PLAN.md
 
 ## Phase 15 Completion Summary
 

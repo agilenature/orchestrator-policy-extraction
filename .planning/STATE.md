@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 18 (Bridge-Warden Structural Integrity Detection) — COMPLETE. All 4/4 plans done. Project complete.
+**Current focus:** Phase 18 (Bridge-Warden Structural Integrity Detection) — COMPLETE. All 4/4 plans + gap closure (18-05) done. Project complete.
 
 ## Current Position
 
 Phase: 18 (Bridge-Warden Structural Integrity Detection)
-Plan: 4 of 4 in current phase
-Status: COMPLETE -- all phases finished
-Last activity: 2026-02-25 -- Completed 18-04-PLAN.md (three-dimensional IntelligenceProfile extension + CLI bridge subgroup)
+Plan: 5 of 5 in current phase (4 plans + 1 gap closure)
+Status: COMPLETE -- all phases finished, gap closure 18-05 done
+Last activity: 2026-02-25 -- Completed 18-05-PLAN.md (assessment structural integrity gap closure)
 
-Progress: [████████████████████████████████] 100% (4/4 plans in phase 18)
-Overall:  [████████████████████████████████████████████████████████████████████████████] 75/75 plans total
+Progress: [████████████████████████████████] 100% (5/5 plans in phase 18)
+Overall:  [████████████████████████████████████████████████████████████████████████████] 76/76 plans total (75 plans + 1 gap closure)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 75
+- Total plans completed: 76 (75 plans + 1 gap closure)
 - Average duration: 5.5 min
-- Total execution time: 7.73 hours
+- Total execution time: 7.84 hours
 
 **By Phase:**
 
@@ -49,11 +49,11 @@ Overall:  [███████████████████████
 | 16-sacred-fire-intelligence-system | 4 | 18 min | 4.5 min |
 
 | 17-candidate-assessment-system | 4 | 41 min | 10.3 min |
-| 18-bridge-warden-structural-integrity | 4/4 | 28 min | 7.0 min |
+| 18-bridge-warden-structural-integrity | 5/5 | 35 min | 7.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 11 min, 4 min, 11 min, 4 min, 9 min
-- Trend: steady execution pace, project complete
+- Last 5 plans: 4 min, 11 min, 4 min, 9 min, 7 min
+- Trend: steady execution pace, project complete (including gap closure)
 
 *Updated after each plan completion*
 
@@ -439,6 +439,11 @@ Recent decisions affecting current work:
 - Plan 18-04: Structural integrity aggregated per-session then averaged (compute_structural_integrity is per-session API)
 - Plan 18-04: floating-cables CLI extracts axis from contributing_flame_event_ids (op8.py does not back-populate structural_events.op8_correction_candidate_id)
 - Plan 18-04: 1649 tests passing (1637 baseline + 12 new profile/CLI tests, excluding pre-existing segmenter failure)
+- Plan 18-05: Lazy import of compute_structural_integrity inside try/except (same pattern as rejection_detector import)
+- Plan 18-05: Floating cable count = AI main_cable failures (subject='ai', signal_type='main_cable', signal_passed=false)
+- Plan 18-05: Structural data deposited via CCD text fields (scope_rule, flood_example), not separate deposit columns
+- Plan 18-05: floating_cable_context is optional parameter on _build_handicap() (not auto-queried from DuckDB in scenario generator)
+- Plan 18-05: 1661 tests passing (1649 baseline + 12 new structural assessment tests, excluding pre-existing segmenter failure)
 
 ### Pending Todos
 
@@ -605,8 +610,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Phase 18 Plan 04 complete. All phases complete. Project finished.
-Resume file: N/A -- project complete (75/75 plans executed)
+Stopped at: Phase 18 Plan 05 (gap closure) complete. All phases complete. Project finished.
+Resume file: N/A -- project complete (76/76 plans executed, including 18-05 gap closure)
 
 ## Phase 15 Completion Summary
 
@@ -709,12 +714,13 @@ Phase 17 delivered the Candidate Assessment System (all 4 plans):
 
 ## Phase 18 Completion Summary
 
-Phase 18 delivered Bridge-Warden Structural Integrity Detection (all 4 plans):
+Phase 18 delivered Bridge-Warden Structural Integrity Detection (all 4 plans + 1 gap closure):
 - **Plan 01 COMPLETE**: structural_events DuckDB schema (3 indexes), StructuralEvent/StructuralIntegrityResult Pydantic models, StructuralConfig with locked formula weights, IntelligenceProfile extended with integrity_score/structural_event_count, write_structural_events, 14 tests
 - **Plan 02 COMPLETE**: Four signal detectors (gravity_check, main_cable, dependency_sequencing, spiral_reinforcement), compute_structural_integrity (weighted formula), deposit_op8_corrections (AI floating cables -> memory_candidates), Pipeline Step 21, 26 tests
 - **Plan 03 COMPLETE**: 18 integration tests covering BRIDGE-01 (signal recording), BRIDGE-02 (score computation), BRIDGE-03 (Op-8 deposit), assessment isolation, end-to-end chain
 - **Plan 04 COMPLETE**: compute_structural_integrity_for_profile() aggregate scoring, CLI bridge subgroup (stats/list/floating-cables), profile Structural Integrity row, 12 tests
-- **1649 tests** passing (1637 baseline + 12 new Plan 04 tests, excluding pre-existing segmenter failure)
+- **Plan 05 COMPLETE (gap closure)**: AssessmentReport structural fields (structural_integrity_score, structural_event_count, floating_cable_count), reporter queries structural_events via compute_structural_integrity(), deposit includes structural data in scope_rule/flood_example, scenario generator floating_cable_context handicap, 12 tests
+- **1661 tests** passing (1649 baseline + 12 new Plan 05 tests, excluding pre-existing segmenter failure)
 - **BRIDGE-01 verified**: structural_events records all four signal types per session for both subjects
 - **BRIDGE-02 verified**: StructuralIntegrityScore computed per session with neutral fallback (0.5 for empty denominators)
 - **BRIDGE-03 verified**: Op-8 fires on AI floating main cables and deposits correction candidates to memory_candidates

@@ -903,7 +903,44 @@ class PipelineRunner:
             logger.warning("TransportEfficiency computation failed: {}", e)
             warnings.append(f"TransportEfficiency computation failed: {e}")
 
-        # Step 21: Compute stats
+        # Step 21: Structural integrity analysis (Phase 18)
+        ddf_structural_count = 0
+        ddf_op8_count = 0
+        try:
+            from src.pipeline.ddf.structural.detectors import (
+                detect_structural_signals as _detect_structural,
+            )
+            from src.pipeline.ddf.structural.writer import (
+                write_structural_events as _write_structural,
+            )
+            from src.pipeline.ddf.structural.op8 import (
+                deposit_op8_corrections as _deposit_op8,
+            )
+            from src.pipeline.ddf.structural.schema import (
+                create_structural_schema as _create_structural_schema,
+            )
+
+            _create_structural_schema(self._conn)
+
+            structural_events = _detect_structural(self._conn, session_id)
+            _write_structural(self._conn, structural_events)
+            ddf_structural_count = len(structural_events)
+
+            ddf_op8_count = _deposit_op8(self._conn, session_id)
+
+            if ddf_structural_count > 0 or ddf_op8_count > 0:
+                logger.info(
+                    "Step 21: Structural: {} events, {} Op-8 corrections",
+                    ddf_structural_count,
+                    ddf_op8_count,
+                )
+        except ImportError:
+            pass  # DDF structural module not available
+        except Exception as e:
+            logger.warning("Structural integrity analysis failed: {}", e)
+            warnings.append(f"Structural integrity analysis failed: {e}")
+
+        # Step 22: Compute stats
         tag_distribution = self._compute_tag_distribution(tagged_events)
         outcome_distribution = seg_stats.get("by_outcome", {})
         duration_s = time.monotonic() - t0
@@ -940,6 +977,8 @@ class PipelineRunner:
             "ddf_te_count": ddf_te_count,
             "ddf_trunk_backfill": ddf_trunk_backfill,
             "ddf_te_delta_backfill": ddf_te_delta_backfill,
+            "ddf_structural_count": ddf_structural_count,
+            "ddf_op8_count": ddf_op8_count,
             "errors": errors,
             "warnings": warnings,
             "duration_seconds": round(duration_s, 2),
@@ -1189,6 +1228,8 @@ class PipelineRunner:
             "ddf_causal_isolation": 0,
             "ddf_metrics_count": 0,
             "ddf_spiral_promotions": 0,
+            "ddf_structural_count": 0,
+            "ddf_op8_count": 0,
             "errors": [error_msg],
             "warnings": [],
             "duration_seconds": 0,

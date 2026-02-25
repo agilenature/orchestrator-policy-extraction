@@ -342,3 +342,131 @@ class TestCheckHandlerWithDaemon:
         assert data["constraints"][0]["severity"] == "forbidden"
         assert data["constraints"][1]["severity"] == "requires_approval"
         assert data["constraints"][2]["severity"] == "warning"
+
+
+# ---------------------------------------------------------------------------
+# Repo scope filtering tests (Phase 20-04)
+# ---------------------------------------------------------------------------
+
+
+def _write_scoped_constraints(tmp_path, constraints: list[dict]) -> str:
+    """Write constraints to a temp file and return the path string."""
+    test_file = tmp_path / "scoped_constraints.json"
+    test_file.write_text(json.dumps(constraints))
+    return str(test_file)
+
+
+class TestRepoScopeFilter:
+    """Tests for repo-based constraint scope filtering in GovernorDaemon."""
+
+    def test_repo_scope_filters_constraints(self, tmp_path):
+        """Scoped constraints delivered only when repo matches; universal always delivered."""
+        cp = _write_scoped_constraints(tmp_path, [
+            {"id": "mw", "severity": "forbidden", "status": "active",
+             "repo_scope": ["migration-workbox"]},
+            {"id": "pc", "severity": "warning", "status": "active",
+             "repo_scope": ["platform-core"]},
+            {"id": "univ", "severity": "requires_approval", "status": "active"},
+        ])
+        daemon = GovernorDaemon(db_path=":memory:", constraints_path=cp)
+        briefing = daemon.get_briefing("s1", "r1", repo="migration-workbox")
+        ids = [c["id"] for c in briefing.constraints]
+        assert "mw" in ids
+        assert "univ" in ids
+        assert "pc" not in ids
+
+    def test_repo_scope_universal_when_absent(self, tmp_path):
+        """Constraints without repo_scope field are universal (delivered to any repo)."""
+        cp = _write_scoped_constraints(tmp_path, [
+            {"id": "c1", "severity": "warning", "status": "active"},
+            {"id": "c2", "severity": "forbidden", "status": "active"},
+        ])
+        daemon = GovernorDaemon(db_path=":memory:", constraints_path=cp)
+        briefing = daemon.get_briefing("s1", "r1", repo="any-repo")
+        assert len(briefing.constraints) == 2
+
+    def test_repo_scope_universal_when_none(self, tmp_path):
+        """Constraints with repo_scope=None are universal."""
+        cp = _write_scoped_constraints(tmp_path, [
+            {"id": "c1", "severity": "warning", "status": "active",
+             "repo_scope": None},
+        ])
+        daemon = GovernorDaemon(db_path=":memory:", constraints_path=cp)
+        briefing = daemon.get_briefing("s1", "r1", repo="ope")
+        assert len(briefing.constraints) == 1
+        assert briefing.constraints[0]["id"] == "c1"
+
+    def test_repo_scope_universal_when_empty_list(self, tmp_path):
+        """Constraints with repo_scope=[] are universal."""
+        cp = _write_scoped_constraints(tmp_path, [
+            {"id": "c1", "severity": "warning", "status": "active",
+             "repo_scope": []},
+        ])
+        daemon = GovernorDaemon(db_path=":memory:", constraints_path=cp)
+        briefing = daemon.get_briefing("s1", "r1", repo="ope")
+        assert len(briefing.constraints) == 1
+
+    def test_repo_scope_no_filter_when_repo_none(self, tmp_path):
+        """When repo=None (default), all constraints delivered regardless of scope."""
+        cp = _write_scoped_constraints(tmp_path, [
+            {"id": "scoped", "severity": "forbidden", "status": "active",
+             "repo_scope": ["migration-workbox"]},
+            {"id": "univ", "severity": "warning", "status": "active"},
+        ])
+        daemon = GovernorDaemon(db_path=":memory:", constraints_path=cp)
+        briefing = daemon.get_briefing("s1", "r1", repo=None)
+        assert len(briefing.constraints) == 2
+
+    def test_repo_scope_multiple_repos_in_scope(self, tmp_path):
+        """Constraint with multiple repos in repo_scope matches any of them."""
+        cp = _write_scoped_constraints(tmp_path, [
+            {"id": "multi", "severity": "warning", "status": "active",
+             "repo_scope": ["migration-workbox", "platform-core"]},
+        ])
+        daemon = GovernorDaemon(db_path=":memory:", constraints_path=cp)
+        briefing = daemon.get_briefing("s1", "r1", repo="platform-core")
+        assert len(briefing.constraints) == 1
+        assert briefing.constraints[0]["id"] == "multi"
+
+    def test_repo_scope_excludes_non_matching(self, tmp_path):
+        """Scoped constraint excluded when repo does not match."""
+        cp = _write_scoped_constraints(tmp_path, [
+            {"id": "mw-only", "severity": "forbidden", "status": "active",
+             "repo_scope": ["migration-workbox"]},
+        ])
+        daemon = GovernorDaemon(db_path=":memory:", constraints_path=cp)
+        briefing = daemon.get_briefing("s1", "r1", repo="platform-core")
+        assert len(briefing.constraints) == 0
+
+
+@pytest.mark.asyncio
+class TestCheckWithRepoFilter:
+    """Integration test: /api/check passes repo to daemon for filtering."""
+
+    async def test_check_passes_repo_to_daemon(self, tmp_path):
+        """POST /api/check with repo filters constraints by repo scope."""
+        cp = _write_scoped_constraints(tmp_path, [
+            {"id": "mw", "severity": "forbidden", "status": "active",
+             "repo_scope": ["migration-workbox"]},
+            {"id": "pc", "severity": "warning", "status": "active",
+             "repo_scope": ["platform-core"]},
+            {"id": "univ", "severity": "requires_approval", "status": "active"},
+        ])
+        daemon = GovernorDaemon(db_path=":memory:", constraints_path=cp)
+        from src.pipeline.live.bus.server import create_app
+        app = create_app(db_path=":memory:", daemon=daemon)
+        async with AsyncClient(
+            transport=ASGITransport(app=app), base_url="http://test"
+        ) as client:
+            r = await client.post(
+                "/api/check",
+                json={"session_id": "s1", "run_id": "r1",
+                      "repo": "migration-workbox"},
+            )
+        assert r.status_code == 200
+        data = r.json()
+        ids = [c["id"] for c in data["constraints"]]
+        assert "mw" in ids
+        assert "univ" in ids
+        assert "pc" not in ids
+        assert data["epistemological_signals"] == []

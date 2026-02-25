@@ -749,6 +749,26 @@ class PipelineRunner:
             logger.warning("DDF Tier 1 detection failed: {}", e)
             warnings.append(f"DDF Tier 1 detection failed: {e}")
 
+        # Step 15.5: Link Tier 1 stubs to episode context (source_episode_id)
+        # Tier 1 detect_markers() creates stubs without source_episode_id because
+        # it runs as a pure text scanner. This step matches each stub to the
+        # episode whose segment contains the stub's triggering event timestamp,
+        # enabling Tier 2 to apply the L3-7 upgrade rules.
+        tier1_linked = 0
+        try:
+            if ddf_tier1_count > 0 or True:  # also relinks pre-existing stubs
+                from src.pipeline.ddf.linker import link_stubs_to_episodes as _link_stubs
+                tier1_linked = _link_stubs(self._conn, session_id)
+                if tier1_linked > 0:
+                    logger.info(
+                        "Step 15.5: Linked {} stubs to episodes", tier1_linked
+                    )
+        except ImportError:
+            pass
+        except Exception as e:
+            logger.warning("DDF stub-episode linking failed: {}", e)
+            warnings.append(f"DDF stub-episode linking failed: {e}")
+
         # Step 16: DDF Tier 2 LLM enrichment (L3-7)
         ddf_tier2_count = 0
         try:

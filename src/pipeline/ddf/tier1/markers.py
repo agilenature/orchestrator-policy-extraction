@@ -219,6 +219,7 @@ def detect_markers(
                         evidence_excerpt=excerpt,
                         subject="human",
                         detection_source="stub",
+                        session_event_ref=event.get("event_id"),
                     )
                 )
 

@@ -4,6 +4,7 @@ Provides subcommands under `intelligence`:
 - profile: Display IntelligenceProfile for a human or AI subject
 - stagnant: List stagnant constraints (floating abstractions)
 - edges: Topology edge management (list, frontier, show)
+- bridge: Structural integrity commands (stats, list, floating-cables)
 - memory-review: Review pending memory_candidates and accept/reject to MEMORY.md
 - assess: Assessment scenario management (annotate-scenarios, list-scenarios)
 
@@ -90,6 +91,9 @@ def profile(human_id: str, db: str, show_ai: bool) -> None:
 
         # TE breakdown display (Phase 16, Plan 03)
         _display_te_metrics(conn, human_id, show_ai)
+
+        # Structural Integrity display (Phase 18, Plan 04)
+        _display_structural_integrity(conn, human_id, show_ai)
 
         conn.close()
 
@@ -371,6 +375,292 @@ def edges_show(edge_id: str, db: str) -> None:
             click.echo(f"    flame_event_ids: {ev.get('flame_event_ids', [])}")
         except (json.JSONDecodeError, TypeError):
             click.echo(f"  evidence: {ev_json}")
+
+    except SystemExit:
+        raise
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+
+@intelligence_group.group(name="bridge")
+def bridge_group():
+    """Structural integrity commands."""
+    pass
+
+
+@bridge_group.command("stats")
+@click.argument("human_id")
+@click.option("--db", default="data/ope.db", help="DuckDB database path.")
+def bridge_stats(human_id: str, db: str) -> None:
+    """Show structural integrity stats for a human.
+
+    Displays signal type breakdown (gravity_check, main_cable,
+    dependency_sequencing, spiral_reinforcement) with pass/fail
+    counts and the computed StructuralIntegrityScore.
+
+    Usage:
+        python -m src.pipeline.cli intelligence bridge stats <human_id>
+    """
+    _setup_logging()
+
+    try:
+        import duckdb
+
+        from src.pipeline.ddf.structural.computer import compute_structural_integrity
+
+        conn = duckdb.connect(db, read_only=True)
+
+        # Find sessions for this human_id
+        sessions = conn.execute(
+            """
+            SELECT DISTINCT se.session_id
+            FROM structural_events se
+            WHERE se.subject = 'human'
+              AND se.assessment_session_id IS NULL
+              AND se.session_id IN (
+                  SELECT DISTINCT session_id
+                  FROM flame_events
+                  WHERE human_id = ?
+                    AND subject = 'human'
+                    AND assessment_session_id IS NULL
+              )
+            """,
+            [human_id],
+        ).fetchall()
+
+        if not sessions:
+            click.echo(f"No structural events found for: {human_id}")
+            conn.close()
+            sys.exit(0)
+
+        # Aggregate across sessions by signal_type
+        rows = conn.execute(
+            """
+            SELECT se.signal_type,
+                   COUNT(*) AS total,
+                   SUM(CASE WHEN se.signal_passed THEN 1 ELSE 0 END) AS passed,
+                   SUM(CASE WHEN NOT se.signal_passed THEN 1 ELSE 0 END) AS failed
+            FROM structural_events se
+            WHERE se.subject = 'human'
+              AND se.assessment_session_id IS NULL
+              AND se.session_id IN (
+                  SELECT DISTINCT session_id
+                  FROM flame_events
+                  WHERE human_id = ?
+                    AND subject = 'human'
+                    AND assessment_session_id IS NULL
+              )
+            GROUP BY se.signal_type
+            ORDER BY se.signal_type
+            """,
+            [human_id],
+        ).fetchall()
+
+        click.echo(f"Structural Integrity Stats: {human_id}")
+        click.echo("=" * 55)
+        click.echo(
+            f"{'signal_type':<25} {'total':<8} {'passed':<8} "
+            f"{'failed':<8} {'rate':<8}"
+        )
+        click.echo("-" * 55)
+
+        for signal_type, total, passed, failed in rows:
+            rate = f"{passed / total:.2f}" if total > 0 else "N/A"
+            click.echo(
+                f"{signal_type:<25} {total:<8} {passed:<8} "
+                f"{failed:<8} {rate:<8}"
+            )
+
+        # Compute aggregate integrity score
+        from src.pipeline.ddf.intelligence_profile import (
+            compute_structural_integrity_for_profile,
+        )
+
+        score, event_count = compute_structural_integrity_for_profile(
+            conn, subject="human", human_id=human_id,
+        )
+        click.echo("-" * 55)
+        if score is not None:
+            click.echo(
+                f"Integrity Score: {score:.4f}  "
+                f"({event_count} events across {len(sessions)} sessions)"
+            )
+        else:
+            click.echo("Integrity Score: N/A")
+
+        conn.close()
+
+    except SystemExit:
+        raise
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+
+@bridge_group.command("list")
+@click.argument("human_id")
+@click.option("--db", default="data/ope.db", help="DuckDB database path.")
+@click.option("--signal-type", default=None, help="Filter by signal type.")
+@click.option("--failed-only", is_flag=True, default=False, help="Show only failed signals.")
+def bridge_list(
+    human_id: str,
+    db: str,
+    signal_type: str | None,
+    failed_only: bool,
+) -> None:
+    """List structural events for a human.
+
+    Usage:
+        python -m src.pipeline.cli intelligence bridge list <human_id>
+        python -m src.pipeline.cli intelligence bridge list <human_id> --failed-only
+        python -m src.pipeline.cli intelligence bridge list <human_id> --signal-type main_cable
+    """
+    _setup_logging()
+
+    try:
+        import duckdb
+
+        conn = duckdb.connect(db, read_only=True)
+
+        # Build query with optional filters
+        where_clauses = [
+            "se.subject = 'human'",
+            "se.assessment_session_id IS NULL",
+            """se.session_id IN (
+                SELECT DISTINCT session_id
+                FROM flame_events
+                WHERE human_id = ?
+                  AND subject = 'human'
+                  AND assessment_session_id IS NULL
+            )""",
+        ]
+        params: list = [human_id]
+
+        if signal_type:
+            where_clauses.append("se.signal_type = ?")
+            params.append(signal_type)
+
+        if failed_only:
+            where_clauses.append("se.signal_passed = false")
+
+        where_sql = " AND ".join(where_clauses)
+
+        rows = conn.execute(
+            f"""
+            SELECT se.session_id, se.prompt_number, se.signal_type,
+                   se.signal_passed, se.evidence
+            FROM structural_events se
+            WHERE {where_sql}
+            ORDER BY se.session_id, se.prompt_number
+            """,
+            params,
+        ).fetchall()
+
+        conn.close()
+
+        if not rows:
+            click.echo(f"No structural events found for: {human_id}")
+            sys.exit(0)
+
+        click.echo(
+            f"{'session_id':<24} {'prompt':<8} {'signal_type':<25} "
+            f"{'passed':<8} {'evidence'}"
+        )
+        click.echo("-" * 90)
+
+        for session_id, prompt, sig_type, passed, evidence in rows:
+            sid_display = (
+                session_id[:22] + ".."
+                if len(session_id) > 24
+                else session_id
+            )
+            ev_display = ""
+            if evidence:
+                ev_display = (
+                    evidence[:40] + "..."
+                    if len(evidence) > 40
+                    else evidence
+                )
+            pass_str = "yes" if passed else "NO"
+            click.echo(
+                f"{sid_display:<24} {prompt:<8} {sig_type:<25} "
+                f"{pass_str:<8} {ev_display}"
+            )
+
+        click.echo(f"\nTotal: {len(rows)} events")
+
+    except SystemExit:
+        raise
+    except Exception as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(1)
+
+
+@bridge_group.command("floating-cables")
+@click.argument("human_id")
+@click.option("--db", default="data/ope.db", help="DuckDB database path.")
+def bridge_floating_cables(human_id: str, db: str) -> None:
+    """Show AI floating cables and their Op-8 correction candidates.
+
+    Lists AI main_cable failures (floating abstractions) and joins
+    with memory_candidates to show correction status.
+
+    Usage:
+        python -m src.pipeline.cli intelligence bridge floating-cables <human_id>
+    """
+    _setup_logging()
+
+    try:
+        import duckdb
+
+        conn = duckdb.connect(db, read_only=True)
+
+        # Query AI floating cables (main_cable failures)
+        rows = conn.execute(
+            """
+            SELECT se.session_id, se.evidence,
+                   se.op8_correction_candidate_id,
+                   mc.ccd_axis, mc.status AS mc_status
+            FROM structural_events se
+            LEFT JOIN memory_candidates mc
+                ON se.op8_correction_candidate_id = mc.id
+            WHERE se.signal_type = 'main_cable'
+              AND se.signal_passed = false
+              AND se.subject = 'ai'
+              AND se.assessment_session_id IS NULL
+            ORDER BY se.session_id
+            """,
+        ).fetchall()
+
+        conn.close()
+
+        if not rows:
+            click.echo("No AI floating cables found.")
+            sys.exit(0)
+
+        click.echo("AI Floating Cables (Main Cable Failures)")
+        click.echo("=" * 70)
+        click.echo(
+            f"{'axis':<30} {'session':<24} {'mc_status':<12}"
+        )
+        click.echo("-" * 70)
+
+        for session_id, evidence, op8_id, ccd_axis, mc_status in rows:
+            axis_display = ccd_axis or "(no axis)"
+            if len(axis_display) > 28:
+                axis_display = axis_display[:26] + ".."
+            sid_display = (
+                session_id[:22] + ".."
+                if len(session_id) > 24
+                else session_id
+            )
+            status_display = mc_status or "not deposited"
+            click.echo(
+                f"{axis_display:<30} {sid_display:<24} {status_display:<12}"
+            )
+
+        click.echo(f"\nTotal floating cables: {len(rows)}")
 
     except SystemExit:
         raise
@@ -781,6 +1071,103 @@ def _display_te_delta_ranking(conn) -> None:
 
     except Exception:
         pass  # memory_candidates may not have te_delta column yet
+
+
+def _display_structural_integrity(
+    conn,
+    human_id: str,
+    show_ai: bool,
+) -> None:
+    """Display Structural Integrity metrics after TE in the profile display.
+
+    Shows aggregate integrity score and per-signal-type breakdown.
+    Gracefully skips if structural_events table doesn't exist.
+
+    Args:
+        conn: Open DuckDB connection (read-only).
+        human_id: Human ID or "ai".
+        show_ai: Whether to display AI-specific metrics.
+    """
+    try:
+        is_ai = show_ai or human_id == "ai"
+        subject_filter = "ai" if is_ai else "human"
+
+        # Get per-signal-type breakdown
+        if is_ai:
+            rows = conn.execute(
+                """
+                SELECT signal_type,
+                       COUNT(*) AS total,
+                       SUM(CASE WHEN signal_passed THEN 1 ELSE 0 END) AS passed
+                FROM structural_events
+                WHERE subject = 'ai'
+                  AND assessment_session_id IS NULL
+                GROUP BY signal_type
+                ORDER BY signal_type
+                """,
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                """
+                SELECT se.signal_type,
+                       COUNT(*) AS total,
+                       SUM(CASE WHEN se.signal_passed THEN 1 ELSE 0 END) AS passed
+                FROM structural_events se
+                WHERE se.subject = 'human'
+                  AND se.assessment_session_id IS NULL
+                  AND se.session_id IN (
+                      SELECT DISTINCT session_id
+                      FROM flame_events
+                      WHERE human_id = ?
+                        AND subject = 'human'
+                        AND assessment_session_id IS NULL
+                  )
+                GROUP BY se.signal_type
+                ORDER BY se.signal_type
+                """,
+                [human_id],
+            ).fetchall()
+
+        if not rows:
+            click.echo("\nStructural Integrity: not yet computed")
+            return
+
+        # Build signal type ratios
+        signal_ratios: dict[str, float] = {}
+        total_events = 0
+        for signal_type, total, passed in rows:
+            ratio = passed / total if total > 0 else 0.0
+            signal_ratios[signal_type] = ratio
+            total_events += total
+
+        # Compute overall integrity score from profile function
+        from src.pipeline.ddf.intelligence_profile import (
+            compute_structural_integrity_for_profile,
+        )
+
+        score, event_count = compute_structural_integrity_for_profile(
+            conn, subject=subject_filter,
+            human_id=None if is_ai else human_id,
+        )
+
+        score_display = f"{score:.2f}" if score is not None else "N/A"
+        click.echo(
+            f"\nStructural Integrity:  {score_display}  ({total_events} events)"
+        )
+
+        # Per-signal-type breakdown
+        gravity = signal_ratios.get("gravity_check", 0.0)
+        main_cable = signal_ratios.get("main_cable", 0.0)
+        deps = signal_ratios.get("dependency_sequencing", 0.0)
+        spiral = signal_ratios.get("spiral_reinforcement", 0.0)
+        click.echo(
+            f"  Gravity:  {gravity:.2f}  Main Cable:  {main_cable:.2f}  "
+            f"Deps:  {deps:.2f}  Spiral:  {spiral:.2f}"
+        )
+
+    except Exception:
+        # Graceful fallback: table may not exist on older DBs
+        click.echo("\nStructural Integrity: not yet computed")
 
 
 def _setup_logging() -> None:

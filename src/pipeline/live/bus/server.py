@@ -65,12 +65,17 @@ def create_app(
 
         session_id = body.get("session_id", "")
         run_id = body.get("run_id", session_id)  # fallback for pre-OpenClaw
+        repo = body.get("repo", None)
+        project_dir = body.get("project_dir", None)
+        transcript_path = body.get("transcript_path", None)
 
         try:
             conn.execute(
                 "INSERT OR REPLACE INTO bus_sessions "
-                "(session_id, run_id, registered_at) VALUES (?, ?, ?)",
-                [session_id, run_id, datetime.now(timezone.utc).isoformat()],
+                "(session_id, run_id, registered_at, repo, project_dir, transcript_path) "
+                "VALUES (?, ?, ?, ?, ?, ?)",
+                [session_id, run_id, datetime.now(timezone.utc).isoformat(),
+                 repo, project_dir, transcript_path],
             )
         except Exception:
             pass  # Fail open: DuckDB error does not block session
@@ -79,6 +84,7 @@ def create_app(
             "status": "registered",
             "session_id": session_id,
             "run_id": run_id,
+            "repo": repo,
         })
 
     async def deregister(request: Request) -> JSONResponse:
@@ -86,10 +92,13 @@ def create_app(
         try:
             body = await request.json()
             session_id = body.get("session_id", "")
+            event_count = body.get("event_count", None)
+            outcome = body.get("outcome", None)
             conn.execute(
                 "UPDATE bus_sessions SET status='deregistered', "
-                "last_seen_at=? WHERE session_id=?",
-                [datetime.now(timezone.utc).isoformat(), session_id],
+                "last_seen_at=?, event_count=?, outcome=? WHERE session_id=?",
+                [datetime.now(timezone.utc).isoformat(),
+                 event_count, outcome, session_id],
             )
         except Exception:
             pass  # Fail open
@@ -111,12 +120,23 @@ def create_app(
             return JSONResponse({
                 "constraints": briefing.constraints,
                 "interventions": briefing.interventions,
+                "epistemological_signals": [],
             })
         except Exception:
             return JSONResponse(CheckResponse().model_dump())
+
+    async def push_link(request: Request) -> JSONResponse:
+        """Accept a causal push link (stub -- full handler in Plan 20-03)."""
+        try:
+            body = await request.json()
+            link_id = body.get("link_id", "")
+            return JSONResponse({"status": "accepted", "link_id": link_id})
+        except Exception:
+            return JSONResponse({"status": "accepted", "link_id": ""})
 
     return Starlette(routes=[
         Route("/api/register", register, methods=["POST"]),
         Route("/api/deregister", deregister, methods=["POST"]),
         Route("/api/check", check, methods=["POST"]),
+        Route("/api/push-link", push_link, methods=["POST"]),
     ])

@@ -61,7 +61,11 @@ def client(app):
 
 
 def test_bus_sessions_table_exists(db):
-    """bus_sessions table is created with expected columns."""
+    """bus_sessions table is created with expected columns.
+
+    Includes Phase 20-01 extension columns (repo, project_dir,
+    transcript_path, event_count, outcome) added via ALTER TABLE.
+    """
     cols = db.execute(
         "SELECT column_name FROM information_schema.columns "
         "WHERE table_name='bus_sessions' ORDER BY ordinal_position"
@@ -69,6 +73,7 @@ def test_bus_sessions_table_exists(db):
     col_names = [c[0] for c in cols]
     assert col_names == [
         "session_id", "run_id", "registered_at", "last_seen_at", "status",
+        "repo", "project_dir", "transcript_path", "event_count", "outcome",
     ]
 
 

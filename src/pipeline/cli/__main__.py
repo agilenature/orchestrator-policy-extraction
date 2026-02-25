@@ -25,11 +25,14 @@ Usage:
     python -m src.pipeline.cli intelligence profile <human_id> [options]
     python -m src.pipeline.cli intelligence stagnant [options]
     python -m src.pipeline.cli intelligence memory-review [options]
+    python -m src.pipeline.cli bus start [options]
+    python -m src.pipeline.cli bus status [options]
 """
 
 import click
 
 from src.pipeline.cli.audit import audit_group
+from src.pipeline.cli.bus import bus_group
 from src.pipeline.cli.extract import main as extract_cmd
 from src.pipeline.cli.govern import govern_group
 from src.pipeline.cli.intelligence import intelligence_group
@@ -53,6 +56,7 @@ cli.add_command(wisdom_group, name="wisdom")
 cli.add_command(govern_group, name="govern")
 cli.add_command(review_group, name="review")
 cli.add_command(intelligence_group, name="intelligence")
+cli.add_command(bus_group, name="bus")
 
 if __name__ == "__main__":
     cli()

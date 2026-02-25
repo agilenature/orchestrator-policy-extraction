@@ -28,6 +28,10 @@ END_TRIGGER_TYPES = frozenset({"X_PROPOSE", "T_TEST", "T_RISKY", "T_GIT_COMMIT"}
 # Start triggers
 START_TRIGGER_TYPES = frozenset({"O_DIR", "O_GATE", "O_CORR", "O_AXS"})
 
+# Mid-episode types that NEVER trigger state transitions (Phase 14 locked decision).
+# X_ASK is structurally mid-episode: a question within an episode, never a boundary.
+MID_EPISODE_TYPES = frozenset({"X_ASK"})
+
 # TTL: 30 minutes
 SESSION_TTL_MINUTES = 30
 
@@ -57,6 +61,10 @@ class SessionStateMachine:
             reached -- flush episode_level signals now.
         """
         now = now or datetime.now(timezone.utc)
+
+        # Mid-episode types never trigger any state transition in any state
+        if event_type in MID_EPISODE_TYPES:
+            return self.state, False
 
         if self.state == SessionState.ACTIVE:
             if event_type in END_TRIGGER_TYPES:

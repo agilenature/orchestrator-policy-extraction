@@ -14,6 +14,7 @@ from .signals import (
 )
 from .state_machine import (
     END_TRIGGER_TYPES,
+    MID_EPISODE_TYPES,
     START_TRIGGER_TYPES,
     SessionState,
     SessionStateMachine,
@@ -24,6 +25,7 @@ __all__ = [
     "SessionState",
     "END_TRIGGER_TYPES",
     "START_TRIGGER_TYPES",
+    "MID_EPISODE_TYPES",
     "classify_boundary_dependency",
     "EVENT_LEVEL_SIGNAL_TYPES",
     "EPISODE_LEVEL_SIGNAL_TYPES",

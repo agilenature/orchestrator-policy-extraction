@@ -5,14 +5,21 @@ table. The IntelligenceProfile is the measurement surface that makes the
 DDF observable -- it aggregates flame_events into meaningful metrics for
 display in the CLI (Plan 06).
 
+Phase 18 extension: integrity_score and structural_event_count from
+structural_events, completing the three-dimensional profile:
+Ignition (flame metrics) x Transport (TE) x Integrity (structural score).
+
 Exports:
     compute_intelligence_profile
     compute_ai_profile
     compute_spiral_depth_for_human
+    compute_structural_integrity_for_profile
     list_available_humans
 """
 
 from __future__ import annotations
+
+from typing import Optional
 
 import duckdb
 
@@ -128,6 +135,86 @@ def _compute_ai_spiral_depth(conn: duckdb.DuckDBPyConnection) -> int:
     return max_depth
 
 
+def compute_structural_integrity_for_profile(
+    conn: duckdb.DuckDBPyConnection,
+    subject: str,
+    human_id: Optional[str] = None,
+) -> tuple[Optional[float], int]:
+    """Compute aggregate structural integrity for a subject's profile.
+
+    Queries structural_events for production sessions (assessment_session_id
+    IS NULL) belonging to the given subject, then delegates to
+    compute_structural_integrity per-session and averages.
+
+    Falls back gracefully when the structural_events table does not exist
+    (older DBs without Phase 18 schema).
+
+    Args:
+        conn: DuckDB connection with structural_events table (optional).
+        subject: 'human' or 'ai'.
+        human_id: Human identifier (used to find sessions). Ignored for AI.
+
+    Returns:
+        Tuple of (avg_integrity_score, total_structural_event_count).
+        Returns (None, 0) when no structural data exists.
+    """
+    try:
+        from src.pipeline.ddf.structural.computer import compute_structural_integrity
+
+        # Find distinct sessions for this subject from structural_events
+        if subject == "ai":
+            session_rows = conn.execute(
+                """
+                SELECT DISTINCT session_id
+                FROM structural_events
+                WHERE subject = 'ai'
+                  AND assessment_session_id IS NULL
+                """,
+            ).fetchall()
+        else:
+            # Join through flame_events to find sessions for this human_id
+            session_rows = conn.execute(
+                """
+                SELECT DISTINCT se.session_id
+                FROM structural_events se
+                WHERE se.subject = 'human'
+                  AND se.assessment_session_id IS NULL
+                  AND se.session_id IN (
+                      SELECT DISTINCT session_id
+                      FROM flame_events
+                      WHERE human_id = ?
+                        AND subject = 'human'
+                        AND assessment_session_id IS NULL
+                  )
+                """,
+                [human_id],
+            ).fetchall()
+
+        if not session_rows:
+            return None, 0
+
+        total_score = 0.0
+        total_events = 0
+        session_count = 0
+
+        for (sid,) in session_rows:
+            result = compute_structural_integrity(conn, sid, subject)
+            if result.structural_event_count > 0:
+                total_score += result.integrity_score
+                total_events += result.structural_event_count
+                session_count += 1
+
+        if session_count == 0:
+            return None, 0
+
+        avg_score = round(total_score / session_count, 4)
+        return avg_score, total_events
+
+    except Exception:
+        # structural_events table may not exist in older DBs
+        return None, 0
+
+
 def compute_intelligence_profile(
     conn: duckdb.DuckDBPyConnection, human_id: str
 ) -> IntelligenceProfile | None:
@@ -170,6 +257,11 @@ def compute_intelligence_profile(
 
     spiral_depth = compute_spiral_depth_for_human(conn, human_id)
 
+    # Phase 18: structural integrity (three-dimensional profile)
+    integrity_score, structural_count = compute_structural_integrity_for_profile(
+        conn, subject="human", human_id=human_id,
+    )
+
     return IntelligenceProfile(
         human_id=row[0],
         subject="human",
@@ -179,6 +271,8 @@ def compute_intelligence_profile(
         spiral_depth=spiral_depth,
         flood_rate=round(float(row[4]), 4),
         session_count=row[5],
+        integrity_score=integrity_score,
+        structural_event_count=structural_count,
     )
 
 
@@ -218,6 +312,11 @@ def compute_ai_profile(
 
     spiral_depth = _compute_ai_spiral_depth(conn)
 
+    # Phase 18: structural integrity (three-dimensional profile)
+    integrity_score, structural_count = compute_structural_integrity_for_profile(
+        conn, subject="ai",
+    )
+
     return IntelligenceProfile(
         human_id="ai",
         subject="ai",
@@ -227,6 +326,8 @@ def compute_ai_profile(
         spiral_depth=spiral_depth,
         flood_rate=round(float(row[3]), 4),
         session_count=row[4],
+        integrity_score=integrity_score,
+        structural_event_count=structural_count,
     )
 
 

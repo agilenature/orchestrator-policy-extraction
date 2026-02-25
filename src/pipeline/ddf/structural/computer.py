@@ -20,6 +20,7 @@ from __future__ import annotations
 from typing import Optional
 
 import duckdb
+from loguru import logger
 
 from src.pipeline.ddf.structural.models import StructuralIntegrityResult
 from src.pipeline.models.config import DDFConfig
@@ -118,3 +119,72 @@ def compute_structural_integrity(
         spiral_capped=round(spiral_capped, 4),
         structural_event_count=total_event_count,
     )
+
+
+def backfill_structural_integrity(
+    conn: duckdb.DuckDBPyConnection,
+) -> dict[str, int]:
+    """Backfill structural_events for sessions that have flame_events but no structural data.
+
+    Finds all sessions where flame_events rows exist but structural_events rows are
+    absent. For each, runs the full Step 21 block: detect → write → op8 deposit.
+    All writes use INSERT OR REPLACE, so re-running is safe.
+
+    Args:
+        conn: DuckDB connection to data/ope.db (must be read-write).
+
+    Returns:
+        Dict with keys:
+            sessions_processed: number of sessions that ran through detection
+            events_written: total structural_events rows written
+            op8_deposits: total Op-8 corrections deposited to memory_candidates
+    """
+    from src.pipeline.ddf.structural.schema import create_structural_schema
+    from src.pipeline.ddf.structural.detectors import detect_structural_signals
+    from src.pipeline.ddf.structural.writer import write_structural_events
+    from src.pipeline.ddf.structural.op8 import deposit_op8_corrections
+
+    # Ensure schema exists (idempotent)
+    create_structural_schema(conn)
+
+    # Sessions with flame_events but no structural_events
+    candidate_sessions = conn.execute(
+        """
+        SELECT DISTINCT f.session_id
+        FROM flame_events f
+        LEFT JOIN structural_events se ON f.session_id = se.session_id
+        WHERE se.session_id IS NULL
+        ORDER BY f.session_id
+        """
+    ).fetchall()
+
+    session_ids = [row[0] for row in candidate_sessions]
+    logger.info(
+        "backfill_structural_integrity: {} sessions to process",
+        len(session_ids),
+    )
+
+    total_events = 0
+    total_op8 = 0
+
+    for session_id in session_ids:
+        events = detect_structural_signals(conn, session_id)
+        written = write_structural_events(conn, events)
+        op8 = deposit_op8_corrections(conn, session_id)
+        total_events += written
+        total_op8 += op8
+        if written > 0 or op8 > 0:
+            logger.info(
+                "  {}: {} structural events, {} op8 deposits",
+                session_id,
+                written,
+                op8,
+            )
+
+    result = {
+        "sessions_processed": len(session_ids),
+        "events_written": total_events,
+        "op8_deposits": total_op8,
+    }
+    logger.info("backfill_structural_integrity complete: {}", result)
+    return result

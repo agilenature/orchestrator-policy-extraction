@@ -19,7 +19,10 @@ from src.pipeline.ddf.structural.models import (
     StructuralIntegrityResult,
 )
 from src.pipeline.ddf.structural.detectors import detect_structural_signals
-from src.pipeline.ddf.structural.computer import compute_structural_integrity
+from src.pipeline.ddf.structural.computer import (
+    compute_structural_integrity,
+    backfill_structural_integrity,
+)
 from src.pipeline.ddf.structural.op8 import deposit_op8_corrections
 
 __all__ = [
@@ -27,5 +30,6 @@ __all__ = [
     "StructuralIntegrityResult",
     "detect_structural_signals",
     "compute_structural_integrity",
+    "backfill_structural_integrity",
     "deposit_op8_corrections",
 ]

@@ -385,6 +385,31 @@ Plans:
 - [x] 17-03-PLAN.md — Session Runner + Observer + Rejection Detector (Wave 3)
 - [x] 17-04-PLAN.md — Report Generator + Terminal Deposit (Wave 4)
 
+### Phase 19: Control Plane Integration
+
+**Goal**: Build the OPE Governance Bus (Unix socket server + stream processor + governing daemon) and wire it to the PAG hook — transforming OPE from a post-hoc analyzer into a prospective governor. Establish OPE's structural position in the SEMF three-plane architecture by resolving two active CCD violations: `run-id-dissolves-repo-boundary` (every session is currently an epistemological island with no cross-repo causal chain) and `identity-firewall × bootstrap-circularity` (Claude's builder-role and operator-role must be structurally separated by OpenClaw's Control Plane to prevent the governance system from validating its own constraints).
+**Depends on**: Phase 18 (Bridge-Warden complete; DDF pipeline fully operational); Phase 14 (bus architecture designed, transport locked: Unix socket + uvicorn/starlette at p99 1.6ms)
+**Governing violations resolved**: `run-id-dissolves-repo-boundary` + `identity-firewall` × `bootstrap-circularity`
+**Requirements**: LIVE-01 (PreToolUse constraint delivery), LIVE-03 (stream processor), LIVE-04 (inter-session bus), LIVE-05 (governing daemon); run_id injection contract; builder/operator boundary documentation
+**Success Criteria** (what must be TRUE):
+  1. OPE Governance Bus server runs on Unix socket `/tmp/ope-governance-bus.sock`; sessions call `/api/register` (announce themselves with `run_id`) and `/api/check` (receive constraint briefings); no session endpoint writes constraints
+  2. Stream processor tails live session JSONL files; event_level signals (escalation, policy_violation) fire immediately; episode_level signals (amnesia) buffer until CONFIRMED_END; X_ASK never triggers state transitions (Phase 14 locked decision)
+  3. PAG hook extended to call `/api/check` on the bus; fails open when bus unavailable (exit 0, no blocking)
+  4. SessionStart hook calls `/api/register` and writes constraint briefing to stdout (user-visible channel, per Phase 14 locked decision)
+  5. Two sessions sharing the same `OPE_RUN_ID` both appear in `bus_sessions` table under that `run_id`; OPE's DuckDB can join `bus_sessions` with `episodes` by `run_id` to reconstruct cross-session causal chain
+  6. Builder/operator boundary documented in `docs/architecture/BUILDER-OPERATOR-BOUNDARY.md`: `OPE_RUN_ID` injection mechanism, bus read-channel enforcement, Skills Pack authorship protocol (deferred to post-OpenClaw-installation)
+  7. PROGRAM-SEQUENCE.md updated: OPE Phases 13.3–18 marked complete, Phase 19 entry added with wave structure and cross-project dependency on MT bus registration
+**Plans:** 5 plans in 3 waves
+
+Plans:
+- [x] 19-01-PLAN.md — Bus Foundation: DuckDB schema + Starlette server + /api/register /api/deregister /api/check (stub) (Wave 1)
+- [x] 19-02-PLAN.md — Stream Processor: JSONL tail + TENTATIVE_END/CONFIRMED_END state machine + event_level/episode_level routing (Wave 1)
+- [x] 19-03-PLAN.md — Governing Daemon: constraint briefing generation + /api/check full implementation (Wave 2)
+- [x] 19-04-PLAN.md — PAG Hook → Bus + SessionStart Hook: /api/check call + run_id extraction + fail-open + settings.local.json (Wave 2)
+- [x] 19-05-PLAN.md — Integration + Boundary Documentation: cross-session tests + BUILDER-OPERATOR-BOUNDARY.md + PROGRAM-SEQUENCE.md + bus CLI (Wave 3)
+
+---
+
 ### Phase 18: Bridge-Warden Structural Integrity Detection
 
 **Goal**: Implement the Suspension Bridge dimension of the DDF — detecting not whether the human or AI is ascending to abstraction (Phase 15) but whether the knowledge structure being built is structurally sound. The human dimension measures structural reasoning quality. The AI dimension is the self-correction mechanism: floating cables detected in the AI's own reasoning become correction candidates in the `memory_candidates` pipeline, actively changing what the AI will assert in the next session — not just flagging the weakness but closing the loop on it. Together with Phases 15-16, this produces a three-dimensional picture: Ignition (upward) x Integrity (downward) x Transport (the mechanism connecting them).
@@ -410,7 +435,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.3 -> 14 -> 14.1 -> 15 -> 16 -> 16.1 -> 17 -> 18
+Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.3 -> 14 -> 14.1 -> 15 -> 16 -> 16.1 -> 17 -> 18 -> 19
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -437,3 +462,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 16.1. Topological Edge-Generation [INSERTED] | 4/4 | ✓ Complete | 2026-02-24 |
 | 17. Candidate Assessment System | 4/4 | ✓ Complete | 2026-02-24 |
 | 18. Bridge-Warden Structural Integrity Detection | 5/5 | ✓ Complete | 2026-02-25 |
+| 19. Control Plane Integration | 0/5 | ○ Planned | — |

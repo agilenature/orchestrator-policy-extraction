@@ -691,7 +691,7 @@ class TestAdditionalContextFormat:
         assert isinstance(response["hookSpecificOutput"]["additionalContext"], str)
 
     def test_no_warnings_no_output(self, monkeypatch, tmp_path):
-        """When no warnings, stdout should be empty."""
+        """When no warnings, stdout has no warning text (may include ope_constraint_count JSON)."""
         transcript = tmp_path / "session.jsonl"
 
         # Create a transcript with a validated (not UNVALIDATED) premise
@@ -724,7 +724,11 @@ class TestAdditionalContextFormat:
         with pytest.raises(SystemExit) as exc_info:
             main()
         assert exc_info.value.code == 0
-        assert captured.getvalue() == ""
+        # Phase 19: hook now injects ope_constraint_count into JSON output.
+        # Verify no warning text in output; JSON metadata is acceptable.
+        output = captured.getvalue()
+        assert "UNVALIDATED" not in output
+        assert "WARNING" not in output
 
 
 class TestNeverBlocks:

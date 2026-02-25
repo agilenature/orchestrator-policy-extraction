@@ -6,14 +6,14 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 20 (Causal Chain Completion) — In progress. 4/5 plans done. Wave 2 Plan 03 complete.
+**Current focus:** Phase 20 (Causal Chain Completion) — In progress. 4/5 plans done. Wave 2 Plans 03+04 complete.
 
 ## Current Position
 
 Phase: 20 (Causal Chain Completion) — In progress
-Plan: 4 of 5 in current phase (Wave 2: Plan 03 complete)
+Plan: 4 of 5 in current phase (Wave 2: Plans 03+04 complete)
 Status: In progress
-Last activity: 2026-02-25 -- Completed 20-03-PLAN.md (full /api/push-link handler with DuckDB persistence + 10 tests)
+Last activity: 2026-02-25 -- Completed 20-04-PLAN.md (repo-scoped constraint filtering in GovernorDaemon + /api/check wiring)
 
 Progress: [████████████████████████░░░░░░░░░] 80% (4/5 plans in phase 20)
 Overall:  [██████████████████████████████████████████████████████████████████████████████████░] 85/86 plans total
@@ -53,11 +53,11 @@ Overall:  [███████████████████████
 
 | 19-control-plane-integration | 5/5 | 24 min | 4.8 min |
 
-| 20-causal-chain-completion | 4/5 | 12 min | 3.0 min |
+| 20-causal-chain-completion | 4/5 | 14 min | 3.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min, 7 min, 2 min, 4 min, 3 min
-- Trend: Phase 20 in progress. Wave 2 Plan 03 complete. Plan 04 parallel. Plan 05 next.
+- Last 5 plans: 7 min, 2 min, 4 min, 3 min, 2 min
+- Trend: Phase 20 in progress. Wave 2 Plans 03+04 complete. Plan 05 (Wave 3) next.
 
 *Updated after each plan completion*
 
@@ -466,6 +466,9 @@ Recent decisions affecting current work:
 - Plan 20-03: Deterministic link_id: SHA-256[:16] of 'link:{parent}:{child}:{trigger}' for idempotent re-pushes
 - Plan 20-03: push_link fails open on DuckDB write errors (200 with warning), but returns 400 for missing required fields (validation is NOT fail-open)
 - Plan 20-03: duckdb.connect(db_path) without read_only=True for test verification (DuckDB disallows mixed read_only/read_write)
+- Plan 20-04: repo_scope convention: list[str] on constraint dicts; absent/None/[] = universal (delivered to all), non-empty = scoped to matching repos only
+- Plan 20-04: _filter_by_repo as @staticmethod (pure function, no daemon instance state)
+- Plan 20-04: Backward compatible: repo=None skips filtering entirely; existing callers unaffected
 
 ### Pending Todos
 
@@ -632,7 +635,7 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Phase 20, Plan 03 complete. Plans 01-04 delivered (schema + BUS_REGISTRATION_FAILED + push-link handler + 10 tests).
+Stopped at: Phase 20, Plan 04 complete. Plans 01-04 delivered (schema + BUS_REGISTRATION_FAILED + push-link handler + repo-scoped constraint filtering).
 Next action: Phase 20 Plan 05 (backward traversal query) -- Wave 3.
 Resume file: .planning/phases/20-causal-chain-completion/20-05-PLAN.md
 

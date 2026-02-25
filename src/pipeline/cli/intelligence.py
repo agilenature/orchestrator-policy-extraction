@@ -617,14 +617,14 @@ def bridge_floating_cables(human_id: str, db: str) -> None:
         conn = duckdb.connect(db, read_only=True)
 
         # Query AI floating cables (main_cable failures)
+        # Extract axis from contributing flame_event_ids since
+        # op8_correction_candidate_id may not be populated on the
+        # structural_events row.
         rows = conn.execute(
             """
             SELECT se.session_id, se.evidence,
-                   se.op8_correction_candidate_id,
-                   mc.ccd_axis, mc.status AS mc_status
+                   se.contributing_flame_event_ids
             FROM structural_events se
-            LEFT JOIN memory_candidates mc
-                ON se.op8_correction_candidate_id = mc.id
             WHERE se.signal_type = 'main_cable'
               AND se.signal_passed = false
               AND se.subject = 'ai'
@@ -633,11 +633,40 @@ def bridge_floating_cables(human_id: str, db: str) -> None:
             """,
         ).fetchall()
 
-        conn.close()
-
         if not rows:
             click.echo("No AI floating cables found.")
+            conn.close()
             sys.exit(0)
+
+        # Resolve axes from contributing flame_events and check mc status
+        display_rows: list[tuple[str, str, str]] = []
+        for session_id, evidence, contributing_ids in rows:
+            axis = None
+            if contributing_ids and len(contributing_ids) > 0:
+                fe_id = contributing_ids[0]
+                axis_row = conn.execute(
+                    "SELECT COALESCE(ccd_axis, axis_identified) "
+                    "FROM flame_events WHERE flame_event_id = ?",
+                    [fe_id],
+                ).fetchone()
+                if axis_row:
+                    axis = axis_row[0]
+
+            # Check if an op8_correction memory_candidate exists for this axis
+            mc_status = "not deposited"
+            if axis:
+                mc_row = conn.execute(
+                    "SELECT status FROM memory_candidates "
+                    "WHERE source_type = 'op8_correction' AND ccd_axis = ? "
+                    "LIMIT 1",
+                    [axis],
+                ).fetchone()
+                if mc_row:
+                    mc_status = mc_row[0]
+
+            display_rows.append((axis or "(no axis)", session_id, mc_status))
+
+        conn.close()
 
         click.echo("AI Floating Cables (Main Cable Failures)")
         click.echo("=" * 70)
@@ -646,8 +675,7 @@ def bridge_floating_cables(human_id: str, db: str) -> None:
         )
         click.echo("-" * 70)
 
-        for session_id, evidence, op8_id, ccd_axis, mc_status in rows:
-            axis_display = ccd_axis or "(no axis)"
+        for axis_display, session_id, status_display in display_rows:
             if len(axis_display) > 28:
                 axis_display = axis_display[:26] + ".."
             sid_display = (
@@ -655,7 +683,6 @@ def bridge_floating_cables(human_id: str, db: str) -> None:
                 if len(session_id) > 24
                 else session_id
             )
-            status_display = mc_status or "not deposited"
             click.echo(
                 f"{axis_display:<30} {sid_display:<24} {status_display:<12}"
             )

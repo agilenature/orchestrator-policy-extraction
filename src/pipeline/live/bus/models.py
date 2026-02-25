@@ -50,11 +50,26 @@ class CheckRequest(BaseModel):
     premise_data: dict[str, Any] = {}
 
 
+class PushLink(BaseModel, frozen=True):
+    """A causal push link between two decision artifacts across repo boundaries."""
+
+    link_id: str
+    parent_decision_id: str
+    child_decision_id: str
+    transition_trigger: str
+    repo_boundary: str | None = None
+    migration_run_id: str
+    captured_at: str = ""  # ISO timestamp, set by server
+
+
 class CheckResponse(BaseModel):
     """Response body for POST /api/check.
 
     Empty lists are the fail-open default: no constraints, no interventions.
+    epistemological_signals is the stub for Gap 6 -- field exists in the
+    response schema, enabling post-OpenClaw activation without schema change.
     """
 
     constraints: list[dict[str, Any]] = []
     interventions: list[dict[str, Any]] = []
+    epistemological_signals: list[dict[str, Any]] = []

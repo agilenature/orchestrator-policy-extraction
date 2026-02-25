@@ -32,8 +32,41 @@ CREATE TABLE IF NOT EXISTS governance_signals (
 )
 """
 
+# -- Phase 20-01: bus_sessions extension columns --------------------------
+
+_BUS_SESSIONS_EXTENSIONS = [
+    "ALTER TABLE bus_sessions ADD COLUMN IF NOT EXISTS repo VARCHAR",
+    "ALTER TABLE bus_sessions ADD COLUMN IF NOT EXISTS project_dir VARCHAR",
+    "ALTER TABLE bus_sessions ADD COLUMN IF NOT EXISTS transcript_path VARCHAR",
+    "ALTER TABLE bus_sessions ADD COLUMN IF NOT EXISTS event_count INTEGER",
+    "ALTER TABLE bus_sessions ADD COLUMN IF NOT EXISTS outcome VARCHAR",
+]
+
+
+def _alter_bus_sessions(conn: duckdb.DuckDBPyConnection) -> None:
+    """Add new columns to bus_sessions idempotently."""
+    for ddl in _BUS_SESSIONS_EXTENSIONS:
+        conn.execute(ddl)
+
+
+# -- Phase 20-01: push_links table ---------------------------------------
+
+PUSH_LINKS_DDL = """
+CREATE TABLE IF NOT EXISTS push_links (
+    link_id               VARCHAR PRIMARY KEY,
+    parent_decision_id    VARCHAR NOT NULL,
+    child_decision_id     VARCHAR NOT NULL,
+    transition_trigger    VARCHAR NOT NULL,
+    repo_boundary         VARCHAR,
+    migration_run_id      VARCHAR NOT NULL,
+    captured_at           TIMESTAMPTZ NOT NULL DEFAULT now()
+)
+"""
+
 
 def create_bus_schema(conn: duckdb.DuckDBPyConnection) -> None:
     """Create bus tables idempotently. Safe to call on every startup."""
     conn.execute(BUS_SESSIONS_DDL)
     conn.execute(GOVERNANCE_SIGNALS_DDL)
+    _alter_bus_sessions(conn)
+    conn.execute(PUSH_LINKS_DDL)

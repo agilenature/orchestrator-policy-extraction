@@ -288,12 +288,26 @@ class ScenarioGenerator:
         )
 
     def _build_handicap(
-        self, title: str, description: str, entity_type: str
+        self,
+        title: str,
+        description: str,
+        entity_type: str,
+        floating_cable_context: str | None = None,
     ) -> str:
         """Build plausible-but-wrong CLAUDE.md handicap for L5-L7 scenarios.
 
         Creates a surface-level analysis that points to the wrong root cause,
         designed to test whether the candidate can resist the framing.
+
+        Args:
+            title: Scenario title.
+            description: Scenario description.
+            entity_type: Entity type from project_wisdom.
+            floating_cable_context: Optional floating-cable awareness text.
+                When provided, appends an AI Analysis Notes section.
+
+        Returns:
+            Handicap markdown string.
         """
         # Generate plausible-but-wrong analysis components
         wrong_component = "configuration handling"
@@ -309,13 +323,23 @@ class ScenarioGenerator:
         )
         wrong_focus = "initialization and configuration code paths"
 
-        return _HANDICAP_TEMPLATE.format(
+        handicap = _HANDICAP_TEMPLATE.format(
             wrong_component=wrong_component,
             wrong_framing=wrong_framing,
             wrong_cause=wrong_cause,
             wrong_fix=wrong_fix,
             wrong_focus=wrong_focus,
         )
+
+        if floating_cable_context:
+            handicap += textwrap.dedent(f"""\
+
+            ### AI Analysis Notes
+
+            {floating_cable_context}
+            """)
+
+        return handicap
 
 
 def generate_scenario(

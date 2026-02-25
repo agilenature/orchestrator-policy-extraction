@@ -398,13 +398,14 @@ Plans:
   4. `StructuralIntegrityScore` computed per session for both human and AI — ratio of grounded abstractions, load-bearing principles, respected hierarchical sequences, and spiral reinforcement events
   5. **Three-dimensional IntelligenceProfile**: Ignition axis (Phase 15 FlameEvents) x Transport axis (Phase 16 TransportEfficiency) x Integrity axis (Phase 18 StructuralEvents) — the complete characterization of how a human-AI system thinks together
   6. Phase 17 assessment scenarios extended with structural integrity dimension: candidates assessed not just for CCD identification (upward) but for whether they ground abstractions, string load-bearing principles, and respect dependencies (downward) — and whether they notice when the AI's principles are floating cables
-**Plans:** 4 plans in 3 waves
+**Plans:** 5 plans in 4 waves
 
 Plans:
 - [x] 18-01-PLAN.md — Schema + models + StructuralConfig + IntelligenceProfile extension + writer (Wave 1)
 - [x] 18-02-PLAN.md — Four signal detectors + StructuralIntegrityComputer + Op-8 depositor + pipeline Step 21 (Wave 2)
 - [x] 18-03-PLAN.md — Integration tests for BRIDGE-01 through BRIDGE-03 (Wave 2)
 - [x] 18-04-PLAN.md — 3D IntelligenceProfile extension + CLI bridge subcommand (Wave 3)
+- [ ] 18-05-PLAN.md — Gap closure: Assessment pipeline structural integrity integration (Wave 4)
 
 ## Progress
 
@@ -435,4 +436,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 16. Sacred Fire Intelligence System | 4/4 | ✓ Complete | 2026-02-24 |
 | 16.1. Topological Edge-Generation [INSERTED] | 4/4 | ✓ Complete | 2026-02-24 |
 | 17. Candidate Assessment System | 4/4 | ✓ Complete | 2026-02-24 |
-| 18. Bridge-Warden Structural Integrity Detection | 4/4 | ✓ Complete | 2026-02-24 |
+| 18. Bridge-Warden Structural Integrity Detection | 4/5 | Gap closure pending | — |

@@ -1,5 +1,7 @@
-"""Live session hook modules for real-time governance.
+"""Live session governance package (Phase 19).
 
-Provides PreToolUse hooks that intercept Claude Code tool calls
-and perform real-time validation, premise checking, and governance.
+Subpackages:
+    hooks  — PreToolUse hooks for real-time validation and premise checking.
+    bus    — Governance Bus: DuckDB-backed session registration, signal
+             routing, and constraint delivery over Unix socket.
 """

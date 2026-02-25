@@ -401,10 +401,10 @@ Plans:
 **Plans:** 4 plans in 3 waves
 
 Plans:
-- [ ] 18-01-PLAN.md — Schema + models + StructuralConfig + IntelligenceProfile extension + writer (Wave 1)
-- [ ] 18-02-PLAN.md — Four signal detectors + StructuralIntegrityComputer + Op-8 depositor + pipeline Step 21 (Wave 2)
-- [ ] 18-03-PLAN.md — Integration tests for BRIDGE-01 through BRIDGE-03 (Wave 2)
-- [ ] 18-04-PLAN.md — 3D IntelligenceProfile extension + CLI bridge subcommand (Wave 3)
+- [x] 18-01-PLAN.md — Schema + models + StructuralConfig + IntelligenceProfile extension + writer (Wave 1)
+- [x] 18-02-PLAN.md — Four signal detectors + StructuralIntegrityComputer + Op-8 depositor + pipeline Step 21 (Wave 2)
+- [x] 18-03-PLAN.md — Integration tests for BRIDGE-01 through BRIDGE-03 (Wave 2)
+- [x] 18-04-PLAN.md — 3D IntelligenceProfile extension + CLI bridge subcommand (Wave 3)
 
 ## Progress
 
@@ -435,4 +435,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 16. Sacred Fire Intelligence System | 4/4 | ✓ Complete | 2026-02-24 |
 | 16.1. Topological Edge-Generation [INSERTED] | 4/4 | ✓ Complete | 2026-02-24 |
 | 17. Candidate Assessment System | 4/4 | ✓ Complete | 2026-02-24 |
-| 18. Bridge-Warden Structural Integrity Detection | 0/4 | ⬜ Planning | — |
+| 18. Bridge-Warden Structural Integrity Detection | 4/4 | ✓ Complete | 2026-02-24 |

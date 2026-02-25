@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 18 (Bridge-Warden Structural Integrity Detection) — in progress. Plans 01-03 complete.
+**Current focus:** Phase 18 (Bridge-Warden Structural Integrity Detection) — COMPLETE. All 4/4 plans done. Project complete.
 
 ## Current Position
 
 Phase: 18 (Bridge-Warden Structural Integrity Detection)
-Plan: 3 of ~4 in current phase
-Status: In progress
-Last activity: 2026-02-25 -- Completed 18-03-PLAN.md (integration tests for BRIDGE-01 through BRIDGE-03)
+Plan: 4 of 4 in current phase
+Status: COMPLETE -- all phases finished
+Last activity: 2026-02-25 -- Completed 18-04-PLAN.md (three-dimensional IntelligenceProfile extension + CLI bridge subgroup)
 
-Progress: [████████████████████████░░░░░░░░] 75% (3/4 plans in phase 18)
-Overall:  [███████████████████████████████████████████████████████████████████████████░] 74/75 plans total
+Progress: [████████████████████████████████] 100% (4/4 plans in phase 18)
+Overall:  [████████████████████████████████████████████████████████████████████████████] 75/75 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 74
+- Total plans completed: 75
 - Average duration: 5.5 min
-- Total execution time: 7.58 hours
+- Total execution time: 7.73 hours
 
 **By Phase:**
 
@@ -49,11 +49,11 @@ Overall:  [███████████████████████
 | 16-sacred-fire-intelligence-system | 4 | 18 min | 4.5 min |
 
 | 17-candidate-assessment-system | 4 | 41 min | 10.3 min |
-| 18-bridge-warden-structural-integrity | 3/4 | 19 min | 6.3 min |
+| 18-bridge-warden-structural-integrity | 4/4 | 28 min | 7.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 12 min, 11 min, 4 min, 11 min, 4 min
-- Trend: steady execution pace
+- Last 5 plans: 11 min, 4 min, 11 min, 4 min, 9 min
+- Trend: steady execution pace, project complete
 
 *Updated after each plan completion*
 
@@ -436,6 +436,9 @@ Recent decisions affecting current work:
 - Plan 18-03: Assessment isolation test verifies assessment_session_id IS NULL filtering through evidence string inspection
 - Plan 18-03: End-to-end chain test: mixed grounded + floating events -> detect -> write -> compute -> deposit -> verify memory_candidates
 - Plan 18-03: 1663 tests passing (1645 baseline + 18 new integration tests, excluding pre-existing segmenter failure)
+- Plan 18-04: Structural integrity aggregated per-session then averaged (compute_structural_integrity is per-session API)
+- Plan 18-04: floating-cables CLI extracts axis from contributing_flame_event_ids (op8.py does not back-populate structural_events.op8_correction_candidate_id)
+- Plan 18-04: 1649 tests passing (1637 baseline + 12 new profile/CLI tests, excluding pre-existing segmenter failure)
 
 ### Pending Todos
 
@@ -602,8 +605,8 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Phase 18 Plan 03 complete. Integration tests for BRIDGE-01, BRIDGE-02, BRIDGE-03.
-Resume file: .planning/phases/18-bridge-warden-structural-integrity/18-04-PLAN.md
+Stopped at: Phase 18 Plan 04 complete. All phases complete. Project finished.
+Resume file: N/A -- project complete (75/75 plans executed)
 
 ## Phase 15 Completion Summary
 
@@ -703,3 +706,19 @@ Phase 17 delivered the Candidate Assessment System (all 4 plans):
 - **Production isolation**: assessment_session_id IS NULL filter on all 5 IntelligenceProfile queries
 - **Key modules**: src/pipeline/assessment/ (schema.py, models.py, scenario_generator.py, session_runner.py, observer.py, rejection_detector.py, te_assessment.py, reporter.py), src/pipeline/cli/assess.py
 - **CLI**: `python -m src.pipeline.cli intelligence assess annotate-scenarios|list-scenarios|run|calibrate|report`
+
+## Phase 18 Completion Summary
+
+Phase 18 delivered Bridge-Warden Structural Integrity Detection (all 4 plans):
+- **Plan 01 COMPLETE**: structural_events DuckDB schema (3 indexes), StructuralEvent/StructuralIntegrityResult Pydantic models, StructuralConfig with locked formula weights, IntelligenceProfile extended with integrity_score/structural_event_count, write_structural_events, 14 tests
+- **Plan 02 COMPLETE**: Four signal detectors (gravity_check, main_cable, dependency_sequencing, spiral_reinforcement), compute_structural_integrity (weighted formula), deposit_op8_corrections (AI floating cables -> memory_candidates), Pipeline Step 21, 26 tests
+- **Plan 03 COMPLETE**: 18 integration tests covering BRIDGE-01 (signal recording), BRIDGE-02 (score computation), BRIDGE-03 (Op-8 deposit), assessment isolation, end-to-end chain
+- **Plan 04 COMPLETE**: compute_structural_integrity_for_profile() aggregate scoring, CLI bridge subgroup (stats/list/floating-cables), profile Structural Integrity row, 12 tests
+- **1649 tests** passing (1637 baseline + 12 new Plan 04 tests, excluding pre-existing segmenter failure)
+- **BRIDGE-01 verified**: structural_events records all four signal types per session for both subjects
+- **BRIDGE-02 verified**: StructuralIntegrityScore computed per session with neutral fallback (0.5 for empty denominators)
+- **BRIDGE-03 verified**: Op-8 fires on AI floating main cables and deposits correction candidates to memory_candidates
+- **BRIDGE-04 verified**: Three-dimensional IntelligenceProfile visible (Ignition x Transport x Integrity)
+- **Key modules**: src/pipeline/ddf/structural/ (models.py, schema.py, detectors.py, computer.py, writer.py, op8.py), src/pipeline/ddf/intelligence_profile.py, src/pipeline/cli/intelligence.py
+- **CLI**: `python -m src.pipeline.cli intelligence bridge stats|list|floating-cables`
+- **Project milestone**: Phase 18 is the final phase. All 75 plans across 18 phases (+ sub-phases) complete.

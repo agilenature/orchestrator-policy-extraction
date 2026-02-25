@@ -6,22 +6,22 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 19 (Control Plane Integration) — IN PROGRESS. 2/5 plans complete. Wave 1 complete. Wave 2 next (Plans 03+04 parallel).
+**Current focus:** Phase 19 (Control Plane Integration) — IN PROGRESS. 3/5 plans complete. Wave 1 complete. Wave 2 in progress (Plan 04 done, Plan 03 pending). Wave 3: Plan 05.
 
 ## Current Position
 
 Phase: 19 (Control Plane Integration)
-Plan: 2 of 5 in current phase (Wave 1: Plans 01+02 done; Wave 2: Plans 03+04 parallel; Wave 3: Plan 05)
-Status: In progress — Wave 1 complete
-Last activity: 2026-02-25 -- Completed 19-02-PLAN.md (Stream Processor: state machine + signal routing + 27 tests)
+Plan: 3 of 5 in current phase (Wave 1: Plans 01+02 done; Wave 2: Plan 04 done, Plan 03 pending; Wave 3: Plan 05)
+Status: In progress — Wave 2 partially complete
+Last activity: 2026-02-25 -- Completed 19-04-PLAN.md (PAG bus wiring + SessionStart hook + 14 tests)
 
-Progress: [████████████░░░░░░░░░░░░░░░░░░░░] 40% (2/5 plans in phase 19)
-Overall:  [██████████████████████████████████████████████████████████████████████████████] 78/81 plans total
+Progress: [██████████████████░░░░░░░░░░░░░░] 60% (3/5 plans in phase 19)
+Overall:  [██████████████████████████████████████████████████████████████████████████████] 79/81 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 78 (75 plans + 1 gap closure + 2 Phase 19)
+- Total plans completed: 79 (75 plans + 1 gap closure + 3 Phase 19)
 - Average duration: 5.5 min
 - Total execution time: 7.99 hours
 
@@ -51,11 +51,11 @@ Overall:  [███████████████████████
 | 17-candidate-assessment-system | 4 | 41 min | 10.3 min |
 | 18-bridge-warden-structural-integrity | 5/5 | 35 min | 7.0 min |
 
-| 19-control-plane-integration | 2/5 | 9 min | 4.5 min |
+| 19-control-plane-integration | 3/5 | 12 min | 4.0 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min, 9 min, 7 min, 4 min, 5 min
-- Trend: steady execution pace, Phase 19 Wave 1 complete
+- Last 5 plans: 9 min, 7 min, 4 min, 5 min, 3 min
+- Trend: steady execution pace, Phase 19 Wave 2 partially complete
 
 *Updated after each plan completion*
 
@@ -449,6 +449,10 @@ Recent decisions affecting current work:
 - Plan 19-02: MID_EPISODE_TYPES frozenset with X_ASK guard at top of transition() enforces Phase 14 locked decision
 - Plan 19-02: GovernanceSignal stub via try/except import for parallel execution with Plan 19-01 bus package
 - Plan 19-02: Unknown signal types default to episode_level (conservative: defer rather than emit prematurely)
+- Plan 19-04: PAG response JSON always emitted (was conditional on additionalContext) to include ope_constraint_count metadata
+- Plan 19-04: SessionStart hook uses [OPE] prefix for stdout briefing (per Phase 14 locked decision)
+- Plan 19-04: _call_bus_check uses 0.5s timeout; _post_json in session_start uses 1.0s timeout (session start can afford slightly more)
+- Plan 19-04: .claude/settings.local.json is in global gitignore -- updated on disk only, not committed
 
 ### Pending Todos
 
@@ -615,7 +619,7 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Phase 19 Wave 1 complete (Plans 01+02). Wave 2 next (Plans 03+04 parallel).
+Stopped at: Phase 19 Wave 2 partially complete (Plan 04 done). Plan 03 pending, then Wave 3 (Plan 05).
 Resume file: .planning/phases/19-control-plane-integration/19-03-PLAN.md
 
 ## Phase 15 Completion Summary

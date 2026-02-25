@@ -211,3 +211,42 @@ class TestFailOpen:
             )
         assert r.status_code == 200
         assert r.json()["status"] == "registered"
+
+
+# ---------------------------------------------------------------------------
+# Bus CLI tests
+# ---------------------------------------------------------------------------
+
+
+class TestBusCLI:
+    """Verify bus CLI start and status commands."""
+
+    def test_status_no_socket(self, tmp_path):
+        """bus status reports 'not running' when socket does not exist."""
+        from click.testing import CliRunner
+
+        from src.pipeline.cli.bus import bus_group
+
+        runner = CliRunner()
+        result = runner.invoke(
+            bus_group,
+            ["status", "--socket", str(tmp_path / "nonexistent.sock")],
+        )
+        assert result.exit_code == 0
+        assert "not running" in result.output
+
+    def test_start_exits_1_when_socket_exists(self, tmp_path):
+        """bus start exits 1 when socket file already exists."""
+        from click.testing import CliRunner
+
+        from src.pipeline.cli.bus import bus_group
+
+        socket_path = str(tmp_path / "existing.sock")
+        open(socket_path, "w").close()  # simulate existing socket
+        runner = CliRunner()
+        result = runner.invoke(
+            bus_group,
+            ["start", "--socket", socket_path, "--db", ":memory:"],
+        )
+        assert result.exit_code == 1
+        assert "already" in result.output

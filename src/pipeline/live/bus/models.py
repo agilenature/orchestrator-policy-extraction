@@ -1,0 +1,60 @@
+"""Pydantic models for the OPE Governance Bus.
+
+Frozen models for bus sessions and governance signals, plus request/response
+models for the /api/check endpoint.
+"""
+
+from __future__ import annotations
+
+import hashlib
+from typing import Any
+
+from pydantic import BaseModel
+
+
+class BusSession(BaseModel, frozen=True):
+    """Represents a registered session on the governance bus."""
+
+    session_id: str
+    run_id: str
+    status: str = "active"
+
+
+class GovernanceSignal(BaseModel, frozen=True):
+    """A governance signal emitted by the stream processor.
+
+    boundary_dependency determines when the signal is actionable:
+    - "event_level": fires immediately on the triggering event
+    - "episode_level": deferred until CONFIRMED_END
+    """
+
+    signal_id: str
+    session_id: str
+    run_id: str
+    signal_type: str
+    boundary_dependency: str  # "event_level" | "episode_level"
+    payload: dict[str, Any] = {}
+
+    @staticmethod
+    def make_id(session_id: str, signal_type: str, ts_iso: str) -> str:
+        """Generate a deterministic 16-char hex signal ID."""
+        raw = f"signal:{session_id}:{signal_type}:{ts_iso}"
+        return hashlib.sha256(raw.encode()).hexdigest()[:16]
+
+
+class CheckRequest(BaseModel):
+    """Request body for POST /api/check."""
+
+    session_id: str
+    run_id: str
+    premise_data: dict[str, Any] = {}
+
+
+class CheckResponse(BaseModel):
+    """Response body for POST /api/check.
+
+    Empty lists are the fail-open default: no constraints, no interventions.
+    """
+
+    constraints: list[dict[str, Any]] = []
+    interventions: list[dict[str, Any]] = []

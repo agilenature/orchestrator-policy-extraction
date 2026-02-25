@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -49,6 +50,34 @@ HIGH_RISK_PATHS = (
     ".claude/settings.json",
     "src/pipeline/models/",
 )
+
+# OPE Control Plane bus connection
+_BUS_SOCKET = os.environ.get("OPE_BUS_SOCKET", "/tmp/ope-governance-bus.sock")
+_OPE_RUN_ID = os.environ.get("OPE_RUN_ID", "")
+_OPE_SESSION_ID = os.environ.get("OPE_SESSION_ID", "")
+
+
+def _call_bus_check(session_id: str, run_id: str, premise_data: dict) -> dict:
+    """Call /api/check on the bus. Returns response dict or empty on failure (fail-open)."""
+    try:
+        import http.client
+        import socket as _socket
+
+        payload = json.dumps({
+            "session_id": session_id,
+            "run_id": run_id,
+            "premise_data": premise_data,
+        }).encode()
+        conn = http.client.HTTPConnection("localhost", timeout=0.5)
+        conn.sock = _socket.socket(_socket.AF_UNIX, _socket.SOCK_STREAM)
+        conn.sock.settimeout(0.5)
+        conn.sock.connect(_BUS_SOCKET)
+        conn.request("POST", "/api/check", body=payload,
+                     headers={"Content-Type": "application/json"})
+        resp = conn.getresponse()
+        return json.loads(resp.read())
+    except Exception:
+        return {"constraints": [], "interventions": []}
 
 
 def _is_high_risk_path(tool_input: dict, cwd: str) -> bool:
@@ -516,14 +545,27 @@ def main() -> None:
     cross_axis_warnings = _check_cross_axis(all_premises, session_id, cwd)
     additional_context.extend(cross_axis_warnings)
 
+    # 7. OPE Control Plane: bus /api/check call (fail-open)
+    bus_session = _OPE_SESSION_ID or session_id
+    bus_run_id = _OPE_RUN_ID
+    bus_response = _call_bus_check(
+        session_id=bus_session,
+        run_id=bus_run_id,
+        premise_data={"premises": [p.claim for p in all_premises]},
+    )
+    ope_constraint_count = len(bus_response.get("constraints", []))
+
     # Emit response
-    if additional_context:
-        response = {
-            "hookSpecificOutput": {
-                "additionalContext": "\n".join(additional_context)
-            }
+    response = {
+        "hookSpecificOutput": {
+            "ope_constraint_count": ope_constraint_count,
         }
-        json.dump(response, sys.stdout)
+    }
+    if additional_context:
+        response["hookSpecificOutput"]["additionalContext"] = "\n".join(
+            additional_context
+        )
+    json.dump(response, sys.stdout)
 
     sys.exit(0)
 

@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 19 (Control Plane Integration) — IN PROGRESS. 4/5 plans complete. Wave 1 complete. Wave 2 complete (Plans 03+04 done). Wave 3: Plan 05 remaining.
+**Current focus:** Phase 19 (Control Plane Integration) — COMPLETE. 5/5 plans done. All 3 waves delivered. Bus operational, cross-session run_id grouping validated.
 
 ## Current Position
 
-Phase: 19 (Control Plane Integration)
-Plan: 4 of 5 in current phase (Wave 1: Plans 01+02 done; Wave 2: Plans 03+04 done; Wave 3: Plan 05)
-Status: In progress — Wave 2 complete
-Last activity: 2026-02-25 -- Completed 19-03-PLAN.md (GovernorDaemon + ConstraintBriefing + /api/check wiring + 21 tests)
+Phase: 19 (Control Plane Integration) — COMPLETE
+Plan: 5 of 5 in current phase (Wave 1: Plans 01+02; Wave 2: Plans 03+04; Wave 3: Plan 05)
+Status: Phase complete
+Last activity: 2026-02-25 -- Completed 19-05-PLAN.md (integration tests, boundary doc, PROGRAM-SEQUENCE update, bus CLI)
 
-Progress: [████████████████████████░░░░░░░░] 80% (4/5 plans in phase 19)
-Overall:  [██████████████████████████████████████████████████████████████████████████████] 80/81 plans total
+Progress: [████████████████████████████████] 100% (5/5 plans in phase 19)
+Overall:  [████████████████████████████████████████████████████████████████████████████████] 81/81 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 80 (75 plans + 1 gap closure + 4 Phase 19)
+- Total plans completed: 81 (75 plans + 1 gap closure + 5 Phase 19)
 - Average duration: 5.5 min
-- Total execution time: 8.07 hours
+- Total execution time: 8.19 hours
 
 **By Phase:**
 
@@ -51,11 +51,11 @@ Overall:  [███████████████████████
 | 17-candidate-assessment-system | 4 | 41 min | 10.3 min |
 | 18-bridge-warden-structural-integrity | 5/5 | 35 min | 7.0 min |
 
-| 19-control-plane-integration | 4/5 | 17 min | 4.3 min |
+| 19-control-plane-integration | 5/5 | 24 min | 4.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 7 min, 4 min, 5 min, 3 min, 5 min
-- Trend: steady execution pace, Phase 19 Wave 2 complete
+- Last 5 plans: 4 min, 5 min, 3 min, 5 min, 7 min
+- Trend: Phase 19 complete. All OPE phases delivered.
 
 *Updated after each plan completion*
 
@@ -457,6 +457,9 @@ Recent decisions affecting current work:
 - Plan 19-04: SessionStart hook uses [OPE] prefix for stdout briefing (per Phase 14 locked decision)
 - Plan 19-04: _call_bus_check uses 0.5s timeout; _post_json in session_start uses 1.0s timeout (session start can afford slightly more)
 - Plan 19-04: .claude/settings.local.json is in global gitignore -- updated on disk only, not committed
+- Plan 19-05: DuckDB read_only=True cannot coexist with active read-write connection on same file; use default mode for test verification
+- Plan 19-05: Bus CLI defers to uvicorn for Unix socket serving (no custom socket management)
+- Plan 19-05: Skills Pack authorship protocol documented but deferred to post-OpenClaw-installation
 
 ### Pending Todos
 
@@ -623,8 +626,9 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-25
-Stopped at: Phase 19 Wave 2 complete (Plans 01-04 done). Wave 3 next: Plan 05 (integration).
-Resume file: .planning/phases/19-control-plane-integration/19-05-PLAN.md
+Stopped at: Phase 19 COMPLETE. All 81 plans delivered across 19 phases.
+Next action: MT Step 7 (repo creation) per PROGRAM-SEQUENCE.md.
+Resume file: .planning/PROGRAM-SEQUENCE.md
 
 ## Phase 15 Completion Summary
 
@@ -740,4 +744,21 @@ Phase 18 delivered Bridge-Warden Structural Integrity Detection (all 4 plans + 1
 - **BRIDGE-04 verified**: Three-dimensional IntelligenceProfile visible (Ignition x Transport x Integrity)
 - **Key modules**: src/pipeline/ddf/structural/ (models.py, schema.py, detectors.py, computer.py, writer.py, op8.py), src/pipeline/ddf/intelligence_profile.py, src/pipeline/cli/intelligence.py
 - **CLI**: `python -m src.pipeline.cli intelligence bridge stats|list|floating-cables`
-- **Project milestone**: Phase 18 is the final phase. All 75 plans across 18 phases (+ sub-phases) complete.
+- **Project milestone**: Phase 18 completed the DDF detection substrate. Phase 19 adds control plane integration.
+
+## Phase 19 Completion Summary
+
+Phase 19 delivered Control Plane Integration (all 5 plans, 3 waves):
+- **Plan 01 COMPLETE (Wave 1)**: Bus foundation -- DuckDB schema (bus_sessions, governance_signals), Starlette server (3 session-facing endpoints), Pydantic models, 18 tests
+- **Plan 02 COMPLETE (Wave 1)**: Stream processor -- JSONL tail, TENTATIVE_END/CONFIRMED_END state machine, signal boundary classification, 15 tests
+- **Plan 03 COMPLETE (Wave 2)**: GovernorDaemon + ConstraintBriefing -- reads constraints.json, severity-sorted briefings, /api/check full wiring, 21 tests
+- **Plan 04 COMPLETE (Wave 2)**: PAG hook bus wiring + SessionStart hook -- constraint delivery via /api/check, OPE_RUN_ID from os.environ, fail-open bus communication, settings.local.json hooks, 16 tests
+- **Plan 05 COMPLETE (Wave 3)**: Integration tests (9), BUILDER-OPERATOR-BOUNDARY.md (Layer 1 canon), PROGRAM-SEQUENCE.md update, bus CLI (start+status)
+- **1787 tests** passing (1661 baseline + 70 new Phase 19 tests + 56 from Phase 18 gap closure, excluding 3 pre-existing failures)
+- **LIVE-01 through LIVE-05 delivered**: Bus server, stream processor, governing daemon, PAG hook wiring, SessionStart hook
+- **Phase 19 validation criterion**: two sessions with shared OPE_RUN_ID both appear in bus_sessions under that run_id (verified by test_two_sessions_same_run_id_grouped_in_db)
+- **Builder-Operator boundary**: documented as Layer 1 canon in docs/architecture/BUILDER-OPERATOR-BOUNDARY.md
+- **Bus CLI**: `python -m src.pipeline.cli bus start|status`
+- **Key modules**: src/pipeline/live/bus/ (server.py, schema.py, models.py), src/pipeline/live/governor/ (daemon.py, briefing.py), src/pipeline/live/stream/ (processor.py, state_machine.py), src/pipeline/live/hooks/ (session_start.py, premise_gate.py extended), src/pipeline/cli/bus.py
+- **Cross-project**: PROGRAM-SEQUENCE.md updated; MT Step 7 (repo creation) now READY; bus must be operational before MT sessions register OPE_RUN_ID
+- **Project milestone**: All 81 plans across 19 phases complete. OPE pipeline fully operational from JSONL ingestion through governance bus delivery.

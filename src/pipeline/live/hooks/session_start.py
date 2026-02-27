@@ -115,6 +115,20 @@ def main() -> None:
                 )
     # else: bus unavailable or no constraints -- silent
 
+    # Relevant documentation (Phase 21)
+    relevant_docs = check.get("relevant_docs", [])
+    if relevant_docs:
+        print(f"\n[OPE] {len(relevant_docs)} relevant doc(s) for this session:", flush=True)
+        for doc in relevant_docs[:3]:
+            path = doc.get("doc_path", "")
+            axis = doc.get("ccd_axis", "")
+            desc = doc.get("description_cache") or ""
+            desc = desc[:80]
+            print(f"[OPE]   - {path} (axis: {axis})", flush=True)
+            if desc:
+                print(f"[OPE]     {desc}", flush=True)
+    # else: no docs -- silent
+
 
 if __name__ == "__main__":
     try:

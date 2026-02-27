@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 22 (Unified Discriminated Query Interface) -- IN PROGRESS. Plan 02 complete.
+**Current focus:** Phase 22 (Unified Discriminated Query Interface) -- COMPLETE. All 3 plans executed.
 
 ## Current Position
 
 Phase: 22 (Unified Discriminated Query Interface)
-Plan: 2 of 3
-Status: In progress
-Last activity: 2026-02-27 -- Completed 22-02-PLAN.md (unified query CLI + projects.json db_path)
+Plan: 3 of 3
+Status: Phase complete
+Last activity: 2026-02-27 -- Completed 22-03-PLAN.md (cross-project ATTACH queries + 32 integration tests)
 
-Progress: [█████████████████████░░░░░░░░░░░] 67% (2/3 plans in phase 22)
-Overall:  [██████████████████████████████████████████████████████████████████████████████████████████████] 92/93 plans total
+Progress: [████████████████████████████████] 100% (3/3 plans in phase 22)
+Overall:  [███████████████████████████████████████████████████████████████████████████████████████████████] 93/93 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 92 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 4 Phase 21 + 2 Phase 22)
+- Total plans completed: 93 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 4 Phase 21 + 3 Phase 22)
 - Average duration: 5.5 min
-- Total execution time: 8.71 hours
+- Total execution time: 8.83 hours
 
 **By Phase:**
 
@@ -57,11 +57,11 @@ Overall:  [███████████████████████
 
 | 21-doc-index-floating-corpus-bridge | 4/4 | 18 min | 4.5 min |
 
-| 22-unified-discriminated-query-interface | 2/3 | 10 min | 5.0 min |
+| 22-unified-discriminated-query-interface | 3/3 | 17 min | 5.7 min |
 
 **Recent Trend:**
-- Last 5 plans: 2 min, 3 min, 9 min, 4 min, 5 min
-- Trend: Phase 22 Plan 02 (unified query CLI) complete in 5 min.
+- Last 5 plans: 3 min, 9 min, 4 min, 5 min, 7 min
+- Trend: Phase 22 Plan 03 (cross-project ATTACH queries) complete in 7 min. Phase 22 complete.
 
 *Updated after each plan completion*
 
@@ -497,6 +497,10 @@ Recent decisions affecting current work:
 - Plan 22-02: Unified query is a Click command (not group) with --source flag dispatching to docs/sessions/code backends
 - Plan 22-02: --project resolves db_path from projects.json; full cross-project ATTACH deferred to Plan 03
 - Plan 22-02: db_path is null for non-OPE projects (no separate DuckDB yet; sessions all in data/ope.db)
+- Plan 22-03: Direct axis matching only for cross-project doc queries (skip axis_edges expansion; remote DBs may lack axis_edges)
+- Plan 22-03: Code search blocked for remote projects with informative message (local-only per research Pitfall 8)
+- Plan 22-03: Fully-qualified remote.doc_index table names to avoid USE/DETACH ordering issues
+- Plan 22-03: Session filtering via JOIN on episodes table when session_ids provided; tilde-expanded sessions_location
 
 ### Pending Todos
 
@@ -668,9 +672,9 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Phase 22 Plan 02 complete. Plan 03 (cross-project ATTACH queries) ready.
-Next action: Execute 22-03-PLAN.md (Wave 3: cross-project DuckDB ATTACH + integration tests)
-Resume file: .planning/phases/22-unified-discriminated-query-interface/22-03-PLAN.md
+Stopped at: Phase 22 complete (all 3 plans, all 6 success criteria verified). 93/93 plans total.
+Next action: Phase 22 complete. All planned phases delivered.
+Resume file: N/A (all phases complete)
 
 ## Phase 15 Completion Summary
 
@@ -835,3 +839,20 @@ Phase 21 delivered the Doc Index Floating Corpus Bridge (all 4 plans):
 - **Key modules**: src/pipeline/live/bus/doc_schema.py, src/pipeline/doc_indexer.py, src/pipeline/cli/docs.py, src/pipeline/live/governor/daemon.py (extended), src/pipeline/live/bus/server.py (extended), src/pipeline/live/hooks/session_start.py (extended)
 - **CLI**: `python -m src.pipeline.cli docs reindex [--docs-dir] [--db] [--socket-path]`
 - **Project milestone**: All 90 plans across 21 phases complete. Doc index pipeline operational for session-start doc delivery.
+
+## Phase 22 Completion Summary
+
+Phase 22 delivered the Unified Discriminated Query Interface (all 3 plans, all 6 success criteria verified):
+- **Plan 01 COMPLETE (Wave 1)**: query_sessions() (BM25 with ILIKE fallback), query_code() (rg with grep fallback), 34 tests
+- **Plan 02 COMPLETE (Wave 2)**: Unified query CLI command (--source docs|sessions|code|all), --project flag with db_path resolution, data/projects.json db_path field, 17 tests
+- **Plan 03 COMPLETE (Wave 3)**: Cross-project ATTACH for remote doc_index queries, session filtering by project session_ids, _resolve_project/_get_project_session_ids/_query_docs_cross_project helpers, 32 integration tests covering all 6 SC
+- **2053 tests** total (2021 passed + 4 pre-existing failures [2 segmenter + 2 doc_integration], zero Phase 22 regressions)
+- **SC-1 verified**: query --source docs delegates to query_docs() and returns doc_index results
+- **SC-2 verified**: query --source sessions returns BM25/ILIKE episode results with metadata
+- **SC-3 verified**: query --source code returns file paths via rg/grep
+- **SC-4 verified**: query --source all aggregates labeled results from all three backends
+- **SC-5 verified**: query --project uses ATTACH READ_ONLY for remote doc_index, graceful null db_path message
+- **SC-6 verified**: data/projects.json has db_path on all 4 projects (OPE=data/ope.db, others=null)
+- **Key modules**: src/pipeline/session_query.py, src/pipeline/code_query.py, src/pipeline/doc_query.py, src/pipeline/cli/query.py
+- **CLI**: `python -m src.pipeline.cli query [--source docs|sessions|code|all] [--project ID] [--db PATH] [--top N] QUERY`
+- **Project milestone**: All 93 plans across 22 phases complete. Unified query interface operational for cross-project knowledge retrieval.

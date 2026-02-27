@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 22 (Unified Discriminated Query Interface) -- IN PROGRESS. Plan 01 complete.
+**Current focus:** Phase 22 (Unified Discriminated Query Interface) -- IN PROGRESS. Plan 02 complete.
 
 ## Current Position
 
 Phase: 22 (Unified Discriminated Query Interface)
-Plan: 1 of 3
+Plan: 2 of 3
 Status: In progress
-Last activity: 2026-02-27 -- Completed 22-01-PLAN.md (query backends: session_query + code_query)
+Last activity: 2026-02-27 -- Completed 22-02-PLAN.md (unified query CLI + projects.json db_path)
 
-Progress: [██████████░░░░░░░░░░░░░░░░░░░░░░] 33% (1/3 plans in phase 22)
-Overall:  [█████████████████████████████████████████████████████████████████████████████████████████████] 91/93 plans total
+Progress: [█████████████████████░░░░░░░░░░░] 67% (2/3 plans in phase 22)
+Overall:  [██████████████████████████████████████████████████████████████████████████████████████████████] 92/93 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 91 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 4 Phase 21 + 1 Phase 22)
+- Total plans completed: 92 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 4 Phase 21 + 2 Phase 22)
 - Average duration: 5.5 min
-- Total execution time: 8.63 hours
+- Total execution time: 8.71 hours
 
 **By Phase:**
 
@@ -57,9 +57,11 @@ Overall:  [███████████████████████
 
 | 21-doc-index-floating-corpus-bridge | 4/4 | 18 min | 4.5 min |
 
+| 22-unified-discriminated-query-interface | 2/3 | 10 min | 5.0 min |
+
 **Recent Trend:**
-- Last 5 plans: 5 min, 2 min, 3 min, 9 min, 4 min
-- Trend: Phase 21 Plan 04 (integration tests) complete in 4 min. Phase 21 complete.
+- Last 5 plans: 2 min, 3 min, 9 min, 4 min, 5 min
+- Trend: Phase 22 Plan 02 (unified query CLI) complete in 5 min.
 
 *Updated after each plan completion*
 
@@ -490,6 +492,11 @@ Recent decisions affecting current work:
 - Plan 21-04: No constraint-axis join verified: empty constraints.json + populated doc_index returns docs via /api/check
 - Plan 21-04: 13 integration tests covering full pipeline reindex->query->deliver
 - Plan 21-04: 1912 total tests (1910 passing + 2 pre-existing segmenter failures, zero Phase 21 regressions)
+- Plan 22-01: query_sessions() uses BM25 with ILIKE fallback; query_code() uses rg with grep fallback (subprocess, fail-open)
+- Plan 22-01: Both backends include source key in result dicts (sessions, code); doc_query does NOT (added by CLI dispatcher)
+- Plan 22-02: Unified query is a Click command (not group) with --source flag dispatching to docs/sessions/code backends
+- Plan 22-02: --project resolves db_path from projects.json; full cross-project ATTACH deferred to Plan 03
+- Plan 22-02: db_path is null for non-OPE projects (no separate DuckDB yet; sessions all in data/ope.db)
 
 ### Pending Todos
 
@@ -661,9 +668,9 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Phase 22 added to roadmap. Ready for planning.
-Next action: Run /gsd:plan-phase 22 to create execution plans for Phase 22.
-Resume file: N/A
+Stopped at: Phase 22 Plan 02 complete. Plan 03 (cross-project ATTACH queries) ready.
+Next action: Execute 22-03-PLAN.md (Wave 3: cross-project DuckDB ATTACH + integration tests)
+Resume file: .planning/phases/22-unified-discriminated-query-interface/22-03-PLAN.md
 
 ## Phase 15 Completion Summary
 

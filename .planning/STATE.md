@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 21 (Doc Index Floating Corpus Bridge) — Plan 01 complete, 3 remaining.
+**Current focus:** Phase 21 (Doc Index Floating Corpus Bridge) — Plan 02 complete, 2 remaining.
 
 ## Current Position
 
 Phase: 21 (Doc Index Floating Corpus Bridge)
-Plan: 1 of 4
+Plan: 2 of 4
 Status: In progress
-Last activity: 2026-02-27 -- Completed 21-01-PLAN.md (doc_index schema + CheckResponse extension)
+Last activity: 2026-02-27 -- Completed 21-02-PLAN.md (3-tier axis extraction + docs CLI)
 
-Progress: [████████░░░░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans in phase 21)
-Overall:  [██████████████████████████████████████████████████████████████████████████████████████░] 87/90 plans total
+Progress: [████████████████░░░░░░░░░░░░░░░░] 50% (2/4 plans in phase 21)
+Overall:  [████████████████████████████████████████████████████████████████████████████████████████░] 88/90 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 87 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 1 Phase 21)
+- Total plans completed: 88 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 2 Phase 21)
 - Average duration: 5.5 min
-- Total execution time: 8.36 hours
+- Total execution time: 8.41 hours
 
 **By Phase:**
 
@@ -56,8 +56,8 @@ Overall:  [███████████████████████
 | 20-causal-chain-completion | 5/5 | 19 min | 3.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 4 min, 3 min, 2 min, 5 min, 2 min
-- Trend: Phase 21 started. Plan 01 (doc_index schema) complete in 2 min.
+- Last 5 plans: 3 min, 2 min, 5 min, 2 min, 3 min
+- Trend: Phase 21 Plan 02 (doc_indexer + docs CLI) complete in 3 min.
 
 *Updated after each plan completion*
 
@@ -474,6 +474,12 @@ Recent decisions affecting current work:
 - Plan 21-01: Lazy import of create_doc_schema() inside create_bus_schema() (not top-level) for minimal schema.py dependencies
 - Plan 21-01: Composite PK (doc_path, ccd_axis) on doc_index for multi-axis documents (one row per axis)
 - Plan 21-01: CHECK constraint on association_type with 5 values (frontmatter, regex, keyword, manual, unclassified)
+- Plan 21-02: Frontmatter axes accepted even if not in known_axes vocabulary (allows forward-declaring new axes)
+- Plan 21-02: Bus safety check via AF_UNIX socket connect with 1.0s timeout before DuckDB writes
+- Plan 21-02: MEMORY.md regex pattern reused from nversion.py for consistency
+- Plan 21-02: load_axis_vocabulary always includes 'always-show' as doc_index-only concept
+- Plan 21-02: Tier 3 token matching requires min 2 non-stopword tokens AND min 3 total occurrences
+- Plan 21-02: 31 tests passing (new: 5 frontmatter + 5 regex + 5 keyword + 5 cascade + 4 desc/hash + 3 reindex + 1 CLI + 3 vocabulary)
 
 ### Pending Todos
 
@@ -644,9 +650,9 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Phase 21 Plan 01 complete. doc_index schema + CheckResponse.relevant_docs field.
-Next action: Execute Plan 21-02 (frontmatter indexer).
-Resume file: .planning/phases/21-doc-index-floating-corpus-bridge/21-02-PLAN.md
+Stopped at: Phase 21 Plan 02 complete. 3-tier axis extraction + docs CLI.
+Next action: Execute Plan 21-03 (CheckResponse relevant_docs wiring) or Plan 21-04 (session-start briefing).
+Resume file: .planning/phases/21-doc-index-floating-corpus-bridge/21-03-PLAN.md
 
 ## Phase 15 Completion Summary
 

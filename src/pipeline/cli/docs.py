@@ -16,6 +16,39 @@ def docs_group():
 
 
 @docs_group.command()
+@click.argument("query_text")
+@click.option("--db", default="data/ope.db", help="DuckDB path")
+@click.option("--top", "top_n", default=3, help="Max docs to return")
+def query(query_text: str, db: str, top_n: int):
+    """Find docs relevant to QUERY_TEXT using the axis graph.
+
+    Derives CCD axis from query tokens, expands via axis_edges (1-hop),
+    returns matching docs from doc_index.  No running bus required.
+
+    Example:
+        python -m src.pipeline.cli docs query "raven cost function absent"
+    """
+    from src.pipeline.doc_query import query_docs
+
+    results = query_docs(query=query_text, db_path=db, top_n=top_n)
+
+    if not results:
+        click.echo(f"[OPE Docs] No axis match for: {query_text!r}")
+        return
+
+    click.echo(f"[OPE Docs] Query: {query_text!r}")
+    click.echo(f"[OPE Docs] {len(results)} relevant doc(s):")
+    for doc in results:
+        path = doc["doc_path"]
+        axis = doc["ccd_axis"]
+        reason = doc["match_reason"]
+        desc = doc["description_cache"][:80] if doc["description_cache"] else ""
+        click.echo(f"[OPE]   - {path} (axis: {axis}, {reason})")
+        if desc:
+            click.echo(f"[OPE]     {desc}")
+
+
+@docs_group.command()
 @click.option("--db", default="data/ope.db", help="DuckDB path")
 @click.option("--docs-dir", default="docs", help="Documentation directory")
 @click.option(

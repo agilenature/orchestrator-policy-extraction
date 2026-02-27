@@ -24,6 +24,7 @@ class ConstraintBriefing(BaseModel, frozen=True):
     interventions: list[dict[str, Any]] = []  # DDF co-pilot stubs (LIVE-06 deferred)
     total_count: int = 0
     top_severity: str | None = None
+    relevant_docs: list[dict[str, Any]] = []  # Phase 21: doc_index entries
 
 
 def generate_briefing(constraints: list[dict[str, Any]]) -> ConstraintBriefing:

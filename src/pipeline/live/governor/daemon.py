@@ -1,8 +1,13 @@
 """GovernorDaemon -- reads active constraints and generates briefings.
 
-Reads active constraints from data/constraints.json (the ConstraintStore
-source of truth). Stateless between requests -- reads fresh on each call.
-Respects DuckDB single-writer invariant: never reads ope.db directly.
+Reads active constraints from data/constraints.json and doc_index from
+DuckDB read-only for doc delivery.  Stateless between requests -- reads
+fresh on each call.
+
+Phase 21: daemon gains DuckDB access for doc_index queries (SELECT only).
+Uses a regular connection (not read_only=True) because DuckDB rejects
+read_only connections when a read-write connection is already open to the
+same file.  Only SELECT queries are issued -- MVCC makes reads safe.
 
 DDF co-pilot interventions (LIVE-06) remain stubbed until post-OpenClaw.
 """
@@ -13,14 +18,17 @@ import json
 from pathlib import Path
 from typing import Any
 
+import duckdb
+
 from .briefing import ConstraintBriefing, generate_briefing
 
 
 class GovernorDaemon:
-    """Reads active constraints from data/constraints.json and generates constraint briefings.
+    """Reads active constraints from constraints.json and doc_index from DuckDB read-only for doc delivery.
 
     Stateless between requests -- reads fresh on each call.
-    Reads constraints.json directly (DuckDB single-writer invariant: no ope.db reads).
+    Constraints: read from constraints.json (ConstraintStore source of truth).
+    Doc index: read from DuckDB via read-only connection (Phase 21).
     """
 
     def __init__(
@@ -56,7 +64,9 @@ class GovernorDaemon:
         constraints = self._load_active_constraints()
         if repo is not None:
             constraints = self._filter_by_repo(constraints, repo)
-        return generate_briefing(constraints)
+        briefing = generate_briefing(constraints)
+        relevant_docs = self._query_relevant_docs()
+        return briefing.model_copy(update={"relevant_docs": relevant_docs})
 
     @staticmethod
     def _filter_by_repo(
@@ -78,6 +88,59 @@ class GovernorDaemon:
                 result.append(c)  # scoped and matches
             # else: scoped but no match -- skip
         return result
+
+    def _query_relevant_docs(self) -> list[dict[str, Any]]:
+        """Query doc_index for relevant documentation entries.
+
+        Returns top 3 non-unclassified docs, deduplicated by doc_path,
+        with always-show docs first then ranked by extracted_confidence DESC.
+
+        Fails open: returns [] on any error (missing table, invalid DB path,
+        DuckDB errors).  Opens a regular connection (not read_only=True) because
+        DuckDB rejects read_only connections when a read-write connection is
+        already open to the same file (e.g., the bus server's write connection).
+        Only SELECT queries are issued -- safe under MVCC.
+        """
+        try:
+            conn = duckdb.connect(self._db_path)
+            try:
+                # Check if doc_index table exists (graceful pre-Phase-21 fallback)
+                tables = conn.execute(
+                    "SELECT table_name FROM information_schema.tables "
+                    "WHERE table_name = 'doc_index'"
+                ).fetchall()
+                if not tables:
+                    return []
+
+                rows = conn.execute(
+                    "SELECT doc_path, ccd_axis, description_cache, extracted_confidence "
+                    "FROM doc_index "
+                    "WHERE association_type != 'unclassified' "
+                    "ORDER BY "
+                    "    CASE WHEN ccd_axis = 'always-show' THEN 0 ELSE 1 END, "
+                    "    extracted_confidence DESC"
+                ).fetchall()
+
+                # Deduplicate by doc_path (first occurrence wins due to ORDER BY)
+                seen: set[str] = set()
+                result: list[dict[str, Any]] = []
+                for doc_path, ccd_axis, description_cache, _confidence in rows:
+                    if doc_path in seen:
+                        continue
+                    seen.add(doc_path)
+                    result.append({
+                        "doc_path": doc_path,
+                        "ccd_axis": ccd_axis,
+                        "description_cache": description_cache,
+                    })
+                    if len(result) >= 3:
+                        break
+
+                return result
+            finally:
+                conn.close()
+        except Exception:
+            return []
 
     def _load_active_constraints(self) -> list[dict[str, Any]]:
         """Load active constraints from constraints.json.

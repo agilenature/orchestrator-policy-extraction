@@ -123,9 +123,16 @@ def create_app(
                 "constraints": briefing.constraints,
                 "interventions": briefing.interventions,
                 "epistemological_signals": [],
+                "relevant_docs": briefing.relevant_docs,
             })
         except Exception:
-            return JSONResponse(CheckResponse().model_dump())
+            resp = CheckResponse()
+            return JSONResponse({
+                "constraints": resp.constraints,
+                "interventions": resp.interventions,
+                "epistemological_signals": resp.epistemological_signals,
+                "relevant_docs": resp.relevant_docs,
+            })
 
     async def push_link(request: Request) -> JSONResponse:
         """Accept and persist a causal push link to the push_links table.

@@ -32,6 +32,7 @@ def query_sessions(
     query: str,
     db_path: str = "data/ope.db",
     top_n: int = 5,
+    session_ids: list[str] | None = None,
 ) -> list[dict[str, Any]]:
     """Search episodes by text, returning enriched result dicts.
 
@@ -45,6 +46,10 @@ def query_sessions(
         query: Natural-language search string.
         db_path: Path to the DuckDB database file.
         top_n: Maximum number of results to return.
+        session_ids: Optional list of session IDs to restrict results to.
+            When provided, only episodes belonging to these sessions are
+            returned.  When ``None``, no filtering is applied (backward
+            compatible).
 
     Returns:
         List of dicts with keys ``source``, ``episode_id``, ``session_id``,
@@ -70,7 +75,7 @@ def query_sessions(
         # FTS internal tables are not visible via duckdb_tables(), so we
         # attempt the BM25 query and catch the CatalogException that fires
         # when the index is absent.
-        matches = _try_bm25_then_ilike(conn, query, top_n)
+        matches = _try_bm25_then_ilike(conn, query, top_n, session_ids)
 
         if not matches:
             # Check if table is empty -- suggest indexing if so
@@ -104,6 +109,7 @@ def _try_bm25_then_ilike(
     conn: duckdb.DuckDBPyConnection,
     query: str,
     limit: int,
+    session_ids: list[str] | None = None,
 ) -> list[tuple[str, float, str]]:
     """Attempt BM25 search; fall back to ILIKE if FTS index is absent.
 
@@ -114,35 +120,60 @@ def _try_bm25_then_ilike(
     """
     try:
         conn.execute("LOAD fts;")
-        return _bm25_search(conn, query, limit)
+        return _bm25_search(conn, query, limit, session_ids)
     except duckdb.CatalogException:
-        return _ilike_search(conn, query, limit)
+        return _ilike_search(conn, query, limit, session_ids)
 
 
 def _bm25_search(
     conn: duckdb.DuckDBPyConnection,
     query: str,
     limit: int,
+    session_ids: list[str] | None = None,
 ) -> list[tuple[str, float, str]]:
     """Run BM25 search via DuckDB FTS extension.
 
     Returns list of ``(episode_id, score, match_reason)`` tuples.
+    When *session_ids* is provided, results are restricted to episodes
+    belonging to those sessions.
     """
-    rows = conn.execute(
-        """
-        SELECT sq.episode_id, sq.score
-        FROM (
-            SELECT *, fts_main_episode_search_text.match_bm25(
-                episode_id, ?
-            ) AS score
-            FROM episode_search_text
-        ) sq
-        WHERE sq.score IS NOT NULL
-        ORDER BY sq.score DESC
-        LIMIT ?
-        """,
-        [query, limit],
-    ).fetchall()
+    if session_ids:
+        placeholders = ",".join(["?"] * len(session_ids))
+        rows = conn.execute(
+            f"""
+            SELECT sq.episode_id, sq.score
+            FROM (
+                SELECT *, fts_main_episode_search_text.match_bm25(
+                    episode_id, ?
+                ) AS score
+                FROM episode_search_text
+            ) sq
+            WHERE sq.score IS NOT NULL
+              AND sq.episode_id IN (
+                  SELECT episode_id FROM episodes
+                  WHERE session_id IN ({placeholders})
+              )
+            ORDER BY sq.score DESC
+            LIMIT ?
+            """,
+            [query] + session_ids + [limit],
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            """
+            SELECT sq.episode_id, sq.score
+            FROM (
+                SELECT *, fts_main_episode_search_text.match_bm25(
+                    episode_id, ?
+                ) AS score
+                FROM episode_search_text
+            ) sq
+            WHERE sq.score IS NOT NULL
+            ORDER BY sq.score DESC
+            LIMIT ?
+            """,
+            [query, limit],
+        ).fetchall()
     return [
         (eid, score, f"bm25 (score={score:.2f})")
         for eid, score in rows
@@ -153,20 +184,37 @@ def _ilike_search(
     conn: duckdb.DuckDBPyConnection,
     query: str,
     limit: int,
+    session_ids: list[str] | None = None,
 ) -> list[tuple[str, float, str]]:
     """Run ILIKE fallback search when no FTS index is available.
 
     Returns list of ``(episode_id, score, match_reason)`` tuples.
+    When *session_ids* is provided, results are restricted to episodes
+    belonging to those sessions.
     """
-    rows = conn.execute(
-        """
-        SELECT episode_id, 1.0 AS score
-        FROM episode_search_text
-        WHERE search_text ILIKE ?
-        LIMIT ?
-        """,
-        [f"%{query}%", limit],
-    ).fetchall()
+    if session_ids:
+        placeholders = ",".join(["?"] * len(session_ids))
+        rows = conn.execute(
+            f"""
+            SELECT est.episode_id, 1.0 AS score
+            FROM episode_search_text est
+            JOIN episodes e ON est.episode_id = e.episode_id
+            WHERE est.search_text ILIKE ?
+              AND e.session_id IN ({placeholders})
+            LIMIT ?
+            """,
+            [f"%{query}%"] + session_ids + [limit],
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            """
+            SELECT episode_id, 1.0 AS score
+            FROM episode_search_text
+            WHERE search_text ILIKE ?
+            LIMIT ?
+            """,
+            [f"%{query}%", limit],
+        ).fetchall()
     return [(eid, score, "ilike") for eid, score in rows]
 
 

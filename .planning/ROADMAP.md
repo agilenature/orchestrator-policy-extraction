@@ -496,21 +496,32 @@ Three deliverables: (1) doc_index DuckDB table, (2) doc_indexer.py one-time inde
 **Plans:** 3 plans in 3 waves
 
 Plans:
-- [ ] 22-01-PLAN.md — query_sessions() BM25 search + query_code() subprocess search (Wave 1)
-- [ ] 22-02-PLAN.md — Unified CLI query command + __main__.py registration + projects.json db_path (Wave 2)
-- [ ] 22-03-PLAN.md — Cross-project --project support + integration tests (Wave 3)
+- [x] 22-01-PLAN.md — query_sessions() BM25 search + query_code() subprocess search (Wave 1)
+- [x] 22-02-PLAN.md — Unified CLI query command + __main__.py registration + projects.json db_path (Wave 2)
+- [x] 22-03-PLAN.md — Cross-project --project support + integration tests (Wave 3)
 
 **Details:**
 Today's query_docs() gives per-query doc retrieval by CCD axis. Missing: the same capability for session episodes (BM25 fulltext), for code, and for other supervised projects (modernizing-tool, objectivism-library). A human should be able to ask one query and choose — or let the system choose — which source to search.
 
 Four deliverables: (1) query_sessions() — BM25 fulltext search over episodes table, same output format as query_docs(); (2) unified CLI dispatcher: python -m src.pipeline.cli query --source [docs|sessions|code|all]; (3) data/projects.json — project registry mapping repo_name to db_path; (4) cross-project flag: --project [ope|modernizing-tool|objectivism-library|all] queries the registered project's DuckDB via ATTACH.
 
+### Phase 23: Autonomous Loop Mode-Switch Detection
+
+**Goal:** Implement the EBC-Drift detection system: External Behavioral Contract schema, ingestion-time alert output, persistent alert artifacts in data/alerts/, STATE.md injection, /project:autonomous-loop-mode-switch local project command, and session-time recovery protocol. Enables the OPE system to detect when a project has transitioned from known-state Execution Mode to unknown-state Discovery Mode and notify the human before false completions accumulate.
+**Depends on:** Phase 22
+**Plans:** 3 plans in 3 waves
+
+Plans:
+- [ ] 23-01-PLAN.md — EBC models, parser, detector, alert writer, config, runner integration (Wave 1)
+- [ ] 23-02-PLAN.md — CLI --plan flag, STATE.md injector, /project:autonomous-loop-mode-switch command (Wave 2)
+- [ ] 23-03-PLAN.md — Integration tests, behavioral pattern detection (tool ratio signals) (Wave 3)
+
 ---
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.3 -> 14 -> 14.1 -> 15 -> 16 -> 16.1 -> 17 -> 18 -> 19 -> 20 -> 21 -> 22
+Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.3 -> 14 -> 14.1 -> 15 -> 16 -> 16.1 -> 17 -> 18 -> 19 -> 20 -> 21 -> 22 -> 23
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -540,4 +551,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 19. Control Plane Integration | 5/5 | ✓ Complete | 2026-02-25 |
 | 20. Causal Chain Completion | 5/5 | ✓ Complete | 2026-02-25 |
 | 21. Doc Index Floating Corpus Bridge | 4/4 | ✓ Complete | 2026-02-27 |
-| 22. Unified Discriminated Query Interface | 0/3 | ○ Pending | — |
+| 22. Unified Discriminated Query Interface | 3/3 | ✓ Complete | 2026-02-27 |
+| 23. Autonomous Loop Mode-Switch Detection | 0/0 | ○ Pending | — |

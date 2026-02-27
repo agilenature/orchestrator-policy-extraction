@@ -68,8 +68,10 @@ class CheckResponse(BaseModel):
     Empty lists are the fail-open default: no constraints, no interventions.
     epistemological_signals is the stub for Gap 6 -- field exists in the
     response schema, enabling post-OpenClaw activation without schema change.
+    relevant_docs: Phase 21 -- relevant documentation entries from doc_index.
     """
 
     constraints: list[dict[str, Any]] = []
     interventions: list[dict[str, Any]] = []
     epistemological_signals: list[dict[str, Any]] = []
+    relevant_docs: list[dict[str, Any]] = []

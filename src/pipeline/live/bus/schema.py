@@ -64,9 +64,41 @@ CREATE TABLE IF NOT EXISTS push_links (
 """
 
 
+# -- Phase 07: canonical trigger vocabulary for push_links ----------------
+# transition_trigger is VARCHAR (extensible). This dict is the authoritative
+# vocabulary enforced by the Governing Orchestrator when calling /api/push-link.
+# No schema CHECK constraint — the GO owns enforcement, not the database.
+
+TRANSITION_TRIGGERS: dict[str, str] = {
+    # T1: forward dispatch
+    "construction.dispatched":         "User approved construction run; GO registered",
+    "repo.created":                    "GO dispatched a new repo session",
+    "semf.slice-deposit":              "SEMF slice written to modernized-workbox",
+    # T7: gate pass → progression
+    "gate-1-schema-passed":            "Gate 1 (Schema) passed; next phase unblocked",
+    "gate-2-integrity-passed":         "Gate 2 (Graph Integrity) passed",
+    "gate-3-canon-passed":             "Gate 3 (BCL/Canon Consistency) passed",
+    "gate-4-coverage-passed":          "Gate 4 (Coverage Threshold) passed",
+    "gate-4-coverage-warnings":        "Gate 4 passed with warnings",
+    # T8: gate failure → correction
+    "gate-1-schema-violation":         "Gate 1 failed; correction task dispatched",
+    "gate-2-integrity-violation":      "Gate 2 failed; referential integrity correction",
+    "gate-3-canon-violation":          "Gate 3 failed; BCL/Canon correction",
+    "gate-4-coverage-below-threshold": "Gate 4 failed; coverage gap task created",
+    # Cross-repo escalation
+    "slice-requires-bcl-extension":    "Slice requires platform Canon extension",
+    "correction.dispatched":           "Gate failure → new correction task dispatched",
+}
+
+
 def create_bus_schema(conn: duckdb.DuckDBPyConnection) -> None:
     """Create bus tables idempotently. Safe to call on every startup."""
     conn.execute(BUS_SESSIONS_DDL)
     conn.execute(GOVERNANCE_SIGNALS_DDL)
     _alter_bus_sessions(conn)
     conn.execute(PUSH_LINKS_DDL)
+
+    # Phase 21: doc_index table for doc-to-axis associations
+    from .doc_schema import create_doc_schema
+
+    create_doc_schema(conn)

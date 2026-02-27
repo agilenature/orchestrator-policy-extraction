@@ -456,10 +456,36 @@ Plans:
 - [x] 18-04-PLAN.md — 3D IntelligenceProfile extension + CLI bridge subcommand (Wave 3)
 - [x] 18-05-PLAN.md — Gap closure: Assessment pipeline structural integrity integration (Wave 4)
 
+### Phase 21: Doc Index Floating Corpus Bridge
+
+**Goal:** Bring the docs/ folder into the axis-indexed graph so sessions can retrieve relevant documentation by ccd_axis at session start without being told to look at specific files.
+**Depends on:** Phase 20
+**Success Criteria** (what must be TRUE):
+  1. `doc_index` DuckDB table exists with schema (doc_path, ccd_axis, association_type, extracted_confidence, description_cache, section_anchor, content_hash, indexed_at), PRIMARY KEY (doc_path, ccd_axis)
+  2. `python -m src.pipeline.cli docs reindex` populates doc_index from docs/ folder using 3-tier axis extraction: frontmatter (conf=1.0) -> regex in headers/comments (conf=0.7) -> keyword token matching (conf=0.4)
+  3. GovernorDaemon queries doc_index via read-only DuckDB and returns top 3 relevant docs (ranked by confidence, always-show first) through /api/check response
+  4. session_start.py prints relevant docs with [OPE] prefix: path + axis + description_cache (80 chars max), silent if 0 docs
+  5. Reindexing is offline-first: doc_indexer.py aborts if bus daemon is reachable; full DELETE+INSERT refresh when bus stopped
+  6. Docs with no axis match stored as ccd_axis='unclassified', excluded from session delivery
+**Plans:** 4 plans in 3 waves
+
+Plans:
+- [ ] 21-01-PLAN.md — doc_schema.py + schema chain wiring + CheckResponse extension (Wave 1)
+- [ ] 21-02-PLAN.md — doc_indexer.py 3-tier extraction + docs CLI group (Wave 2)
+- [ ] 21-03-PLAN.md — GovernorDaemon doc query + server wiring + session_start.py briefing (Wave 2)
+- [ ] 21-04-PLAN.md — Integration tests: full pipeline reindex -> query -> deliver (Wave 3)
+
+**Details:**
+The docs/ folder is currently a floating corpus — files exist on disk with no axis-indexed entries, no causal edges in push_links, and no entries in the OPE session-start briefing. Every time a session needs architectural decisions or design rationale, the human must explicitly prompt "look at the docs folder." This is a raven-cost-function-absent failure: the AI retrieves by surface similarity because the docs have file-provenance, not session-provenance.
+
+Three deliverables: (1) doc_index DuckDB table, (2) doc_indexer.py one-time indexing step, (3) session-start briefing extension delivering relevant_docs alongside constraints.
+
+---
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.3 -> 14 -> 14.1 -> 15 -> 16 -> 16.1 -> 17 -> 18 -> 19 -> 20
+Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.3 -> 14 -> 14.1 -> 15 -> 16 -> 16.1 -> 17 -> 18 -> 19 -> 20 -> 21
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -488,3 +514,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 18. Bridge-Warden Structural Integrity Detection | 5/5 | ✓ Complete | 2026-02-25 |
 | 19. Control Plane Integration | 5/5 | ✓ Complete | 2026-02-25 |
 | 20. Causal Chain Completion | 5/5 | ✓ Complete | 2026-02-25 |
+| 21. Doc Index Floating Corpus Bridge | 0/4 | In Progress | |

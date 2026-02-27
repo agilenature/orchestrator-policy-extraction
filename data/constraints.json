@@ -24,7 +24,9 @@
         "changed_at": "2026-02-06T00:00:00.636000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "83cd03a2422e20e5",
@@ -55,7 +57,9 @@
         "changed_at": "2026-02-06T00:07:13.406000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "f63d24ab4cec39b5",
@@ -82,7 +86,9 @@
         "changed_at": "2026-02-10T20:19:28.436000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "c02ab2f8c17fb820",
@@ -121,7 +127,9 @@
         "changed_at": "2026-02-10T21:36:14.939696+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "f6f17d7fd266aea0",
@@ -148,7 +156,9 @@
         "changed_at": "2026-02-05T23:13:16.628000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "6b52cf0b049302ed",
@@ -175,7 +185,9 @@
         "changed_at": "2026-02-05T22:20:56.266000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "276348e04fbfdf52",
@@ -204,7 +216,9 @@
         "changed_at": "2026-02-10T22:59:01.517000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "06479393b39821a7",
@@ -229,7 +243,9 @@
         "changed_at": "2026-01-29T14:01:26.541000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "95321dd07b6b18f5",
@@ -306,7 +322,9 @@
         "changed_at": "2026-01-29T14:24:30.042000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "bbd376a26cb13b1f",
@@ -334,7 +352,9 @@
         "changed_at": "2026-01-28T23:56:00.960000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "65564e150fd137db",
@@ -367,7 +387,9 @@
         "changed_at": "2026-01-29T09:40:17.460000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "ffca4a98c5a81a81",
@@ -814,7 +836,9 @@
         "changed_at": "2026-01-29T09:42:32.954000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "5207628b2e67c40b",
@@ -1051,7 +1075,9 @@
         "changed_at": "2026-01-29T09:44:48.294000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "884ac832569c852b",
@@ -1129,7 +1155,9 @@
         "changed_at": "2026-02-05T01:36:37.366000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "9209456781f9d15e",
@@ -1173,7 +1201,9 @@
         "changed_at": "2026-02-03T00:00:50.403000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "5ae1cdbda5e7ce95",
@@ -1198,7 +1228,9 @@
         "changed_at": "2026-02-03T00:28:45.563000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "8411ea7969cafa9e",
@@ -1230,7 +1262,9 @@
         "changed_at": "2026-02-03T14:49:40.055000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "a7b8b5557503e06f",
@@ -1318,7 +1352,9 @@
         "changed_at": "2026-02-03T15:17:44.823000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "d85c1f02c9bbfd2f",
@@ -1348,7 +1384,9 @@
         "changed_at": "2026-02-06T15:42:43.008000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "48c920dd609dc53b",
@@ -1389,7 +1427,9 @@
         "changed_at": "2026-02-06T15:56:00.787000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "1ad1ee4702d4efc3",
@@ -1426,7 +1466,9 @@
         "changed_at": "2026-02-06T16:08:08.862000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "186267e0fac8d4d9",
@@ -1455,7 +1497,9 @@
         "changed_at": "2026-02-06T16:14:48.092000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "2a354f1a450a2da7",
@@ -1484,7 +1528,9 @@
         "changed_at": "2026-02-06T16:29:19.866000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "b7ad2233f380851e",
@@ -1513,7 +1559,9 @@
         "changed_at": "2026-02-06T16:42:22.088000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "910cb399388d431c",
@@ -1551,7 +1599,9 @@
         "changed_at": "2026-02-06T17:00:39.490000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "64f818dfa6de4c57",
@@ -1584,7 +1634,9 @@
         "changed_at": "2026-02-06T17:11:56.686000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "a56ed8a2298cd52f",
@@ -1615,7 +1667,9 @@
         "changed_at": "2026-02-06T17:19:20.323000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "c1054a6926ae81b9",
@@ -1673,7 +1727,9 @@
         "changed_at": "2026-02-06T17:33:53.234000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "c84bb4489477cffe",
@@ -1698,7 +1754,9 @@
         "changed_at": "2026-02-11T21:50:55.054000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "eaa12296f8afb242",
@@ -1725,7 +1783,9 @@
         "changed_at": "2026-02-11T18:52:09.326000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "55a3de32e5f47a9e",
@@ -1786,7 +1846,9 @@
         "changed_at": "2026-02-15T20:58:11.053727+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "9a4a6c1c9df2181d",
@@ -1811,7 +1873,9 @@
         "changed_at": "2026-02-07T08:45:26.478000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "96290c5e26d052db",
@@ -1836,7 +1900,9 @@
         "changed_at": "2026-02-12T15:40:33.618000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "68a019fcfdfea59d",
@@ -1871,7 +1937,9 @@
         "changed_at": "2026-02-11T14:24:03.880000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "4be28154c5cae414",
@@ -1909,7 +1977,9 @@
         "changed_at": "2026-02-11T14:33:08.668000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "d6e16c17d5dc6ed4",
@@ -1945,7 +2015,9 @@
         "changed_at": "2026-02-11T14:33:31.192000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "1641aea6e2a66a22",
@@ -1989,7 +2061,9 @@
         "changed_at": "2026-02-11T14:35:54.990000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "0e5ecca6739346c4",
@@ -2032,7 +2106,9 @@
         "changed_at": "2026-02-11T14:36:27.433000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "bfdcb1bdfe3f2e65",
@@ -2110,7 +2186,9 @@
         "changed_at": "2026-02-11T01:59:46.797000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "3305305e88753be2",
@@ -2140,7 +2218,9 @@
         "changed_at": "2026-02-03T16:32:27.256000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "cbfb3dcee3b37a17",
@@ -2165,7 +2245,9 @@
         "changed_at": "2026-02-03T16:34:26.088000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "68abd927dc7ee1a5",
@@ -2190,7 +2272,9 @@
         "changed_at": "2026-02-09T01:41:52.652000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "fb31a4d419ff41df",
@@ -2282,7 +2366,9 @@
         "changed_at": "2026-02-10T19:48:36.868000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "26ffa2778eae533e",
@@ -2309,7 +2395,9 @@
         "changed_at": "2026-02-10T21:02:46.839000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "e67eba10c83ef22d",
@@ -2385,7 +2473,9 @@
         "changed_at": "2026-02-10T21:06:24.589000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "fb3c365dc74523e9",
@@ -2414,7 +2504,9 @@
         "changed_at": "2026-02-11T19:48:29.961000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "ad6e7d70c9a34c1f",
@@ -2439,7 +2531,9 @@
         "changed_at": "2026-02-11T19:52:29.398000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "ac229e518eec8553",
@@ -2470,7 +2564,9 @@
         "changed_at": "2026-02-04T00:32:05.857000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "ef46e23913ab0323",
@@ -2498,7 +2594,9 @@
         "changed_at": "2026-02-04T00:33:21.352000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "16faf78958bf6501",
@@ -2527,7 +2625,9 @@
         "changed_at": "2026-02-04T00:35:20.746000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "dce39f97665a5069",
@@ -2583,7 +2683,9 @@
         "changed_at": "2026-02-11T15:35:05.633000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "983cca1d43b5f855",
@@ -2608,7 +2710,9 @@
         "changed_at": "2026-02-12T09:46:25.190000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "8dfe6fa467274925",
@@ -2633,7 +2737,9 @@
         "changed_at": "2026-02-12T09:52:32.343000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "fc1fb3d67c515ee0",
@@ -2701,7 +2807,9 @@
         "changed_at": "2026-02-08T10:31:47.428000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "1ee9f7c7dddd6e29",
@@ -2726,7 +2834,9 @@
         "changed_at": "2026-02-08T10:57:06.312000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "9a5fe211934ac637",
@@ -2759,7 +2869,9 @@
         "changed_at": "2026-01-30T21:22:58.950000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "0518db763a3dd13c",
@@ -2841,7 +2953,9 @@
         "changed_at": "2026-02-11T10:40:26.215000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "771af6de7cafa1f0",
@@ -2875,7 +2989,9 @@
         "changed_at": "2026-02-04T19:21:27.239000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "369e422969facc93",
@@ -2900,7 +3016,9 @@
         "changed_at": "2026-02-02T18:07:25.615000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "6f07462fc3776149",
@@ -2925,7 +3043,9 @@
         "changed_at": "2026-02-02T19:09:35.789000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "a0aa7e1bac5a9c94",
@@ -2950,7 +3070,9 @@
         "changed_at": "2026-02-02T19:23:28.338000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "a102af9db6a8f008",
@@ -2991,7 +3113,9 @@
         "changed_at": "2026-02-17T21:57:51.259000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "0e3ef47d4fccb13e",
@@ -3016,7 +3140,9 @@
         "changed_at": "2026-02-16T20:24:27.897000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "57fac1441ae9405c",
@@ -3090,7 +3216,9 @@
         "changed_at": "2026-02-16T20:55:28.545000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "9a76f11e715d5f57",
@@ -3117,7 +3245,9 @@
         "changed_at": "2026-02-16T21:33:44.367000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "69ec61d377fce9d1",
@@ -3142,7 +3272,9 @@
         "changed_at": "2026-02-16T21:56:57.259000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "eec0cae68cdeb650",
@@ -3196,7 +3328,9 @@
         "changed_at": "2026-02-16T22:03:04.443000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "3c8b0170e7d0dac9",
@@ -3265,7 +3399,9 @@
         "changed_at": "2026-02-16T23:35:32.620000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "cb30a4f834652515",
@@ -3297,7 +3433,9 @@
         "changed_at": "2026-02-16T23:42:15.581728+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "8f1e215f13286e63",
@@ -3374,7 +3512,9 @@
         "changed_at": "2026-02-17T00:46:04.621000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "8c925e90a07d1116",
@@ -3406,7 +3546,9 @@
         "changed_at": "2026-02-17T01:22:25.981000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "d0075769723faf74",
@@ -3463,7 +3605,9 @@
         "changed_at": "2026-02-17T02:48:04.581000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "049e9f51525b319a",
@@ -3488,7 +3632,9 @@
         "changed_at": "2026-02-16T17:10:43.969000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "aeea3cb2916034f1",
@@ -3513,7 +3659,9 @@
         "changed_at": "2026-02-17T16:10:15.972000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "599656cc201c2f08",
@@ -3587,7 +3735,9 @@
         "changed_at": "2026-02-17T16:12:44.692000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "bafd01738e236040",
@@ -3612,7 +3762,9 @@
         "changed_at": "2026-02-17T17:53:55.909000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "f72461f3618c8422",
@@ -3715,7 +3867,9 @@
         "changed_at": "2026-02-17T19:37:12.537000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "b90babca85f3ad9d",
@@ -3742,7 +3896,9 @@
         "changed_at": "2026-02-17T19:39:57.078530+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "4484c6dfb7e83c35",
@@ -3767,7 +3923,9 @@
         "changed_at": "2026-02-17T19:50:23.058000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "4f6add6477d86355",
@@ -3792,7 +3950,9 @@
         "changed_at": "2026-02-17T20:05:43.830000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "4d5ebe015e434481",
@@ -3817,7 +3977,9 @@
         "changed_at": "2026-02-17T21:07:45.223000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "70644c519880310a",
@@ -3889,7 +4051,9 @@
         "changed_at": "2026-02-16T14:53:23.283000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "1d66ee323574df12",
@@ -3916,7 +4080,9 @@
         "changed_at": "2026-02-16T15:17:42.690000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "afdd5e09a4eea8ed",
@@ -3944,7 +4110,9 @@
         "changed_at": "2026-02-16T15:20:21.044000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "ea9c53ab84cf90ce",
@@ -3969,7 +4137,9 @@
         "changed_at": "2026-02-16T15:26:40.021000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "7b0b39cf627b94df",
@@ -3994,7 +4164,9 @@
         "changed_at": "2026-02-15T23:29:10.555000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "3289788972f7d6db",
@@ -4069,7 +4241,9 @@
         "changed_at": "2026-02-16T09:41:50.833055+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "c4fd7c2c3519ce90",
@@ -4109,7 +4283,9 @@
         "changed_at": "2026-02-18T15:35:35.909000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "f441cccc9c526abd",
@@ -4134,7 +4310,9 @@
         "changed_at": "2026-02-18T16:13:59.563000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "34d97832e7455858",
@@ -4161,7 +4339,9 @@
         "changed_at": "2026-02-18T16:22:05.777000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "356ca4207cf1940f",
@@ -4293,7 +4473,9 @@
         "changed_at": "2026-02-18T16:43:05.944000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "513db821a9553c83",
@@ -4329,7 +4511,9 @@
         "changed_at": "2026-02-18T16:45:32.463323+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "5489bc6cf0c1a372",
@@ -4354,7 +4538,9 @@
         "changed_at": "2026-02-18T17:33:11.947000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "e1d42bcd4c3f5e5d",
@@ -4487,7 +4673,9 @@
         "changed_at": "2026-02-18T17:46:34.726000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "ce0fac6d9edbe55c",
@@ -4590,7 +4778,9 @@
         "changed_at": "2026-02-18T17:55:03.048373+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "b560e06d5f3f1172",
@@ -4695,7 +4885,9 @@
         "changed_at": "2026-02-18T18:15:34.287000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "2864afbdf7698775",
@@ -4801,7 +4993,9 @@
         "changed_at": "2026-02-18T18:42:59.018863+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "7a9f1df9dfad15fe",
@@ -4894,7 +5088,9 @@
         "changed_at": "2026-02-18T18:45:54.912129+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "d2374cb6e759101d",
@@ -4981,7 +5177,9 @@
         "changed_at": "2026-02-18T18:47:05.319064+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "f2d9de7251296c24",
@@ -5062,7 +5260,9 @@
         "changed_at": "2026-02-18T18:48:12.578102+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "ee66f7c7496311f8",
@@ -5137,7 +5337,9 @@
         "changed_at": "2026-02-18T18:50:11.350818+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "533a7b185759bf81",
@@ -5211,7 +5413,9 @@
         "changed_at": "2026-02-18T18:51:25.053007+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "0532ab500d1ae726",
@@ -5287,7 +5491,9 @@
         "changed_at": "2026-02-18T18:52:18.395477+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "4927dee201c643db",
@@ -5362,7 +5568,9 @@
         "changed_at": "2026-02-18T18:53:12.422198+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "52607170ed6f423d",
@@ -5437,7 +5645,9 @@
         "changed_at": "2026-02-18T18:54:24.929653+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "db47869554e52267",
@@ -5510,7 +5720,9 @@
         "changed_at": "2026-02-18T18:55:22.270812+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "1c22b8b5cc1d961e",
@@ -5581,7 +5793,9 @@
         "changed_at": "2026-02-18T18:56:21.561803+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "53d7d660c137b7f4",
@@ -5655,7 +5869,9 @@
         "changed_at": "2026-02-18T18:57:19.082469+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "272344dc8b478a75",
@@ -5735,7 +5951,9 @@
         "changed_at": "2026-02-18T18:58:31.953213+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "6b352539cd1e592c",
@@ -5806,7 +6024,9 @@
         "changed_at": "2026-02-18T18:59:30.198000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "d27b4387a57443c1",
@@ -5875,7 +6095,9 @@
         "changed_at": "2026-02-18T19:00:26.395710+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "f73fde27db601528",
@@ -5941,7 +6163,9 @@
         "changed_at": "2026-02-18T19:01:32.547383+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "68957f702abd4cc1",
@@ -6012,7 +6236,9 @@
         "changed_at": "2026-02-18T19:02:34.034098+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "4f9dd6c3abde681d",
@@ -6082,7 +6308,9 @@
         "changed_at": "2026-02-18T19:03:33.581272+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "910cce95b657c39a",
@@ -6162,7 +6390,9 @@
         "changed_at": "2026-02-18T19:04:56.060157+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "0b26cb1aada906a9",
@@ -6243,7 +6473,9 @@
         "changed_at": "2026-02-18T19:06:08.473118+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "9ae272e80c36b0b1",
@@ -6319,7 +6551,9 @@
         "changed_at": "2026-02-18T19:07:15.679141+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "fdc5d0c387955e47",
@@ -6388,7 +6622,9 @@
         "changed_at": "2026-02-18T19:08:17.580176+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "73bf722a67537eea",
@@ -6459,7 +6695,9 @@
         "changed_at": "2026-02-18T19:09:23.224000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "f89793151bdbf8fc",
@@ -6531,7 +6769,9 @@
         "changed_at": "2026-02-18T19:10:32.377553+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "fa2880fe0a6c3a25",
@@ -6602,7 +6842,9 @@
         "changed_at": "2026-02-18T19:11:47.434000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "e789f04506f5271f",
@@ -6675,7 +6917,9 @@
         "changed_at": "2026-02-18T19:13:02.235857+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "b33da6c81a883575",
@@ -6745,7 +6989,9 @@
         "changed_at": "2026-02-18T19:14:08.816161+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "9f2ad47504fe35aa",
@@ -6815,7 +7061,9 @@
         "changed_at": "2026-02-18T19:15:21.639689+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "e0fa189bc1e2231c",
@@ -6883,7 +7131,9 @@
         "changed_at": "2026-02-18T19:16:39.308057+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "3ef7de30be227235",
@@ -6953,7 +7203,9 @@
         "changed_at": "2026-02-18T19:17:44.406652+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "581c771ae0e9830f",
@@ -7022,7 +7274,9 @@
         "changed_at": "2026-02-18T19:18:53.403508+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "c8763d9981cd8b43",
@@ -7090,7 +7344,9 @@
         "changed_at": "2026-02-18T19:20:00.817674+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "c50a3f668511b608",
@@ -7161,7 +7417,9 @@
         "changed_at": "2026-02-18T19:21:03.379818+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "b627b7d8de7e4fb5",
@@ -7231,7 +7489,9 @@
         "changed_at": "2026-02-18T19:22:10.292332+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "78649f3e4b2a4e5c",
@@ -7306,7 +7566,9 @@
         "changed_at": "2026-02-18T19:23:24.903879+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "0610df4c14d6a20f",
@@ -7377,7 +7639,9 @@
         "changed_at": "2026-02-18T19:24:33.421161+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "79233299e9176360",
@@ -7453,7 +7717,9 @@
         "changed_at": "2026-02-18T19:25:38.180581+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "344bca3066869147",
@@ -7526,7 +7792,9 @@
         "changed_at": "2026-02-18T19:26:41.963014+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "533fa4378f5cb1d8",
@@ -7598,7 +7866,9 @@
         "changed_at": "2026-02-18T19:27:49.507609+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "b31b05c40512dcc9",
@@ -7664,7 +7934,9 @@
         "changed_at": "2026-02-18T19:28:57.079102+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "94754e0b9523a4c3",
@@ -7743,7 +8015,9 @@
         "changed_at": "2026-02-18T19:29:53.876679+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "ff56df481639dfcf",
@@ -7816,7 +8090,9 @@
         "changed_at": "2026-02-18T19:30:58.214784+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "f18ec003b478563b",
@@ -7891,7 +8167,9 @@
         "changed_at": "2026-02-18T19:32:10.120079+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "ab6bbab2bf724e54",
@@ -7964,7 +8242,9 @@
         "changed_at": "2026-02-18T19:33:19.961905+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "df1fdff908437ac5",
@@ -8032,7 +8312,9 @@
         "changed_at": "2026-02-18T19:34:55.030867+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "7877c525379085f7",
@@ -8102,7 +8384,9 @@
         "changed_at": "2026-02-18T19:36:03.802914+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "bb171f33aab662ed",
@@ -8171,7 +8455,9 @@
         "changed_at": "2026-02-18T19:37:16.431927+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "bb94b0930184a47d",
@@ -8244,7 +8530,9 @@
         "changed_at": "2026-02-18T19:38:18.942081+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "5d8d2e5c2c3b5ea2",
@@ -8323,7 +8611,9 @@
         "changed_at": "2026-02-18T19:39:22.731103+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "2f6e093fef545b1c",
@@ -8394,7 +8684,9 @@
         "changed_at": "2026-02-18T19:40:31.495400+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "c9fa1c795ffc2d7e",
@@ -8468,7 +8760,9 @@
         "changed_at": "2026-02-18T19:41:43.450304+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "2f9472d01db37233",
@@ -8493,7 +8787,9 @@
         "changed_at": "2026-02-19T11:01:53.989000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "6f66d876862fc69d",
@@ -8581,7 +8877,9 @@
         "changed_at": "2026-02-18T09:59:48.237000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "d546d7a239b0dfca",
@@ -8687,7 +8985,9 @@
         "changed_at": "2026-02-18T23:42:29.283000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "f3bdcef0715d61e4",
@@ -8743,7 +9043,9 @@
         "changed_at": "2026-02-17T23:04:06.435000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "38eae8f024de183b",
@@ -8776,7 +9078,9 @@
         "changed_at": "2026-02-19T01:17:54.493000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "63ee762f58139ae9",
@@ -8816,7 +9120,9 @@
         "changed_at": "2026-02-19T01:49:12.205000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "813351758f018bd7",
@@ -8855,7 +9161,9 @@
         "changed_at": "2026-02-19T01:50:35.183000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "721ea57511bf8d50",
@@ -8899,7 +9207,9 @@
         "changed_at": "2026-02-19T02:18:35+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "2f122ea30bac1b36",
@@ -9052,7 +9362,9 @@
         "changed_at": "2026-02-19T02:33:43.197000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "a01b1fddf59c5c63",
@@ -9255,7 +9567,9 @@
         "changed_at": "2026-02-19T03:00:02.712000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "daf4144334343cb6",
@@ -9409,7 +9723,9 @@
         "changed_at": "2026-02-19T10:06:56.431164+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "a1d23e7c0d3da316",
@@ -9438,7 +9754,9 @@
         "changed_at": "2026-02-19T10:33:32.998000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "16c5b832339b82ca",
@@ -9463,7 +9781,9 @@
         "changed_at": "2026-02-19T10:54:02.804000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "5eae15599f83376b",
@@ -9506,7 +9826,9 @@
         "changed_at": "2026-02-18T01:31:03.799000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "e5a1b1e5889ba1a2",
@@ -9534,7 +9856,9 @@
         "changed_at": "2026-02-19T14:26:51.678000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "90e2d8ee4642c7bf",
@@ -9561,7 +9885,9 @@
         "changed_at": "2026-02-19T16:00:45.391774+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "ac8983980224e2d3",
@@ -9586,7 +9912,9 @@
         "changed_at": "2026-02-19T17:16:12.096000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "8a0a3d30a3fde8f6",
@@ -9611,7 +9939,9 @@
         "changed_at": "2026-02-19T17:21:50.545000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "0dcaf606aceb743e",
@@ -9636,7 +9966,9 @@
         "changed_at": "2026-02-19T20:47:39.954000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "d170536551ced373",
@@ -9725,7 +10057,9 @@
         "changed_at": "2026-02-19T20:56:05.762000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "9257bb224ed2c9a1",
@@ -9755,7 +10089,9 @@
         "changed_at": "2026-02-19T20:57:55.983455+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "ca0c6b9a3ea1a6d1",
@@ -9808,7 +10144,9 @@
         "changed_at": "2026-02-17T22:49:12.515381+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "a92056bcf23abae5",
@@ -9854,7 +10192,9 @@
         "changed_at": "2026-02-17T22:59:34.948000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "5c916a17bb737187",
@@ -9902,7 +10242,9 @@
         "changed_at": "2026-02-17T23:02:40.363000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "d18a1fdbc9e4c673",
@@ -9955,7 +10297,9 @@
         "changed_at": "2026-02-17T23:02:43.716000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "526e80de41312e56",
@@ -10011,7 +10355,9 @@
         "changed_at": "2026-02-17T23:03:11.797000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "becb4c16dfabbd5a",
@@ -10058,7 +10404,9 @@
         "changed_at": "2026-02-19T17:35:11.583167+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "5c49ea467e1be35e",
@@ -10095,7 +10443,9 @@
         "changed_at": "2026-02-19T22:29:14.005670+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "9ce5fd6c493577e2",
@@ -10124,7 +10474,9 @@
         "changed_at": "2026-02-19T23:41:15.977000+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "d9a3e794347e7b2c",
@@ -10150,7 +10502,9 @@
         "changed_at": "2026-02-20T01:01:28.476914+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "94e052ae55520e6b",
@@ -10175,7 +10529,9 @@
         "changed_at": "2026-02-20T01:01:28.477184+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "772c787ff3ce4596",
@@ -10200,7 +10556,9 @@
         "changed_at": "2026-02-20T01:01:28.477373+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "46112a36b84ba8d0",
@@ -10226,7 +10584,9 @@
         "changed_at": "2026-02-20T01:01:28.477559+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "681cccee12a3029d",
@@ -10251,7 +10611,9 @@
         "changed_at": "2026-02-20T01:01:28.478814+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "cc5e92577adaf2b1",
@@ -10277,7 +10639,9 @@
         "changed_at": "2026-02-20T01:01:28.479098+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "8bbf979c709a651a",
@@ -10303,7 +10667,9 @@
         "changed_at": "2026-02-20T01:01:28.479328+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "b8983935d39d22ef",
@@ -10328,7 +10694,9 @@
         "changed_at": "2026-02-20T01:01:28.480658+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
   },
   {
     "constraint_id": "9b01092f8ca5fa84",
@@ -10354,6 +10722,2381 @@
         "changed_at": "2026-02-20T01:01:28.480889+00:00"
       }
     ],
-    "supersedes": null
+    "supersedes": null,
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "9c9287c48d0b3434",
+    "text": "Forbid  performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "1\u2192The"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:19:53.809144+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:19:53.809144+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "c92bb4c65f646c6b",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "ls"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:19:53.809490+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "46112a36b84ba8d0",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:19:53.809490+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "8cc1b903d259b27a",
+    "text": "Forbid Edit performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Edit"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:19:53.809702+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:19:53.809702+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "51f4f7dcddcb1624",
+    "text": "Forbid Edit performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Edit"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:19:53.809894+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:19:53.809894+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "555de3ecf5439026",
+    "text": "Forbid Edit performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Edit"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:19:53.810091+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:19:53.810091+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "c9287a331ec819e6",
+    "text": "Forbid  performing delete on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "1\u2192#"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:20:03.432397+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:20:03.432397+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "e2b20d46b02fd255",
+    "text": "Forbid Edit performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Edit"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:20:04.509643+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:20:04.509643+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "05365f0a7f8edc28",
+    "text": "Forbid  performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "1\u2192---"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:20:15.256651+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:20:15.256651+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "bdb002611cdbd1ce",
+    "text": "Forbid  performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "The"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:20:15.257292+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:20:15.257292+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "c2af83bc28f3140a",
+    "text": "Forbid  performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "The"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:20:15.258423+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:20:15.258423+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "f3147612dafc6efb",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "grep"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:20:15.258675+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:20:15.258675+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "37161fe40e3c8bfd",
+    "text": "Forbid Edit performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Edit"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:20:17.296382+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:20:17.296382+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "1785c5685d396b52",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "git add"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:20:18.323032+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:20:18.323032+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "dc3290e95963469c",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "git log"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:20:18.323288+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:20:18.323288+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "59f50c001f1b64f0",
+    "text": "Forbid  performing delete on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "1\u2192#"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:20:19.509657+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:20:19.509657+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "0766b44936b45edc",
+    "text": "Forbid Write performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Write"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:20:21.898102+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:20:21.898102+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "05383494331d9b47",
+    "text": "Forbid  performing push on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "1\u2192{"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:20:22.826471+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:20:22.826471+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "0752f1b0d3b24adf",
+    "text": "Forbid  performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "1\u2192#"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:20:25.024958+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:20:25.024958+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "6fe969c1ec3d2796",
+    "text": "Forbid  performing delete on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "1\u2192#"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:20:25.027136+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:20:25.027136+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "399bdb7e45342792",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "mkdir"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:20:39.875400+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "d9a3e794347e7b2c",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:20:39.875400+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "300381f3cba7cd9f",
+    "text": "Forbid  performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Base"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:20:39.876766+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:20:39.876766+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "40894c925be3ad97",
+    "text": "Forbid  performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "<objective>"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:20:45.818435+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:20:45.818435+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "99ac560eef34568f",
+    "text": "Forbid  performing delete on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "575\u2192"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:04.118741+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:04.118741+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "487083bea6529f2a",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "grep"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:04.119061+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "f3147612dafc6efb",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:04.119061+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "79c085d6e1051379",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "git diff"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:04.119341+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:04.119341+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "36ef4be919a14029",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "git status"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:04.119583+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:04.119583+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "d608e0921f5fbce0",
+    "text": "Forbid  performing delete on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "1\u2192#"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:04.121689+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:04.121689+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "928e33791e9b1e22",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "python"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:05.468595+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:05.468595+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "48ed44e7a4884db6",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "python"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:07.746414+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "928e33791e9b1e22",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:07.746414+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "14acf4d446f58b62",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "kill"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:07.746708+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:07.746708+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "8f5b6c6d498fc472",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "sqlite3"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:07.746963+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:07.746963+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "df82cb5beecb57de",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "grep"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:07.747191+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "f3147612dafc6efb",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:07.747191+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "37d5a46d964b09c2",
+    "text": "Forbid  performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Good"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:07.747419+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:07.747419+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "cdb9c00074965155",
+    "text": "Forbid  performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Excellent"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:07.748456+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:07.748456+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "bf8b3b8fff77796e",
+    "text": "Forbid Edit performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Edit"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:07.748673+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:07.748673+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "6c563bf07e3b448a",
+    "text": "Forbid Bash performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "python"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:07.748889+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "928e33791e9b1e22",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:07.748889+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "13ee12708fa6f9ee",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "sqlite3"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:07.749124+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "8f5b6c6d498fc472",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:07.749124+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "8b07f76612a4358e",
+    "text": "Forbid  performing delete on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "#"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:07.751789+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:07.751789+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "0a1ac9943ca44941",
+    "text": "Forbid Edit performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Edit"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:07.752138+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:07.752138+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "33dd9f86904d137e",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "python"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:07.752487+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "928e33791e9b1e22",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:07.752487+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "0db19a964f00a5ea",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "python"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:07.753059+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "928e33791e9b1e22",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:07.753059+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "10a5ff444af3a714",
+    "text": "Forbid  performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Looking"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:07.753429+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:07.753429+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "6e0361103acda0b8",
+    "text": "Forbid  performing delete on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "627\u2192"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:16.252999+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:16.252999+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "3b6d6ee9eb7f9342",
+    "text": "Forbid  performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "The"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:16.253528+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:16.253528+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "96219d81698b19b1",
+    "text": "Forbid  performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "1\u2192#"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:18.131743+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:18.131743+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "e475519f00a1b602",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "mkdir"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:18.132130+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "d9a3e794347e7b2c",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:18.132130+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "7c016c2b36dae6c1",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "python"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:18.132360+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "928e33791e9b1e22",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:18.132360+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "5679bc6fdd92e9ac",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "python3"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:18.132677+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:18.132677+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "1d6b63d470a0eabc",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "ls"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:18.132915+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "46112a36b84ba8d0",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:18.132915+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "657568c6be957d10",
+    "text": "Forbid Bash performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "ls"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:18.133124+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "46112a36b84ba8d0",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:18.133124+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "36b718b2afbb8179",
+    "text": "Forbid Write performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Write"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:18.133336+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:18.133336+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "b20ae47587587b90",
+    "text": "Forbid  performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Resuming"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:18.133581+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:18.133581+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "df50b603ff34b1ec",
+    "text": "Forbid  performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Picking"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:18.133805+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:18.133805+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "7eb2f8d6f67995bc",
+    "text": "Forbid  performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Continuing"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:18.134024+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:18.134024+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "d708c3e09bcdc204",
+    "text": "Forbid  performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Picking"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:18.134249+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:18.134249+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "edc8d97d946a700f",
+    "text": "Forbid Edit performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Edit"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:18.134456+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:18.134456+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "d883a954cc43fb61",
+    "text": "Forbid Edit performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Edit"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:18.134661+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:18.134661+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "a02e8a2257039162",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "ls"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:27.008486+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "46112a36b84ba8d0",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:27.008486+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "6ab24bffce0d2dd0",
+    "text": "Forbid Edit performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Edit"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:33.153666+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:33.153666+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "9048c3412a18c401",
+    "text": "Forbid  performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Base"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:34.364319+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:34.364319+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "69917bf76a4e3d15",
+    "text": "Forbid Bash performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "find"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:37.107812+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:37.107812+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "37521cf0b5814550",
+    "text": "Forbid  performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "1\u2192#"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:37.110069+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:37.110069+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "885cba42263bd0c3",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "python3"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:43.111326+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "5679bc6fdd92e9ac",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:43.111326+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "372670f9b6d9a88c",
+    "text": "Forbid  performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "1\u2192#"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:43.112564+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:43.112564+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "e9a487feee059cf7",
+    "text": "Forbid  performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "1\u2192#"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:43.114668+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:43.114668+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "bcd821ceb46d4109",
+    "text": "Forbid  performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Base"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:43.115472+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:43.115472+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "8dbb63d43c407575",
+    "text": "Forbid  performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "1\u2192---"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:43.116644+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:43.116644+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "328f92377352f884",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "python"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:54.670674+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "928e33791e9b1e22",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:54.670674+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "aa6e98dd13718ba9",
+    "text": "Forbid  performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Picking"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:54.671028+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:54.671028+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "dedfe387a10dc517",
+    "text": "Forbid  performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "The"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:56.282556+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:56.282556+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "d882696abc1ffb8b",
+    "text": "Forbid  performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "The"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:56.282916+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:56.282916+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "6f0b0222ea93e102",
+    "text": "Forbid Write performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Write"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:56.283139+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:56.283139+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "3774bce31f729376",
+    "text": "Forbid  performing delete on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "1\u2192[Model"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:21:56.284165+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:21:56.284165+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "57f4dd1606771084",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "python"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:22:01.779622+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "928e33791e9b1e22",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:22:01.779622+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "ecae7b0aa1a234a5",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "python"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:22:01.779947+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "928e33791e9b1e22",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:22:01.779947+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "88333f1ad04c3d4c",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "find"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:22:02.911779+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "69917bf76a4e3d15",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:22:02.911779+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "d7f13d9fc13db2d8",
+    "text": "Forbid  performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Base"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:22:08.453999+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:22:08.453999+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "d23650d2b776dc7d",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "ls"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:22:19.728746+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "46112a36b84ba8d0",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:22:19.728746+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "7c88e01ebc97edd9",
+    "text": "Forbid  performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "180\u2192"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:22:19.729309+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:22:19.729309+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "efc0813546ebef82",
+    "text": "Forbid  performing delete on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "1\u2192#"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:22:22.145869+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:22:22.145869+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "f2d811c1029c17ca",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "python3"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:22:35.990690+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "5679bc6fdd92e9ac",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:22:35.990690+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "f3e194ddbb1418a9",
+    "text": "Forbid  performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Got"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:22:35.991044+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:22:35.991044+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "9eb39bec767fcc38",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "grep"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:22:35.991335+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "f3147612dafc6efb",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:22:35.991335+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "d8ad8d57efe797e1",
+    "text": "Forbid  performing delete on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "270\u2192"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:22:35.991638+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:22:35.991638+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "4be8ce22d128e089",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "sqlite3"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:22:35.991888+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "8f5b6c6d498fc472",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:22:35.991888+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "b992190dd0d53d9e",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "git log"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:22:35.992120+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "dc3290e95963469c",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:22:35.992120+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "bde6a0092a40687e",
+    "text": "Forbid Bash performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "Bash",
+      "python"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:22:35.992342+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": "928e33791e9b1e22",
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:22:35.992342+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "2432c461dd579855",
+    "text": "Forbid  performing write on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "1\u2192#"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T20:22:35.993474+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T20:22:35.993474+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "d816280cc342460f",
+    "text": "Forbid  performing delete on any path without prior approval following a rejected O_CORR gate",
+    "severity": "requires_approval",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "1\u2192#"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-24T23:19:36.376146+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-24T23:19:36.376146+00:00"
+      }
+    ],
+    "epistemological_origin": "principled",
+    "epistemological_confidence": 1.0
+  },
+  {
+    "constraint_id": "c809537cd48faa3e",
+    "text": "Forbid  performing execute on any path without prior approval following a rejected O_CORR gate",
+    "severity": "forbidden",
+    "scope": {
+      "paths": []
+    },
+    "detection_hints": [
+      "310-"
+    ],
+    "source_episode_id": "",
+    "created_at": "2026-02-25T18:47:31.482077+00:00",
+    "status": "candidate",
+    "source": "inferred_from_escalation",
+    "examples": [],
+    "bypassed_constraint_id": null,
+    "type": "behavioral_constraint",
+    "status_history": [
+      {
+        "status": "candidate",
+        "changed_at": "2026-02-25T18:47:31.482077+00:00"
+      }
+    ]
   }
 ]

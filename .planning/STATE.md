@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 21 (Doc Index Floating Corpus Bridge) — Plans 01-03 complete, 1 remaining.
+**Current focus:** Phase 21 (Doc Index Floating Corpus Bridge) -- COMPLETE. All 4 plans delivered.
 
 ## Current Position
 
 Phase: 21 (Doc Index Floating Corpus Bridge)
-Plan: 3 of 4
-Status: In progress
-Last activity: 2026-02-27 -- Completed 21-03-PLAN.md (doc briefing delivery pipeline)
+Plan: 4 of 4
+Status: Phase complete
+Last activity: 2026-02-27 -- Completed 21-04-PLAN.md (integration tests for full doc index pipeline)
 
-Progress: [████████████████████████░░░░░░░░] 75% (3/4 plans in phase 21)
-Overall:  [██████████████████████████████████████████████████████████████████████████████████████████] 89/90 plans total
+Progress: [████████████████████████████████] 100% (4/4 plans in phase 21)
+Overall:  [████████████████████████████████████████████████████████████████████████████████████████████] 90/90 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 89 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 3 Phase 21)
+- Total plans completed: 90 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 4 Phase 21)
 - Average duration: 5.5 min
-- Total execution time: 8.56 hours
+- Total execution time: 8.63 hours
 
 **By Phase:**
 
@@ -55,9 +55,11 @@ Overall:  [███████████████████████
 
 | 20-causal-chain-completion | 5/5 | 19 min | 3.8 min |
 
+| 21-doc-index-floating-corpus-bridge | 4/4 | 18 min | 4.5 min |
+
 **Recent Trend:**
-- Last 5 plans: 2 min, 5 min, 2 min, 3 min, 9 min
-- Trend: Phase 21 Plan 03 (doc briefing delivery pipeline) complete in 9 min.
+- Last 5 plans: 5 min, 2 min, 3 min, 9 min, 4 min
+- Trend: Phase 21 Plan 04 (integration tests) complete in 4 min. Phase 21 complete.
 
 *Updated after each plan completion*
 
@@ -484,6 +486,10 @@ Recent decisions affecting current work:
 - Plan 21-03: Dedup by doc_path in Python (first occurrence wins due to ORDER BY) since DuckDB lacks DISTINCT ON
 - Plan 21-03: Doc delivery is confidence-ranked across all classified docs; no per-session axis filtering (constraints.json has no ccd_axis field)
 - Plan 21-03: 15 tests passing (8 daemon + 2 briefing model + 2 server + 3 session_start)
+- Plan 21-04: pytest.approx(abs=1e-6) for DuckDB FLOAT confidence comparisons (0.7 round-trips as 0.699999988079071)
+- Plan 21-04: No constraint-axis join verified: empty constraints.json + populated doc_index returns docs via /api/check
+- Plan 21-04: 13 integration tests covering full pipeline reindex->query->deliver
+- Plan 21-04: 1912 total tests (1910 passing + 2 pre-existing segmenter failures, zero Phase 21 regressions)
 
 ### Pending Todos
 
@@ -654,9 +660,9 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Phase 21 Plan 03 complete. Doc briefing delivery pipeline operational.
-Next action: Execute Plan 21-04 (doc_indexer CLI integration + session-start docs).
-Resume file: .planning/phases/21-doc-index-floating-corpus-bridge/21-04-PLAN.md
+Stopped at: Phase 21 COMPLETE. All 4 plans delivered. 90/90 total plans complete.
+Next action: All planned phases complete. Project at milestone.
+Resume file: N/A (all phases complete)
 
 ## Phase 15 Completion Summary
 
@@ -808,3 +814,16 @@ Phase 20 delivered Causal Chain Completion (all 5 plans, all 6 structural gaps v
 - **Gap 6 verified**: /api/check response includes epistemological_signals: []
 - **Key modules**: src/pipeline/live/bus/ (server.py, schema.py, models.py), src/pipeline/live/governor/daemon.py, src/pipeline/live/hooks/session_start.py
 - **Project milestone**: All 86 plans across 20 phases complete. Causal chain infrastructure ready for post-OpenClaw activation.
+
+## Phase 21 Completion Summary
+
+Phase 21 delivered the Doc Index Floating Corpus Bridge (all 4 plans):
+- **Plan 01 COMPLETE (Wave 1)**: doc_schema.py with DOC_INDEX_DDL (8 columns, composite PK), create_doc_schema() wired into create_bus_schema(), CheckResponse.relevant_docs field, 8 tests
+- **Plan 02 COMPLETE (Wave 2)**: doc_indexer.py with 9 functions (3-tier extraction: frontmatter/regex/keyword), load_axis_vocabulary (DuckDB primary, MEMORY.md fallback), docs CLI group with reindex command, 31 tests
+- **Plan 03 COMPLETE (Wave 2)**: GovernorDaemon._query_relevant_docs() (top 3, always-show first, dedup by path), /api/check returns relevant_docs, session_start.py prints [OPE] doc briefing, 15 tests
+- **Plan 04 COMPLETE (Wave 3)**: 13 integration tests verifying full pipeline (reindex -> doc_index -> daemon query -> /api/check delivery -> session_start printing), idempotency, unclassified exclusion, always-show ordering, no constraint-axis join
+- **1912 tests** total (1910 passed + 2 pre-existing segmenter failures, zero Phase 21 regressions)
+- **Full pipeline verified**: reindex_docs() populates doc_index, GovernorDaemon queries it, /api/check delivers results, session_start.py prints with [OPE] prefix
+- **Key modules**: src/pipeline/live/bus/doc_schema.py, src/pipeline/doc_indexer.py, src/pipeline/cli/docs.py, src/pipeline/live/governor/daemon.py (extended), src/pipeline/live/bus/server.py (extended), src/pipeline/live/hooks/session_start.py (extended)
+- **CLI**: `python -m src.pipeline.cli docs reindex [--docs-dir] [--db] [--socket-path]`
+- **Project milestone**: All 90 plans across 21 phases complete. Doc index pipeline operational for session-start doc delivery.

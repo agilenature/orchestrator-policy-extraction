@@ -470,10 +470,10 @@ Plans:
 **Plans:** 4 plans in 3 waves
 
 Plans:
-- [ ] 21-01-PLAN.md — doc_schema.py + schema chain wiring + CheckResponse extension (Wave 1)
-- [ ] 21-02-PLAN.md — doc_indexer.py 3-tier extraction + docs CLI group (Wave 2)
-- [ ] 21-03-PLAN.md — GovernorDaemon doc query + server wiring + session_start.py briefing (Wave 2)
-- [ ] 21-04-PLAN.md — Integration tests: full pipeline reindex -> query -> deliver (Wave 3)
+- [x] 21-01-PLAN.md — doc_schema.py + schema chain wiring + CheckResponse extension (Wave 1)
+- [x] 21-02-PLAN.md — doc_indexer.py 3-tier extraction + docs CLI group (Wave 2)
+- [x] 21-03-PLAN.md — GovernorDaemon doc query + server wiring + session_start.py briefing (Wave 2)
+- [x] 21-04-PLAN.md — Integration tests: full pipeline reindex -> query -> deliver (Wave 3)
 
 **Details:**
 The docs/ folder is currently a floating corpus — files exist on disk with no axis-indexed entries, no causal edges in push_links, and no entries in the OPE session-start briefing. Every time a session needs architectural decisions or design rationale, the human must explicitly prompt "look at the docs folder." This is a raven-cost-function-absent failure: the AI retrieves by surface similarity because the docs have file-provenance, not session-provenance.
@@ -514,4 +514,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 18. Bridge-Warden Structural Integrity Detection | 5/5 | ✓ Complete | 2026-02-25 |
 | 19. Control Plane Integration | 5/5 | ✓ Complete | 2026-02-25 |
 | 20. Causal Chain Completion | 5/5 | ✓ Complete | 2026-02-25 |
-| 21. Doc Index Floating Corpus Bridge | 0/4 | In Progress | |
+| 21. Doc Index Floating Corpus Bridge | 4/4 | ✓ Complete | 2026-02-27 |

@@ -401,11 +401,11 @@ Plans:
 **Plans:** 5 plans in 3 waves
 
 Plans:
-- [ ] 20-01-PLAN.md — Bus schema extension: bus_sessions + push_links table + /api/push-link endpoint + deregister event_count/outcome (Wave 1)
-- [ ] 20-02-PLAN.md — BUS_REGISTRATION_FAILED event emission + openclaw_unavailable flag in session_start.py (Wave 1)
-- [ ] 20-03-PLAN.md — /api/push-link handler + push link round-trip tests (Wave 2)
-- [ ] 20-04-PLAN.md — GovernorDaemon repo scope filter + epistemological_signals stub in CheckResponse (Wave 2)
-- [ ] 20-05-PLAN.md — Integration tests: repo-field registration + push link T1 round-trip + BUS_REGISTRATION_FAILED + scope filter + openclaw_unavailable (Wave 3)
+- [x] 20-01-PLAN.md — Bus schema extension: bus_sessions + push_links table + /api/push-link endpoint + deregister event_count/outcome (Wave 1)
+- [x] 20-02-PLAN.md — BUS_REGISTRATION_FAILED event emission + openclaw_unavailable flag in session_start.py (Wave 1)
+- [x] 20-03-PLAN.md — /api/push-link handler + push link round-trip tests (Wave 2)
+- [x] 20-04-PLAN.md — GovernorDaemon repo scope filter + epistemological_signals stub in CheckResponse (Wave 2)
+- [x] 20-05-PLAN.md — Integration tests: repo-field registration + push link T1 round-trip + BUS_REGISTRATION_FAILED + scope filter + openclaw_unavailable (Wave 3)
 
 ---
 
@@ -482,10 +482,35 @@ Three deliverables: (1) doc_index DuckDB table, (2) doc_indexer.py one-time inde
 
 ---
 
+### Phase 22: Unified Discriminated Query Interface
+**Goal**: Single query entry point that discriminates across conversations (episodes), documentation (doc_index), and code (src/), with cross-project support via DuckDB ATTACH
+**Depends on**: Phase 21
+**Requirements**: QUERY-01 through QUERY-04
+**Success Criteria** (what must be TRUE):
+  1. `python -m src.pipeline.cli query --source docs "raven cost function"` returns axis-matched docs (delegates to query_docs())
+  2. `python -m src.pipeline.cli query --source sessions "segmenter fix"` returns relevant episodes via BM25 fulltext search
+  3. `python -m src.pipeline.cli query --source code "episode populator"` returns file paths + line ranges via grep
+  4. `python -m src.pipeline.cli query --source all "raven cost function"` returns results from all three sources, labeled by source
+  5. `python -m src.pipeline.cli query --project modernizing-tool --source docs "causal chain"` queries the modernizing-tool doc_index via DuckDB ATTACH
+  6. `data/projects.json` exists with at least ope and modernizing-tool entries with db_path field
+**Plans:** 3 plans in 3 waves
+
+Plans:
+- [ ] 22-01-PLAN.md — query_sessions() BM25 search + query_code() subprocess search (Wave 1)
+- [ ] 22-02-PLAN.md — Unified CLI query command + __main__.py registration + projects.json db_path (Wave 2)
+- [ ] 22-03-PLAN.md — Cross-project --project support + integration tests (Wave 3)
+
+**Details:**
+Today's query_docs() gives per-query doc retrieval by CCD axis. Missing: the same capability for session episodes (BM25 fulltext), for code, and for other supervised projects (modernizing-tool, objectivism-library). A human should be able to ask one query and choose — or let the system choose — which source to search.
+
+Four deliverables: (1) query_sessions() — BM25 fulltext search over episodes table, same output format as query_docs(); (2) unified CLI dispatcher: python -m src.pipeline.cli query --source [docs|sessions|code|all]; (3) data/projects.json — project registry mapping repo_name to db_path; (4) cross-project flag: --project [ope|modernizing-tool|objectivism-library|all] queries the registered project's DuckDB via ATTACH.
+
+---
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.3 -> 14 -> 14.1 -> 15 -> 16 -> 16.1 -> 17 -> 18 -> 19 -> 20 -> 21
+Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.3 -> 14 -> 14.1 -> 15 -> 16 -> 16.1 -> 17 -> 18 -> 19 -> 20 -> 21 -> 22
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -515,3 +540,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 19. Control Plane Integration | 5/5 | ✓ Complete | 2026-02-25 |
 | 20. Causal Chain Completion | 5/5 | ✓ Complete | 2026-02-25 |
 | 21. Doc Index Floating Corpus Bridge | 4/4 | ✓ Complete | 2026-02-27 |
+| 22. Unified Discriminated Query Interface | 0/3 | ○ Pending | — |

@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 20 (Causal Chain Completion) — Complete. All 5/5 plans done. All 6 structural gaps verified.
+**Current focus:** Phase 21 (Doc Index Floating Corpus Bridge) — Plan 01 complete, 3 remaining.
 
 ## Current Position
 
-Phase: 20 (Causal Chain Completion) — Complete
-Plan: 5 of 5 in current phase (all waves complete)
-Status: Phase complete
-Last activity: 2026-02-25 -- Completed 20-05-PLAN.md (integration tests for all 6 structural gaps)
+Phase: 21 (Doc Index Floating Corpus Bridge)
+Plan: 1 of 4
+Status: In progress
+Last activity: 2026-02-27 -- Completed 21-01-PLAN.md (doc_index schema + CheckResponse extension)
 
-Progress: [████████████████████████████████] 100% (5/5 plans in phase 20)
-Overall:  [██████████████████████████████████████████████████████████████████████████████████████] 86/86 plans total
+Progress: [████████░░░░░░░░░░░░░░░░░░░░░░░░] 25% (1/4 plans in phase 21)
+Overall:  [██████████████████████████████████████████████████████████████████████████████████████░] 87/90 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 86 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20)
+- Total plans completed: 87 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 1 Phase 21)
 - Average duration: 5.5 min
-- Total execution time: 8.33 hours
+- Total execution time: 8.36 hours
 
 **By Phase:**
 
@@ -56,8 +56,8 @@ Overall:  [███████████████████████
 | 20-causal-chain-completion | 5/5 | 19 min | 3.8 min |
 
 **Recent Trend:**
-- Last 5 plans: 2 min, 4 min, 3 min, 2 min, 5 min
-- Trend: Phase 20 complete. All 6 structural gaps verified by integration tests.
+- Last 5 plans: 4 min, 3 min, 2 min, 5 min, 2 min
+- Trend: Phase 21 started. Plan 01 (doc_index schema) complete in 2 min.
 
 *Updated after each plan completion*
 
@@ -471,6 +471,9 @@ Recent decisions affecting current work:
 - Plan 20-04: Backward compatible: repo=None skips filtering entirely; existing callers unaffected
 - Plan 20-05: duckdb.connect(db_path) without read_only=True for verification reads (consistent with Plans 01/03)
 - Plan 20-05: Sync test moved out of @pytest.mark.asyncio class to eliminate pytest warning
+- Plan 21-01: Lazy import of create_doc_schema() inside create_bus_schema() (not top-level) for minimal schema.py dependencies
+- Plan 21-01: Composite PK (doc_path, ccd_axis) on doc_index for multi-axis documents (one row per axis)
+- Plan 21-01: CHECK constraint on association_type with 5 values (frontmatter, regex, keyword, manual, unclassified)
 
 ### Pending Todos
 
@@ -484,6 +487,10 @@ Four components required for real-time premise validation. Architecture: three t
 | 2 | **Premise Registry table** — `premise_registry` in `data/ope.db`. 20-column schema with PremiseRecord model, PremiseRegistry CRUD, PREMISE block parser, create_schema() integration. 64 tests. | ✓ **Complete** — 2026-02-23 (Plan 14.1-01) | Phase 14.1-01 |
 | 3 | **PAG hook** (Premise-Assertion Gate) — PreToolUse hook extension. Reads PREMISE blocks from AI output at write-class tool calls; emits PROJECTION_WARNING when foil_path_outcomes non-empty; warns UNVALIDATED high-risk mutations. Stained premise check + foil lookup + Ad Ignorantiam detection. Always exits 0 (fail-open). | ✓ **Complete** — 2026-02-23 (Plan 14.1-02) | Phase 14.1-02 |
 | 4 | **CLAUDE.md premise declaration rule** — Global forcing function. Defines write-class vs. validation-class distinction, PREMISE block format, FOIL_VERIFIED format, staleness rule. Prerequisite for items 2 and 3. | ✓ **Complete** — 2026-02-23. Located at `~/.claude/CLAUDE.md` | — |
+
+### Roadmap Evolution
+
+- Phase 21 added (2026-02-27): Doc Index Floating Corpus Bridge — doc_index table + doc_indexer.py + session-start relevant_docs briefing extension
 
 ### Blockers/Concerns
 
@@ -636,10 +643,10 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 
 ## Session Continuity
 
-Last session: 2026-02-25
-Stopped at: Phase 20 complete. All 5 plans delivered, all 6 structural gaps verified by integration tests.
-Next action: Post-OpenClaw activation or new phase planning.
-Resume file: N/A (phase complete)
+Last session: 2026-02-27
+Stopped at: Phase 21 Plan 01 complete. doc_index schema + CheckResponse.relevant_docs field.
+Next action: Execute Plan 21-02 (frontmatter indexer).
+Resume file: .planning/phases/21-doc-index-floating-corpus-bridge/21-02-PLAN.md
 
 ## Phase 15 Completion Summary
 

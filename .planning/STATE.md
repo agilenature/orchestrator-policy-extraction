@@ -6,22 +6,22 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 21 (Doc Index Floating Corpus Bridge) -- COMPLETE. All 4 plans delivered.
+**Current focus:** Phase 22 (Unified Discriminated Query Interface) -- IN PROGRESS. Plan 01 complete.
 
 ## Current Position
 
-Phase: 21 (Doc Index Floating Corpus Bridge)
-Plan: 4 of 4
-Status: Phase complete
-Last activity: 2026-02-27 -- Completed 21-04-PLAN.md (integration tests for full doc index pipeline)
+Phase: 22 (Unified Discriminated Query Interface)
+Plan: 1 of 3
+Status: In progress
+Last activity: 2026-02-27 -- Completed 22-01-PLAN.md (query backends: session_query + code_query)
 
-Progress: [████████████████████████████████] 100% (4/4 plans in phase 21)
-Overall:  [████████████████████████████████████████████████████████████████████████████████████████████] 90/90 plans total
+Progress: [██████████░░░░░░░░░░░░░░░░░░░░░░] 33% (1/3 plans in phase 22)
+Overall:  [█████████████████████████████████████████████████████████████████████████████████████████████] 91/93 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 90 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 4 Phase 21)
+- Total plans completed: 91 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 4 Phase 21 + 1 Phase 22)
 - Average duration: 5.5 min
 - Total execution time: 8.63 hours
 
@@ -507,6 +507,7 @@ Four components required for real-time premise validation. Architecture: three t
 ### Roadmap Evolution
 
 - Phase 21 added (2026-02-27): Doc Index Floating Corpus Bridge — doc_index table + doc_indexer.py + session-start relevant_docs briefing extension
+- Phase 22 added (2026-02-27): Unified Discriminated Query Interface — query_sessions() BM25 + unified CLI dispatcher + data/projects.json registry + cross-project DuckDB ATTACH
 
 ### Blockers/Concerns
 
@@ -660,9 +661,9 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Phase 21 COMPLETE. All 4 plans delivered. 90/90 total plans complete.
-Next action: All planned phases complete. Project at milestone.
-Resume file: N/A (all phases complete)
+Stopped at: Phase 22 added to roadmap. Ready for planning.
+Next action: Run /gsd:plan-phase 22 to create execution plans for Phase 22.
+Resume file: N/A
 
 ## Phase 15 Completion Summary
 

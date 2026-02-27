@@ -35,7 +35,7 @@ TIER3_STOPWORDS = frozenset(
 
 DEFAULT_BUS_SOCKET = "/tmp/ope-governance-bus.sock"
 
-_MEMORY_MD_AXIS_RE = re.compile(r"\*\*CCD axis:\*\*\s+`([^`]+)`")
+_MEMORY_MD_AXIS_RE = re.compile(r"\*\*CCD axis:\*\*\s+([a-z0-9][a-z0-9-]*)")
 
 # ---------------------------------------------------------------------------
 # 1. Axis vocabulary loader

@@ -394,8 +394,8 @@ class TestLoadAxisVocabulary:
         md_path = tmp_path / "MEMORY.md"
         md_path.write_text(
             "## Entry\n\n"
-            "**CCD axis:** `test-axis-one`\n"
-            "**CCD axis:** `test-axis-two`\n"
+            "**CCD axis:** test-axis-one\n"
+            "**CCD axis:** test-axis-two\n"
         )
 
         result = load_axis_vocabulary(

@@ -553,10 +553,30 @@ Plans:
 
 ---
 
+### Phase 27: ReactiveX Reactive Adoption
+
+**Goal:** Adopt `reactivex` v4 (ReactiveX for Python) in OPE's source code where modules have latent observable semantics being expressed imperatively. This is an **adoption phase, not a migration** — OPE is a synchronous batch pipeline with one production async file (`bus/server.py`, framework-imposed). Three applicable modules identified by source inventory: (1) `live/stream/processor.py` — the stream processor IS a reactive pipeline in concept (event → state machine → route by boundary_dependency → buffer/flush); adopt external operator pattern with `concat_map` for ordered stateful processing; (2) `runner.py:run_batch()` — sequential session loop → `ops.merge(max_concurrent=N)` fan-out with config-controlled concurrency; (3) `rag/embedder.py:embed_episodes()` — sequential `model.encode()` loop → parallel `run_in_executor` observable. Gate criterion: behavioral parity (identical outputs for identical inputs before and after adoption), not test coverage. Phase 18 spike learnings (objectivism-library-semantic-search) inherited as locked decisions.
+**Depends on:** Phase 25 complete
+**Requirements**: RXA-01 (reactivex v4 dependency), RXA-02 (embedder parallelism), RXA-03 (batch runner fan-out), RXA-04 (stream processor operator), RXA-05 (behavioral parity gate)
+**Success Criteria** (what must be TRUE):
+  1. `reactivex>=4.0` added to `pyproject.toml` — importable as `import reactivex as rx`
+  2. `rag/embedder.py:embed_episodes()` uses `run_in_executor` + observable with `merge(max_concurrent=4)` — all existing embedding tests pass
+  3. `runner.py:run_batch()` uses `ops.map(factory).pipe(ops.merge(max_concurrent=N))` with `max_concurrent=1` default — identical DuckDB state for identical session set input
+  4. `live/stream/processor.py` exposes `create_stream_processor_operator(session_id, run_id)` that wraps `process_event()` in an RxPY pipeline — same `GovernanceSignal` sequence for same event sequence
+  5. Full pytest suite passes — no behavior regression
+  6. Canon.json updated to index all adopted modules and the shared `rx_operators.py`
+**Plans:** 4 plans
+- [ ] 27-01-PLAN.md — Scope gate + short spike: reactivex v4 API validation (run_in_executor bridge, concat_map + sync DuckDB, Starlette Subject bridge) — hostile posture, go/no-go gate
+- [ ] 27-02-PLAN.md — Tier 3: embedder parallelism (`embed_episodes()` → run_in_executor + merge)
+- [ ] 27-03-PLAN.md — Tier 2: batch runner fan-out (`run_batch()` → merge fan-out with configurable max_concurrent)
+- [ ] 27-04-PLAN.md — Tier 1: stream processor operator + behavioral parity validation + Canon update
+
+---
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.3 -> 14 -> 14.1 -> 15 -> 16 -> 16.1 -> 17 -> 18 -> 19 -> 20 -> 21 -> 22 -> 23 -> 24 -> 25
+Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.3 -> 14 -> 14.1 -> 15 -> 16 -> 16.1 -> 17 -> 18 -> 19 -> 20 -> 21 -> 22 -> 23 -> 24 -> 25 -> 27
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -590,3 +610,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 23. Autonomous Loop Mode-Switch Detection | 3/3 | ✓ Complete | 2026-02-27 |
 | 24. Genus-Check Gate | 3/3 | ✓ Complete | 2026-02-28 |
 | 25. Genus Protocol Propagation | 0/4 | ○ Pending | — |
+| 27. ReactiveX Reactive Adoption | 0/4 | ○ Pending | — |

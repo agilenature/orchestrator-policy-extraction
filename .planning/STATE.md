@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 23 (Autonomous Loop Mode-Switch Detection) -- COMPLETE. All 3/3 plans delivered.
+**Current focus:** Phase 24 (Genus-Check Gate) -- EXECUTING. PAG extension with genus declaration enforcement.
 
 ## Current Position
 
-Phase: 23 (Autonomous Loop Mode-Switch Detection)
-Plan: 3 of 3 complete
-Status: Phase complete
-Last activity: 2026-02-28 -- Completed 23-03-PLAN.md (integration tests, tool usage ratio signal)
+Phase: 24 (Genus-Check Gate)
+Plan: 1 of 3 (complete)
+Status: Plan 01 complete; Wave 1 done; Wave 2 pending
+Last activity: 2026-02-28 -- 24-01 parser extension complete
 
-Progress: [████████████████████████████████] 100% (3/3 plans in phase 23)
-Overall:  [██████████████████████████████████████████████████████████████████████████████████████████████████] 96/96 plans total
+Progress: [███████████░░░░░░░░░░░░░░░░░░░░░] 33% (1/3 plans in phase 24)
+Overall:  [██████████████████████████████████████████████████████████████████████████████████████████████████] 97/99 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 96 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 4 Phase 21 + 3 Phase 22 + 3 Phase 23)
+- Total plans completed: 97 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 4 Phase 21 + 3 Phase 22 + 3 Phase 23 + 1 Phase 24)
 - Average duration: 5.5 min
-- Total execution time: 9.11 hours
+- Total execution time: 9.14 hours
 
 **By Phase:**
 
@@ -61,9 +61,11 @@ Overall:  [███████████████████████
 
 | 23-autonomous-loop-mode-switch-detection | 3/3 | 17 min | 5.7 min |
 
+| 24-genus-check-gate | 1/3 | 2 min | 2.0 min |
+
 **Recent Trend:**
-- Last 5 plans: 4 min, 5 min, 7 min, 5 min, 5 min
-- Trend: Phase 23 complete (3/3 plans, 17 min total). All phases delivered.
+- Last 5 plans: 5 min, 7 min, 5 min, 5 min, 2 min
+- Trend: Phase 24 in progress (1/3 plans, 2 min). Wave 1 complete.
 
 *Updated after each plan completion*
 
@@ -504,6 +506,9 @@ Recent decisions affecting current work:
 - Plan 22-03: Fully-qualified remote.doc_index table names to avoid USE/DETACH ordering issues
 - Plan 22-03: Session filtering via JOIN on episodes table when session_ids provided; tilde-expanded sessions_location
 
+- Plan 24-01: GENUS field is optional 5th line in PREMISE blocks; parsed into genus_name and genus_instances on ParsedPremise only (not PremiseRecord)
+- Plan 24-01: genus_check config block with 24 causal_indicator_words for GenusEdgeWriter (Wave 3)
+
 ### Pending Todos
 
 **Premise-Assertion Architecture — gap list (designed 2026-02-23):**
@@ -521,6 +526,7 @@ Four components required for real-time premise validation. Architecture: three t
 
 - Phase 21 added (2026-02-27): Doc Index Floating Corpus Bridge — doc_index table + doc_indexer.py + session-start relevant_docs briefing extension
 - Phase 22 added (2026-02-27): Unified Discriminated Query Interface — query_sessions() BM25 + unified CLI dispatcher + data/projects.json registry + cross-project DuckDB ATTACH
+- Phase 24 added (2026-02-28): Genus-Check Gate — PAG extension with genus declaration enforcement. Optional GENUS field in PREMISE blocks, FundamentalityChecker, GenusEdgeWriter.
 
 ### Blockers/Concerns
 
@@ -674,9 +680,9 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Phase 23, Plan 02 complete (CLI --plan/--inject-state flags, STATE.md injector, recovery command). 95/96 plans total.
-Next action: Phase 23, Plan 03 (auto-discovery, batch mode, documentation).
-Resume file: .planning/phases/23-autonomous-loop-mode-switch-detection/23-03-PLAN.md
+Stopped at: Phase 24, Plan 01 complete (parser extension + ParsedPremise genus fields + config). 97/99 plans total.
+Next action: Phase 24, Plan 02 (FundamentalityChecker -- genus validation logic).
+Resume file: .planning/phases/24-genus-check-gate/24-02-PLAN.md
 
 ## Phase 15 Completion Summary
 
@@ -862,3 +868,4 @@ Phase 22 delivered the Unified Discriminated Query Interface (all 3 plans, all 6
 ## Roadmap Evolution
 
 - Phase 23 added: Autonomous Loop Mode-Switch Detection — EBC-Drift detection system for operating-mode mismatch. Detects when a project has transitioned from Execution Mode (known state space) to Discovery Mode (unknown state space) and notifies the human before false completions accumulate. CCD axis: `operating-mode-epistemic-mismatch`.
+- Phase 24 added (2026-02-28): Genus-Check Gate — PAG PreToolUse hook extension enforcing genus declaration at write-class boundaries. PREMISE block GENUS field, FundamentalityChecker (2-instance + causal criterion), axis_edges weighted node write on accepted genus, genus_shift signal_type in ai_flame_events. CCD axis: `genus-check-gate`. Depends on Phase 14.1 (PAG), Phase 16.1 (axis_edges), Phase 15 (ai_flame_events). Test: apply gate to A7 per-file searchability failure → CRAD solution emerges from correct genus identification.

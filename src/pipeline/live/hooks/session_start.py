@@ -129,6 +129,16 @@ def main() -> None:
                 print(f"[OPE]     {desc}", flush=True)
     # else: no docs -- silent
 
+    # Genus hint (Phase 25)
+    genus_count = check.get("genus_count", 0)
+    if genus_count > 0:
+        print(
+            f"\n[OPE] GENUS: {genus_count} prior genera available "
+            f"-- /genus-first before writing",
+            flush=True,
+        )
+    # else: no genera -- silent
+
 
 if __name__ == "__main__":
     try:

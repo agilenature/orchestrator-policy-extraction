@@ -66,7 +66,8 @@ class GovernorDaemon:
             constraints = self._filter_by_repo(constraints, repo)
         briefing = generate_briefing(constraints)
         relevant_docs = self._query_relevant_docs()
-        return briefing.model_copy(update={"relevant_docs": relevant_docs})
+        genus_count = self._query_genus_count(repo=repo)
+        return briefing.model_copy(update={"relevant_docs": relevant_docs, "genus_count": genus_count})
 
     @staticmethod
     def _filter_by_repo(
@@ -141,6 +142,58 @@ class GovernorDaemon:
                 conn.close()
         except Exception:
             return []
+
+    def _query_genus_count(self, repo: str | None = None) -> int:
+        """Query axis_edges for count of distinct genus_of edges.
+
+        When *repo* is provided and bus_sessions table exists, scopes the
+        count to edges created by sessions in that repo.  When *repo* is
+        ``None`` or bus_sessions is missing, returns the global count.
+
+        Fails open: returns 0 on any error (missing table, invalid DB path,
+        DuckDB errors).
+        """
+        try:
+            conn = duckdb.connect(self._db_path)
+            try:
+                # Check if axis_edges table exists
+                tables = conn.execute(
+                    "SELECT table_name FROM information_schema.tables "
+                    "WHERE table_name = 'axis_edges'"
+                ).fetchall()
+                if not tables:
+                    return 0
+
+                # Check if bus_sessions exists for repo-scoped query
+                has_bus_sessions = False
+                if repo is not None:
+                    bs_tables = conn.execute(
+                        "SELECT table_name FROM information_schema.tables "
+                        "WHERE table_name = 'bus_sessions'"
+                    ).fetchall()
+                    has_bus_sessions = bool(bs_tables)
+
+                if repo is not None and has_bus_sessions:
+                    result = conn.execute(
+                        "SELECT COUNT(DISTINCT ae.axis_a) FROM axis_edges ae "
+                        "JOIN bus_sessions bs ON ae.created_session_id = bs.session_id "
+                        "WHERE ae.relationship_text = 'genus_of' "
+                        "AND ae.status IN ('candidate', 'active') "
+                        "AND bs.repo = ?",
+                        [repo],
+                    ).fetchone()
+                else:
+                    result = conn.execute(
+                        "SELECT COUNT(DISTINCT axis_a) FROM axis_edges "
+                        "WHERE relationship_text = 'genus_of' "
+                        "AND status IN ('candidate', 'active')"
+                    ).fetchone()
+
+                return result[0] if result else 0
+            finally:
+                conn.close()
+        except Exception:
+            return 0
 
     def _load_active_constraints(self) -> list[dict[str, Any]]:
         """Load active constraints from constraints.json.

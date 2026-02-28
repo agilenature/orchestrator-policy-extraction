@@ -124,6 +124,7 @@ def create_app(
                 "interventions": briefing.interventions,
                 "epistemological_signals": [],
                 "relevant_docs": briefing.relevant_docs,
+                "genus_count": briefing.genus_count,
             })
         except Exception:
             resp = CheckResponse()
@@ -132,6 +133,7 @@ def create_app(
                 "interventions": resp.interventions,
                 "epistemological_signals": resp.epistemological_signals,
                 "relevant_docs": resp.relevant_docs,
+                "genus_count": resp.genus_count,
             })
 
     async def push_link(request: Request) -> JSONResponse:

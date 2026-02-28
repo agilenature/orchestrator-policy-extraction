@@ -25,6 +25,7 @@ class ConstraintBriefing(BaseModel, frozen=True):
     total_count: int = 0
     top_severity: str | None = None
     relevant_docs: list[dict[str, Any]] = []  # Phase 21: doc_index entries
+    genus_count: int = 0  # Phase 25: count of genus_of edges in axis_edges
 
 
 def generate_briefing(constraints: list[dict[str, Any]]) -> ConstraintBriefing:

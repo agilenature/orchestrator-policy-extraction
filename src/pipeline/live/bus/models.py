@@ -75,3 +75,4 @@ class CheckResponse(BaseModel):
     interventions: list[dict[str, Any]] = []
     epistemological_signals: list[dict[str, Any]] = []
     relevant_docs: list[dict[str, Any]] = []
+    genus_count: int = 0

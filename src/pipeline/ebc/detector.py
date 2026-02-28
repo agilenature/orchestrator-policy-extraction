@@ -40,6 +40,12 @@ class EBCDriftDetector:
     # Read-class tools that are always excluded from write detection
     _READ_TOOLS = frozenset({"Read", "Glob", "Grep", "WebFetch", "WebSearch", "Task"})
 
+    # Minimum read events required before computing read/write ratio
+    _MIN_READ_EVENTS_FOR_RATIO = 20
+
+    # Read/write ratio above which a high_read_ratio signal fires
+    _HIGH_RATIO_THRESHOLD = 10.0
+
     def __init__(self, config: PipelineConfig) -> None:
         ebc_cfg = config.ebc_drift
         self._threshold = ebc_cfg.threshold
@@ -106,12 +112,22 @@ class EBCDriftDetector:
                 )
             )
 
+        # Add secondary behavioral signal: tool usage ratio
+        ratio_signal = self._compute_tool_ratio_signal(session_events)
+        if ratio_signal is not None:
+            signals.append(ratio_signal)
+
         if not signals:
             return None
 
         # Compute drift score: weighted sum / max(expected count, 1), capped at 1.0
         raw_score = sum(s.weight for s in signals) / max(len(expected_normalized), 1)
         drift_score = min(raw_score, 1.0)
+
+        # Ratio-only signals use a higher threshold (less likely to alert alone)
+        has_file_signals = any(s.signal_type != "high_read_ratio" for s in signals)
+        if not has_file_signals and drift_score < self._ratio_only_threshold:
+            return None
 
         if drift_score < self._threshold:
             return None
@@ -193,3 +209,63 @@ class EBCDriftDetector:
             if fnmatch(filename, pattern):
                 return True
         return False
+
+    def _get_tool_name(self, event: dict[str, Any]) -> str:
+        """Extract tool_name from an event dict.
+
+        Mirrors the extraction logic in _extract_write_paths for consistency.
+
+        Args:
+            event: Event dict from read_events().
+
+        Returns:
+            Tool name string, or empty string if not found.
+        """
+        payload = event.get("payload")
+        if not isinstance(payload, dict):
+            return ""
+        common = payload.get("common", {})
+        if not isinstance(common, dict):
+            return ""
+        return common.get("tool_name", "")
+
+    def _compute_tool_ratio_signal(
+        self, session_events: list[dict[str, Any]]
+    ) -> DriftSignal | None:
+        """Detect high read-to-write ratio indicating possible Discovery Mode.
+
+        Sessions that are heavily read-dominant (>10:1 read/write ratio with
+        at least 20 read events) may indicate the agent has drifted into
+        exploratory behavior rather than executing the plan.
+
+        Args:
+            session_events: List of event dicts from read_events().
+
+        Returns:
+            DriftSignal with signal_type="high_read_ratio" if ratio exceeds
+            threshold, None otherwise.
+        """
+        read_count = sum(
+            1 for e in session_events if self._get_tool_name(e) in self._READ_TOOLS
+        )
+        write_count = len(self._extract_write_paths(session_events))
+
+        if read_count < self._MIN_READ_EVENTS_FOR_RATIO:
+            return None
+
+        if write_count == 0:
+            return DriftSignal(
+                signal_type="high_read_ratio",
+                detail=f"read={read_count}, write=0 — session appears exploratory",
+                weight=0.5,
+            )
+
+        ratio = read_count / write_count
+        if ratio > self._HIGH_RATIO_THRESHOLD:
+            return DriftSignal(
+                signal_type="high_read_ratio",
+                detail=f"read/write ratio {ratio:.1f}:1 — heavily read-dominant",
+                weight=0.3,
+            )
+
+        return None

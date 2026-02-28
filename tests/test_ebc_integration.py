@@ -306,3 +306,109 @@ class TestEdgeCases:
         detector = EBCDriftDetector(_make_config())
         result = detector.detect(ebc, [], "sess-empty")
         assert result is None
+
+
+class TestToolRatioSignal:
+    """Tests for the tool usage ratio secondary signal."""
+
+    def test_high_read_ratio_30_reads_0_writes(self, tmp_path: Path) -> None:
+        """30 Read events, 0 writes -> signal with weight 0.5."""
+        plan_path = _write_plan_file(tmp_path, ["src/a.py"])
+        ebc = parse_ebc_from_plan(plan_path)
+        assert ebc is not None
+
+        events = [_make_event("Read", f"src/file{i}.py") for i in range(30)]
+        detector = EBCDriftDetector(_make_config())
+
+        signal = detector._compute_tool_ratio_signal(events)
+        assert signal is not None
+        assert signal.signal_type == "high_read_ratio"
+        assert signal.weight == 0.5
+        assert "write=0" in signal.detail
+
+    def test_high_read_ratio_30_reads_2_writes(self, tmp_path: Path) -> None:
+        """30 reads, 2 writes (15:1) -> signal with weight 0.3."""
+        plan_path = _write_plan_file(tmp_path, ["src/a.py"])
+        ebc = parse_ebc_from_plan(plan_path)
+        assert ebc is not None
+
+        events = [_make_event("Read", f"src/file{i}.py") for i in range(30)]
+        events.append(_make_event("Edit", "src/a.py"))
+        events.append(_make_event("Write", "src/b.py"))
+
+        detector = EBCDriftDetector(_make_config())
+        signal = detector._compute_tool_ratio_signal(events)
+        assert signal is not None
+        assert signal.signal_type == "high_read_ratio"
+        assert signal.weight == 0.3
+        assert "15.0:1" in signal.detail
+
+    def test_read_ratio_below_threshold(self, tmp_path: Path) -> None:
+        """20 reads, 5 writes (4:1) -> no ratio signal."""
+        plan_path = _write_plan_file(tmp_path, ["src/a.py"])
+        ebc = parse_ebc_from_plan(plan_path)
+        assert ebc is not None
+
+        events = [_make_event("Read", f"src/file{i}.py") for i in range(20)]
+        for i in range(5):
+            events.append(_make_event("Edit", f"src/w{i}.py"))
+
+        detector = EBCDriftDetector(_make_config())
+        signal = detector._compute_tool_ratio_signal(events)
+        assert signal is None
+
+    def test_small_session_no_ratio_signal(self, tmp_path: Path) -> None:
+        """5 reads, 0 writes -> no signal (below min 20 reads)."""
+        plan_path = _write_plan_file(tmp_path, ["src/a.py"])
+        ebc = parse_ebc_from_plan(plan_path)
+        assert ebc is not None
+
+        events = [_make_event("Read", f"src/file{i}.py") for i in range(5)]
+        detector = EBCDriftDetector(_make_config())
+        signal = detector._compute_tool_ratio_signal(events)
+        assert signal is None
+
+    def test_ratio_only_no_alert_at_default_threshold(self, tmp_path: Path) -> None:
+        """Ratio signal only (no file-set signals) at score < 0.8 -> returns None."""
+        plan_path = _write_plan_file(
+            tmp_path, [f"src/f{i}.py" for i in range(10)]
+        )
+        ebc = parse_ebc_from_plan(plan_path)
+        assert ebc is not None
+
+        # Match all expected files (no file-set drift), add 25 reads + 0 writes
+        events = [_make_event("Edit", f"src/f{i}.py") for i in range(10)]
+        events.extend(_make_event("Read", f"src/r{i}.py") for i in range(25))
+
+        # ratio signal weight=0.5, score = 0.5/10 = 0.05, well below 0.8
+        detector = EBCDriftDetector(_make_config())
+        result = detector.detect(ebc, events, "sess-ratio-only")
+        assert result is None
+
+    def test_ratio_plus_file_signals_increases_score(self, tmp_path: Path) -> None:
+        """Ratio signal + file-set signals combined -> drift_score includes ratio weight."""
+        plan_path = _write_plan_file(tmp_path, ["src/a.py", "src/b.py"])
+        ebc = parse_ebc_from_plan(plan_path)
+        assert ebc is not None
+
+        # Write unexpected files + many reads to trigger both signal types
+        events = [
+            _make_event("Edit", "src/a.py"),
+            _make_event("Write", "src/unexpected1.py"),
+            _make_event("Write", "src/unexpected2.py"),
+        ]
+        # Add 25 Read events for ratio signal (25 reads, 0 write-tool writes
+        # counted by _extract_write_paths produces {src/a.py, src/unexpected1.py,
+        # src/unexpected2.py} = 3 write paths; 25/3 = 8.3:1, below 10:1 threshold)
+        # Need 0 writes for 0.5 weight or very high ratio.
+        # Actually the writes above DO count. Let's use 40 reads for 40/3 = 13.3:1
+        events.extend(_make_event("Read", f"src/r{i}.py") for i in range(40))
+
+        detector = EBCDriftDetector(_make_config())
+        result = detector.detect(ebc, events, "sess-combined")
+        assert result is not None
+        # Should have file signals AND ratio signal
+        signal_types = {s.signal_type for s in result.signals}
+        assert "unexpected_file" in signal_types
+        assert "high_read_ratio" in signal_types
+        assert result.drift_score > 0

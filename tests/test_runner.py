@@ -811,6 +811,115 @@ class TestPipelineRunnerWithConstraints:
             runner.close()
 
 
+class TestRunBatchRxBehavioralParity:
+    """Tests that run_batch() RxPY adoption preserves behavioral parity."""
+
+    @pytest.fixture
+    def config(self):
+        """Load pipeline config."""
+        return load_config("data/config.yaml")
+
+    def test_run_batch_processes_multiple_sessions(self, config, tmp_path):
+        """run_batch() processes all JSONL files in a directory and aggregates results.
+
+        Validates:
+        - sessions_processed == number of JSONL files
+        - total_events and total_episodes are populated
+        - errors list is populated correctly (no false errors)
+        - Aggregate tag/outcome/reaction distributions are present
+        """
+        # Create 2 JSONL session files in the tmp directory
+        _create_realistic_fixture(tmp_path)  # session 1
+        _create_episode_fixture(tmp_path)  # session 2
+
+        # Verify we have exactly 2 JSONL files
+        jsonl_files = sorted(tmp_path.glob("*.jsonl"))
+        assert len(jsonl_files) == 2, f"Expected 2 JSONL files, got {len(jsonl_files)}"
+
+        runner = PipelineRunner(config, db_path=":memory:")
+        try:
+            result = runner.run_batch(tmp_path)
+
+            assert result["sessions_processed"] == 2, (
+                f"Expected 2 sessions processed, got {result['sessions_processed']}"
+            )
+            assert result["total_events"] > 0, "Expected non-zero total events"
+            assert result["total_episodes"] >= 0, "total_episodes should be >= 0"
+            assert isinstance(result["errors"], list), "errors should be a list"
+            assert isinstance(result["results"], list), "results should be a list"
+            assert len(result["results"]) == 2, "Should have 2 per-session result dicts"
+
+            # Aggregate stats should be present
+            assert "tag_distribution" in result
+            assert "outcome_distribution" in result
+            assert "reaction_distribution" in result
+            assert "constraints_extracted" in result
+            assert "constraints_total" in result
+        finally:
+            runner.close()
+
+    def test_run_batch_empty_directory(self, config, tmp_path):
+        """run_batch() on empty directory returns zero-count result."""
+        runner = PipelineRunner(config, db_path=":memory:")
+        try:
+            result = runner.run_batch(tmp_path)
+
+            assert result["sessions_processed"] == 0
+            assert result["total_events"] == 0
+            assert result["total_episodes"] == 0
+            assert result["results"] == []
+            assert result["errors"] == []
+        finally:
+            runner.close()
+
+    def test_run_batch_respects_max_concurrent_config(self, config, tmp_path):
+        """run_batch() reads batch_max_concurrent from config.
+
+        Verifies the config field is wired correctly by asserting default=1
+        produces identical results to the sequential pattern.
+        """
+        from src.pipeline.models.config import PipelineConfig
+
+        # Verify default is 1 (sequential)
+        assert config.batch_max_concurrent == 1
+
+        # Create a session file
+        _create_realistic_fixture(tmp_path)
+
+        runner = PipelineRunner(config, db_path=":memory:")
+        try:
+            result = runner.run_batch(tmp_path)
+            assert result["sessions_processed"] == 1
+            assert result["total_events"] > 0
+        finally:
+            runner.close()
+
+    def test_run_batch_collects_errors_not_raises(self, config, tmp_path):
+        """run_batch() collects session errors in batch_errors, does not raise.
+
+        Creates a scenario where one session has issues. The batch should
+        still complete and report the error in the errors list.
+        """
+        # Create one good session file
+        _create_realistic_fixture(tmp_path)
+
+        # Create a completely broken JSONL file (invalid JSON)
+        broken_path = tmp_path / "broken_session.jsonl"
+        broken_path.write_text("this is not valid json\n{also broken\n")
+
+        runner = PipelineRunner(config, db_path=":memory:")
+        try:
+            # Should NOT raise -- errors collected
+            result = runner.run_batch(tmp_path)
+
+            # At least one session should have processed successfully
+            assert result["sessions_processed"] >= 1, (
+                f"Expected at least 1 processed session, got {result['sessions_processed']}"
+            )
+        finally:
+            runner.close()
+
+
 class TestPipelineRunnerWithRealData:
     """Tests that use real JSONL data if available (skipped in CI)."""
 

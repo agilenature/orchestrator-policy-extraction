@@ -512,9 +512,9 @@ Four deliverables: (1) query_sessions() — BM25 fulltext search over episodes t
 **Plans:** 3 plans in 3 waves
 
 Plans:
-- [ ] 23-01-PLAN.md — EBC models, parser, detector, alert writer, config, runner integration (Wave 1)
-- [ ] 23-02-PLAN.md — CLI --plan flag, STATE.md injector, /project:autonomous-loop-mode-switch command (Wave 2)
-- [ ] 23-03-PLAN.md — Integration tests, behavioral pattern detection (tool ratio signals) (Wave 3)
+- [x] 23-01-PLAN.md — EBC models, parser, detector, alert writer, config, runner integration (Wave 1)
+- [x] 23-02-PLAN.md — CLI --plan flag, STATE.md injector, /project:autonomous-loop-mode-switch command (Wave 2)
+- [x] 23-03-PLAN.md — Integration tests, behavioral pattern detection (tool ratio signals) (Wave 3)
 
 ---
 
@@ -552,4 +552,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 20. Causal Chain Completion | 5/5 | ✓ Complete | 2026-02-25 |
 | 21. Doc Index Floating Corpus Bridge | 4/4 | ✓ Complete | 2026-02-27 |
 | 22. Unified Discriminated Query Interface | 3/3 | ✓ Complete | 2026-02-27 |
-| 23. Autonomous Loop Mode-Switch Detection | 0/0 | ○ Pending | — |
+| 23. Autonomous Loop Mode-Switch Detection | 3/3 | ✓ Complete | 2026-02-27 |

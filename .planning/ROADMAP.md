@@ -567,11 +567,13 @@ Plans:
   4. `live/stream/processor.py` exposes `create_stream_processor_operator(session_id, run_id)` that wraps `process_event()` in an RxPY pipeline — same `GovernanceSignal` sequence for same event sequence
   5. Full pytest suite passes — no behavior regression
   6. Canon.json updated to index all adopted modules and the shared `rx_operators.py`
-**Plans:** 4 plans
-- [ ] 27-01-PLAN.md — Scope gate + short spike: reactivex v4 API validation (run_in_executor bridge, concat_map + sync DuckDB, Starlette Subject bridge) — hostile posture, go/no-go gate
-- [ ] 27-02-PLAN.md — Tier 3: embedder parallelism (`embed_episodes()` → run_in_executor + merge)
-- [ ] 27-03-PLAN.md — Tier 2: batch runner fan-out (`run_batch()` → merge fan-out with configurable max_concurrent)
-- [ ] 27-04-PLAN.md — Tier 1: stream processor operator + behavioral parity validation + Canon update
+**Plans:** 4 plans in 3 waves
+
+Plans:
+- [ ] 27-01-PLAN.md — Scope gate + short spike: validate reactivex v4 patterns (external operator, map+merge+DuckDB, ThreadPoolScheduler CPU offload) (Wave 1)
+- [ ] 27-02-PLAN.md — Tier 3: embedder parallelism (embed_episodes -> ThreadPoolScheduler + merge(max_concurrent=4)) (Wave 2)
+- [ ] 27-03-PLAN.md — Tier 2: batch runner fan-out (run_batch -> merge fan-out with configurable max_concurrent) (Wave 2)
+- [ ] 27-04-PLAN.md — Tier 1: stream processor operator + full regression suite + behavioral parity gate (Wave 3)
 
 ---
 

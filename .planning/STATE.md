@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 25 (Genus Protocol Propagation) -- In progress. Wave 3: GenusOracleHandler fully implemented with tokenization-based search.
+**Current focus:** Phase 25 (Genus Protocol Propagation) -- In progress. Wave 3: /reframe skill created as process-level companion to /elevate.
 
 ## Current Position
 
 Phase: 25 (Genus Protocol Propagation)
-Plan: 3 of 5
+Plan: 4 of 5
 Status: In progress
-Last activity: 2026-02-28 -- Completed 25-03 GenusOracleHandler implementation + tests
+Last activity: 2026-02-28 -- Completed 25-05 /reframe skill creation
 
-Progress: [████████████████████░░░░░░░░░░░░] 60% (3/5 plans in phase 25)
-Overall:  [████████████████████████████████████████████████████████████████████████████████████████████████████] 102/104 plans total
+Progress: [█████████████████████████░░░░░░░] 80% (4/5 plans in phase 25)
+Overall:  [████████████████████████████████████████████████████████████████████████████████████████████████████] 103/104 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 102 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 4 Phase 21 + 3 Phase 22 + 3 Phase 23 + 3 Phase 24 + 3 Phase 25)
-- Average duration: 5.5 min
-- Total execution time: 9.27 hours
+- Total plans completed: 103 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 4 Phase 21 + 3 Phase 22 + 3 Phase 23 + 3 Phase 24 + 4 Phase 25)
+- Average duration: 5.4 min
+- Total execution time: 9.30 hours
 
 **By Phase:**
 
@@ -63,11 +63,11 @@ Overall:  [███████████████████████
 
 | 24-genus-check-gate | 3/3 | 11 min | 3.7 min |
 
-| 25-genus-protocol-propagation | 3/5 | 7 min | 2.3 min |
+| 25-genus-protocol-propagation | 4/5 | 9 min | 2.3 min |
 
 **Recent Trend:**
-- Last 5 plans: 3 min, 6 min, 3 min, 2 min, 2 min
-- Trend: Phase 25 progressing (3/5 plans). Wave 3 GenusOracleHandler implemented.
+- Last 5 plans: 6 min, 3 min, 2 min, 2 min, 2 min
+- Trend: Phase 25 progressing (4/5 plans). /reframe skill created. Plan 04 remaining.
 
 *Updated after each plan completion*
 

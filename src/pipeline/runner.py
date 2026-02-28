@@ -100,6 +100,10 @@ class PipelineRunner:
             schema_path=Path("data/schemas/constraint.schema.json"),
         )
 
+        # EBC (External Behavioral Contract) for drift detection (Phase 23)
+        # Set via external caller before run_session; Plan 02 adds set_ebc().
+        self._ebc = None
+
         self._config_hash = self._compute_config_hash(config)
         logger.info(
             "PipelineRunner initialized (db={}, config_hash={})",
@@ -650,7 +654,7 @@ class PipelineRunner:
                 try:
                     amnesia_rows = self._conn.execute(
                         "SELECT amnesia_id, session_id, constraint_id, constraint_type, "
-                        "severity, evidence, detected_at FROM amnesia_events "
+                        "severity, evidence_json, detected_at FROM amnesia_events "
                         "WHERE session_id = ?",
                         [session_id],
                     ).fetchall()
@@ -960,6 +964,47 @@ class PipelineRunner:
             logger.warning("Structural integrity analysis failed: {}", e)
             warnings.append(f"Structural integrity analysis failed: {e}")
 
+        # Step 23: EBC Drift Detection (Phase 23)
+        ebc_drift_alert = None
+        try:
+            from src.pipeline.ebc.detector import EBCDriftDetector as _EBCDriftDetector
+            from src.pipeline.ebc.writer import write_alert as _write_alert
+
+            if self._config.ebc_drift.enabled and self._ebc is not None:
+                _detector = _EBCDriftDetector(self._config)
+                ebc_drift_alert = _detector.detect(
+                    self._ebc, all_session_events, session_id
+                )
+                if ebc_drift_alert is not None:
+                    _alert_path = _write_alert(ebc_drift_alert)
+                    logger.warning(
+                        "Step 23: EBC DRIFT detected for session {}: score={:.2f}, alert={}",
+                        session_id,
+                        ebc_drift_alert.drift_score,
+                        _alert_path,
+                    )
+                    if self._config.ebc_drift.inject_state:
+                        try:
+                            from src.pipeline.ebc.state_injector import (
+                                inject_alert_into_state,
+                            )
+
+                            _state_path = Path(self._config.ebc_drift.state_path)
+                            _alert_block = (
+                                f"> **WARNING:** Session `{session_id}` drifted from EBC\n"
+                                f"> - Phase: {self._ebc.phase}, Plan: {self._ebc.plan}\n"
+                                f"> - Alert artifact: `{_alert_path}`\n"
+                                f"> - Recovery: Run `/project:autonomous-loop-mode-switch` for options"
+                            )
+                            inject_alert_into_state(_state_path, _alert_block)
+                        except Exception as _inj_err:
+                            logger.warning("STATE.md injection failed: {}", _inj_err)
+        except ImportError:
+            pass  # EBC module not available
+        except Exception as e:
+            logger.warning("EBC drift detection failed: {}", e)
+            warnings.append(f"EBC drift detection failed: {e}")
+
         # Step 22: Compute stats
         tag_distribution = self._compute_tag_distribution(tagged_events)
         outcome_distribution = seg_stats.get("by_outcome", {})
@@ -999,6 +1044,7 @@ class PipelineRunner:
             "ddf_te_delta_backfill": ddf_te_delta_backfill,
             "ddf_structural_count": ddf_structural_count,
             "ddf_op8_count": ddf_op8_count,
+            "ebc_drift_detected": ebc_drift_alert is not None,
             "errors": errors,
             "warnings": warnings,
             "duration_seconds": round(duration_s, 2),
@@ -1250,6 +1296,7 @@ class PipelineRunner:
             "ddf_spiral_promotions": 0,
             "ddf_structural_count": 0,
             "ddf_op8_count": 0,
+            "ebc_drift_detected": False,
             "errors": [error_msg],
             "warnings": [],
             "duration_seconds": 0,

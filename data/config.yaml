@@ -335,6 +335,28 @@ ddf:
   epistemological_default: "principled"
   stagnation_min_firing_count: 10
 
+# Phase 23: EBC Drift Detection
+ebc_drift:
+  enabled: true
+  threshold: 0.5
+  ratio_only_threshold: 0.8
+  inject_state: false
+  state_path: ".planning/STATE.md"
+  tolerance_patterns:
+    - "__init__.py"
+    - "__pycache__"
+    - "*.pyc"
+  write_tool_names:
+    - Edit
+    - Write
+  bash_write_indicators:
+    - "mkdir"
+    - "cp "
+    - "mv "
+    - "touch "
+    - "> "
+    - ">> "
+
 # Constraint Extraction Patterns (preserved from existing config)
 constraint_patterns:
   forbidden:

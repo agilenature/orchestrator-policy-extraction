@@ -245,6 +245,45 @@ class DDFConfig(BaseModel):
     structural: StructuralConfig = Field(default_factory=StructuralConfig)
 
 
+class EBCDriftConfig(BaseModel):
+    """EBC Drift Detection settings (Phase 23).
+
+    Controls the External Behavioral Contract drift detector that compares
+    declared PLAN.md contracts against actual session write behavior.
+    """
+
+    enabled: bool = True
+    threshold: float = 0.5
+    ratio_only_threshold: float = 0.8
+    inject_state: bool = False
+    state_path: str = ".planning/STATE.md"
+    tolerance_patterns: list[str] = Field(
+        default_factory=lambda: ["__init__.py", "__pycache__", "*.pyc"]
+    )
+    write_tool_names: list[str] = Field(
+        default_factory=lambda: ["Edit", "Write"]
+    )
+    bash_write_indicators: list[str] = Field(
+        default_factory=lambda: ["mkdir", "cp ", "mv ", "touch ", "> ", ">> "]
+    )
+
+    @field_validator("threshold")
+    @classmethod
+    def ebc_threshold_in_range(cls, v: float) -> float:
+        if not 0.0 <= v <= 1.0:
+            raise ValueError(f"threshold must be between 0.0 and 1.0, got {v}")
+        return v
+
+    @field_validator("ratio_only_threshold")
+    @classmethod
+    def ebc_ratio_threshold_in_range(cls, v: float) -> float:
+        if not 0.0 <= v <= 1.0:
+            raise ValueError(
+                f"ratio_only_threshold must be between 0.0 and 1.0, got {v}"
+            )
+        return v
+
+
 class GitCommands(BaseModel):
     """Git command patterns for tagging."""
 
@@ -309,6 +348,7 @@ class PipelineConfig(BaseModel):
         default_factory=PolicyFeedbackConfig
     )
     ddf: DDFConfig = Field(default_factory=DDFConfig)
+    ebc_drift: EBCDriftConfig = Field(default_factory=EBCDriftConfig)
 
     # Preserved from existing config (used by downstream components)
     mode_inference: dict[str, Any] = Field(default_factory=dict)

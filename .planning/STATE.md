@@ -6,22 +6,22 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 25 (Genus Protocol Propagation) -- In progress. Wave 1 complete (CLAUDE.md + genus_count advisory channel).
+**Current focus:** Phase 25 (Genus Protocol Propagation) -- In progress. Wave 2: /api/genus-consult endpoint wired.
 
 ## Current Position
 
 Phase: 25 (Genus Protocol Propagation)
-Plan: 1 of 5
+Plan: 2 of 5
 Status: In progress
-Last activity: 2026-02-28 -- 25-01 CLAUDE.md GENUS field + genus_count propagation + requirements
+Last activity: 2026-02-28 -- Completed 25-02 genus-consult endpoint + models + oracle stub
 
-Progress: [██████░░░░░░░░░░░░░░░░░░░░░░░░░░] 20% (1/5 plans in phase 25)
-Overall:  [████████████████████████████████████████████████████████████████████████████████████████████████████] 100/104 plans total
+Progress: [████████████░░░░░░░░░░░░░░░░░░░░] 40% (2/5 plans in phase 25)
+Overall:  [████████████████████████████████████████████████████████████████████████████████████████████████████] 101/104 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 100 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 4 Phase 21 + 3 Phase 22 + 3 Phase 23 + 3 Phase 24 + 1 Phase 25)
+- Total plans completed: 101 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 4 Phase 21 + 3 Phase 22 + 3 Phase 23 + 3 Phase 24 + 2 Phase 25)
 - Average duration: 5.5 min
 - Total execution time: 9.24 hours
 
@@ -63,11 +63,11 @@ Overall:  [███████████████████████
 
 | 24-genus-check-gate | 3/3 | 11 min | 3.7 min |
 
-| 25-genus-protocol-propagation | 1/5 | 3 min | 3.0 min |
+| 25-genus-protocol-propagation | 2/5 | 5 min | 2.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min, 2 min, 3 min, 6 min, 3 min
-- Trend: Phase 25 started (1/5 plans). Wave 1 genus advisory channel operational.
+- Last 5 plans: 2 min, 3 min, 6 min, 3 min, 2 min
+- Trend: Phase 25 progressing (2/5 plans). Wave 2 genus-consult endpoint wired.
 
 *Updated after each plan completion*
 
@@ -682,9 +682,9 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Completed 25-01-PLAN.md (CLAUDE.md GENUS field + genus_count propagation + Phase 25 requirements). 100/104 plans total.
-Next action: Phase 25, Plan 02 (genus oracle handler).
-Resume file: .planning/phases/25-genus-protocol-propagation/25-02-PLAN.md
+Stopped at: Completed 25-02-PLAN.md (genus-consult endpoint + models + oracle stub). 101/104 plans total.
+Next action: Phase 25, Plan 03 (genus oracle query implementation).
+Resume file: .planning/phases/25-genus-protocol-propagation/25-03-PLAN.md
 
 ## Phase 15 Completion Summary
 

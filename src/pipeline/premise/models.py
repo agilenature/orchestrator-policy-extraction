@@ -31,6 +31,7 @@ class ParsedPremise(BaseModel, frozen=True):
         VALIDATED_BY: [evidence or UNVALIDATED]
         FOIL: [confusable] | [distinguishing property]
         SCOPE: [validity context]
+        GENUS: [genus name] | INSTANCES: [instance1, instance2]  (optional)
 
     Attributes:
         claim: The PREMISE assertion text.
@@ -40,6 +41,8 @@ class ParsedPremise(BaseModel, frozen=True):
         distinguishing_prop: What distinguishes claim from foil, or None.
         scope: Validity context for the premise.
         derivation_chain: Cross-premise references detected in validated_by.
+        genus_name: The genus (process/mechanism) this premise belongs to, or None.
+        genus_instances: Known instances of this genus, or None.
     """
 
     model_config = ConfigDict(populate_by_name=True)
@@ -51,6 +54,8 @@ class ParsedPremise(BaseModel, frozen=True):
     distinguishing_prop: str | None = None
     scope: str
     derivation_chain: list[dict] | None = None
+    genus_name: str | None = None
+    genus_instances: list[str] | None = None
 
 
 class PremiseRecord(BaseModel, frozen=True):

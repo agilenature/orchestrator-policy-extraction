@@ -48,7 +48,8 @@ PREMISE_BLOCK_RE = re.compile(
     r"^\s*PREMISE:\s*(.+?)[ \t]*(?:\r?\n)"
     r"^\s*VALIDATED_BY:\s*(.+?)[ \t]*(?:\r?\n)"
     r"^\s*FOIL:\s*(.+?)[ \t]*(?:\r?\n)"
-    r"^\s*SCOPE:\s*(.+?)[ \t]*(?:\r?\n|$)",
+    r"^\s*SCOPE:\s*(.+?)[ \t]*(?:\r?\n)"
+    r"(?:^\s*GENUS:\s*(.+?)[ \t]*(?:\r?\n|$))?",
     re.MULTILINE,
 )
 
@@ -108,6 +109,21 @@ def parse_premise_blocks(text: str) -> list[ParsedPremise]:
         # Detect cross-premise references in validated_by
         derivation_chain = _detect_cross_references(validated_by)
 
+        # Parse optional GENUS field (group 5)
+        genus_line = match.group(5)
+        genus_name = None
+        genus_instances: list[str] | None = None
+        if genus_line:
+            genus_line = genus_line.strip()
+            if " | INSTANCES: " in genus_line:
+                parts = genus_line.split(" | INSTANCES: ", 1)
+                genus_name = parts[0].strip()
+                raw_instances = parts[1].strip()
+                raw_instances = raw_instances.strip("[]")
+                genus_instances = [i.strip() for i in raw_instances.split(",") if i.strip()]
+            else:
+                genus_name = genus_line
+
         results.append(
             ParsedPremise(
                 claim=claim,
@@ -117,6 +133,8 @@ def parse_premise_blocks(text: str) -> list[ParsedPremise]:
                 distinguishing_prop=distinguishing_prop,
                 scope=scope,
                 derivation_chain=derivation_chain,
+                genus_name=genus_name,
+                genus_instances=genus_instances,
             )
         )
 

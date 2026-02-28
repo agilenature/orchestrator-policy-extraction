@@ -469,7 +469,38 @@ def _check_genus(
 
         result = checker.check(genus_name=genus_name, instances=genus_instances)
 
-        if not result.valid:
+        if result.valid:
+            # Stage accepted genus for batch ingestion
+            try:
+                from src.pipeline.premise.genus_writer import (
+                    GenusEdgeWriter,
+                    append_genus_staging,
+                )
+                import json as _json
+                from datetime import datetime as _datetime, timezone as _timezone
+                writer = GenusEdgeWriter()
+                edge = writer.build_genus_edge(
+                    genus_name=result.genus_name,
+                    premise_claim=getattr(premise, "claim", ""),
+                    session_id=session_id,
+                    instances=genus_instances or [],
+                )
+                flame_event = writer.build_genus_shift_event(
+                    genus_name=result.genus_name,
+                    session_id=session_id,
+                    evidence_excerpt=getattr(premise, "claim", None),
+                )
+                edge_dict = _json.loads(edge.model_dump_json())
+                fe_dict = _json.loads(flame_event.model_dump_json())
+                append_genus_staging([{
+                    "edge": edge_dict,
+                    "flame_event": fe_dict,
+                    "session_id": session_id,
+                    "created_at": _datetime.now(_timezone.utc).isoformat(),
+                }])
+            except Exception as e:
+                logger.debug("Genus staging write failed (fail-open): %s", e)
+        else:
             warnings.append(
                 f"GENUS_INVALID: {result.reason}. "
                 f"Declare genus with >= 2 citable instances and a causal explanation. "

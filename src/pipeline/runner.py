@@ -461,6 +461,22 @@ class PipelineRunner:
             logger.warning("Premise staging ingestion failed: {}", e)
             warnings.append(f"Premise staging ingestion failed: {e}")
 
+        # Step 11.6: Ingest staged genus declarations (Phase 24)
+        try:
+            from src.pipeline.premise.genus_writer import ingest_genus_staging as _ingest_genus_staging
+            genus_stats = _ingest_genus_staging(self._conn)
+            if genus_stats.get("edges_written", 0) > 0 or genus_stats.get("events_written", 0) > 0:
+                logger.info(
+                    "Step 11.6: Ingested {} genus edges, {} genus_shift events ({} errors)",
+                    genus_stats["edges_written"],
+                    genus_stats["events_written"],
+                    genus_stats["errors"],
+                )
+        except ImportError:
+            pass  # Genus module not available
+        except Exception as e:
+            logger.warning("Genus staging ingestion failed: {}", e)
+
         # Step 12: Extract constraints from correct/block episodes
         constraints_new = 0
         constraints_dup = 0

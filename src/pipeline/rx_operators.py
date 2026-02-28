@@ -1,7 +1,21 @@
 """Shared RxPY operator utilities for OPE pipeline.
 
-Provides reusable observable factories and helpers used across
-embedder, runner, and stream processor adoptions (Phase 27).
+Phase 27 ReactiveX Adoption - Operator Index
+=============================================
+Adopted modules:
+  - src/pipeline/rag/embedder.py: embed_episodes() uses ThreadPoolScheduler
+    + merge(max_concurrent=4) for parallel embedding computation
+  - src/pipeline/runner.py: run_batch() uses map+merge(max_concurrent=N)
+    for configurable session-level fan-out (default N=1, sequential)
+  - src/pipeline/live/stream/processor.py: create_stream_processor_operator()
+    wraps StreamProcessor in cold observable operator (external operator pattern)
+
+Shared utilities:
+  - create_work_observable: Factory for wrapping sync work in a cold observable
+
+Note: Canon.json referenced in ROADMAP SC-6 does not exist in this project
+(vestigial reference from Phase 18 template). This docstring serves as the
+operator index for the adoption.
 
 Exports:
     create_work_observable: Factory for wrapping sync work in an observable

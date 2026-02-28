@@ -23,6 +23,7 @@ from starlette.routing import Route
 
 from .models import CheckResponse
 from .schema import create_bus_schema
+from ..genus_oracle import GenusOracleHandler
 from ..governor.daemon import GovernorDaemon
 
 SOCKET_PATH = os.environ.get("OPE_BUS_SOCKET", "/tmp/ope-governance-bus.sock")
@@ -47,6 +48,7 @@ def create_app(
     create_bus_schema(conn)
 
     _daemon = daemon if daemon is not None else GovernorDaemon(db_path=db_path)
+    _genus_oracle = GenusOracleHandler(conn)
 
     async def register(request: Request) -> JSONResponse:
         """Register a session on the governance bus.
@@ -209,9 +211,31 @@ def create_app(
 
         return JSONResponse({"status": "accepted", "link_id": link_id})
 
+    async def genus_consult(request: Request) -> JSONResponse:
+        """Consult the genus oracle for best-matching genus.
+
+        Given a problem description, searches axis_edges for genus_of
+        entries matching the problem via token overlap. Fails open:
+        returns null genus on any error.
+        """
+        try:
+            body = await request.json()
+            problem = body.get("problem", "")
+            repo = body.get("repo", None)
+            result = _genus_oracle.query_genus(problem, repo)
+            return JSONResponse(result)
+        except Exception:
+            return JSONResponse({
+                "genus": None,
+                "instances": [],
+                "valid": False,
+                "confidence": 0.0,
+            })
+
     return Starlette(routes=[
         Route("/api/register", register, methods=["POST"]),
         Route("/api/deregister", deregister, methods=["POST"]),
         Route("/api/check", check, methods=["POST"]),
         Route("/api/push-link", push_link, methods=["POST"]),
+        Route("/api/genus-consult", genus_consult, methods=["POST"]),
     ])

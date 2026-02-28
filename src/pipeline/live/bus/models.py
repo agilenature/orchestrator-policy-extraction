@@ -76,3 +76,23 @@ class CheckResponse(BaseModel):
     epistemological_signals: list[dict[str, Any]] = []
     relevant_docs: list[dict[str, Any]] = []
     genus_count: int = 0
+
+
+class GenusConsultRequest(BaseModel):
+    """Request body for POST /api/genus-consult."""
+
+    problem: str
+    session_id: str = ""
+    repo: str | None = None
+
+
+class GenusConsultResponse(BaseModel):
+    """Response body for POST /api/genus-consult.
+
+    Null genus with confidence 0.0 is the fail-open default.
+    """
+
+    genus: str | None = None
+    instances: list[str] = []
+    valid: bool = False
+    confidence: float = 0.0

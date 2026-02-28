@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 27 (ReactiveX Reactive Adoption) -- In progress. Plan 02 (embedder adoption) complete, 2 plans remaining.
+**Current focus:** Phase 27 (ReactiveX Reactive Adoption) -- In progress. Plan 03 (runner adoption) complete, 1 plan remaining.
 
 ## Current Position
 
 Phase: 27 (ReactiveX Reactive Adoption)
-Plan: 2 of 4
+Plan: 3 of 4
 Status: In progress
-Last activity: 2026-02-28 -- Completed 27-02-PLAN.md (embedder RxPY adoption)
+Last activity: 2026-02-28 -- Completed 27-03-PLAN.md (run_batch RxPY adoption)
 
-Progress: [████████████████░░░░░░░░░░░░░░░░] 50% (2/4 plans in phase 27)
-Overall:  [████████████████████████████████████████████████████████████████████████████████████████████████████] 106/108 plans total
+Progress: [████████████████████████░░░░░░░░] 75% (3/4 plans in phase 27)
+Overall:  [████████████████████████████████████████████████████████████████████████████████████████████████████] 107/108 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 106 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 4 Phase 21 + 3 Phase 22 + 3 Phase 23 + 3 Phase 24 + 5 Phase 25 + 2 Phase 27)
+- Total plans completed: 107 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 4 Phase 21 + 3 Phase 22 + 3 Phase 23 + 3 Phase 24 + 5 Phase 25 + 3 Phase 27)
 - Average duration: 5.4 min
-- Total execution time: 9.42 hours
+- Total execution time: 9.47 hours
 
 **By Phase:**
 
@@ -65,11 +65,11 @@ Overall:  [███████████████████████
 
 | 25-genus-protocol-propagation | 5/5 | 13 min | 2.6 min |
 
-| 27-reactivex-reactive-adoption | 2/4 | 5 min | 2.5 min |
+| 27-reactivex-reactive-adoption | 3/4 | 8 min | 2.7 min |
 
 **Recent Trend:**
-- Last 5 plans: 2 min, 2 min, 4 min, 2 min, 3 min
-- Trend: Phase 27 IN PROGRESS (2/4 plans). Spike + embedder adoption complete, runner and stream processor remaining.
+- Last 5 plans: 2 min, 4 min, 2 min, 3 min, 3 min
+- Trend: Phase 27 IN PROGRESS (3/4 plans). Spike + embedder + runner adoption complete, stream processor remaining.
 
 *Updated after each plan completion*
 
@@ -685,9 +685,9 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Completed 27-02-PLAN.md (embedder RxPY adoption with ThreadPoolScheduler). 106/108 plans total.
-Next action: Phase 27, Plan 03 (Tier 2 runner adoption).
-Resume file: .planning/phases/27-reactivex-reactive-adoption/27-03-PLAN.md
+Stopped at: Completed 27-03-PLAN.md (run_batch RxPY adoption with ops.map+merge fan-out). 107/108 plans total.
+Next action: Phase 27, Plan 04 (Tier 3 stream processor adoption).
+Resume file: .planning/phases/27-reactivex-reactive-adoption/27-04-PLAN.md
 
 ## Phase 15 Completion Summary
 

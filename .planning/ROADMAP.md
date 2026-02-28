@@ -547,7 +547,7 @@ The Genus-Check Gate is not new infrastructure — it is PAG + three extensions:
 **Plans:** 5 plans in 3 waves
 
 Plans:
-- [ ] 25-01-PLAN.md — CLAUDE.md GENUS field extension + session_start.py genus hint (Wave 1)
+- [x] 25-01-PLAN.md — CLAUDE.md GENUS field extension + session_start.py genus hint (Wave 1)
 - [ ] 25-02-PLAN.md — /api/genus-consult endpoint + GenusConsultRequest/Response models (Wave 2)
 - [ ] 25-03-PLAN.md — GenusOracleHandler: axis_edges search + confidence scoring (Wave 2)
 - [ ] 25-04-PLAN.md — /genus-first skill bus escalation path + integration tests (Wave 3)

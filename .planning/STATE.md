@@ -6,22 +6,22 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 24 (Genus-Check Gate) -- COMPLETE. All 3 plans executed; full deposit loop operational.
+**Current focus:** Phase 25 (Genus Protocol Propagation) -- In progress. Wave 1 complete (CLAUDE.md + genus_count advisory channel).
 
 ## Current Position
 
-Phase: 24 (Genus-Check Gate)
-Plan: 3 of 3 (complete)
-Status: All plans complete; phase execution done; verification pending
-Last activity: 2026-02-28 -- 24-03 GenusEdgeWriter + runner Step 11.6 complete
+Phase: 25 (Genus Protocol Propagation)
+Plan: 1 of 5
+Status: In progress
+Last activity: 2026-02-28 -- 25-01 CLAUDE.md GENUS field + genus_count propagation + requirements
 
-Progress: [████████████████████████████████] 100% (3/3 plans in phase 24)
-Overall:  [████████████████████████████████████████████████████████████████████████████████████████████████████] 99/99 plans total
+Progress: [██████░░░░░░░░░░░░░░░░░░░░░░░░░░] 20% (1/5 plans in phase 25)
+Overall:  [████████████████████████████████████████████████████████████████████████████████████████████████████] 100/104 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 99 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 4 Phase 21 + 3 Phase 22 + 3 Phase 23 + 3 Phase 24)
+- Total plans completed: 100 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 4 Phase 21 + 3 Phase 22 + 3 Phase 23 + 3 Phase 24 + 1 Phase 25)
 - Average duration: 5.5 min
 - Total execution time: 9.24 hours
 
@@ -63,9 +63,11 @@ Overall:  [███████████████████████
 
 | 24-genus-check-gate | 3/3 | 11 min | 3.7 min |
 
+| 25-genus-protocol-propagation | 1/5 | 3 min | 3.0 min |
+
 **Recent Trend:**
-- Last 5 plans: 5 min, 5 min, 2 min, 3 min, 6 min
-- Trend: Phase 24 COMPLETE (3/3 plans, 11 min). Full genus deposit loop operational.
+- Last 5 plans: 5 min, 2 min, 3 min, 6 min, 3 min
+- Trend: Phase 25 started (1/5 plans). Wave 1 genus advisory channel operational.
 
 *Updated after each plan completion*
 
@@ -680,9 +682,9 @@ Phase 13 delivered the policy-to-constraint feedback loop (all 3 plans):
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Phase 24, Plan 01 complete (parser extension + ParsedPremise genus fields + config). 97/99 plans total.
-Next action: Phase 24, Plan 02 (FundamentalityChecker -- genus validation logic).
-Resume file: .planning/phases/24-genus-check-gate/24-02-PLAN.md
+Stopped at: Completed 25-01-PLAN.md (CLAUDE.md GENUS field + genus_count propagation + Phase 25 requirements). 100/104 plans total.
+Next action: Phase 25, Plan 02 (genus oracle handler).
+Resume file: .planning/phases/25-genus-protocol-propagation/25-02-PLAN.md
 
 ## Phase 15 Completion Summary
 

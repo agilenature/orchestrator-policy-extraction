@@ -27,7 +27,10 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+import reactivex as rx
 from loguru import logger
+from reactivex import operators as ops
+from reactivex.disposable import Disposable
 
 from src.pipeline.adapters.claude_jsonl import load_jsonl_to_duckdb, normalize_jsonl_events
 from src.pipeline.adapters.git_history import parse_git_history
@@ -1118,27 +1121,57 @@ class PipelineRunner:
         logger.info("Batch processing {} JSONL files from {}", len(jsonl_files), jsonl_dir)
 
         results: list[dict[str, Any]] = []
-        total_events = 0
-        total_episodes = 0
+        total_events_holder = [0]
+        total_episodes_holder = [0]
         batch_errors: list[str] = []
 
+        max_concurrent = self._config.batch_max_concurrent
+
+        # Optional tqdm progress bar
+        pbar = None
         try:
             from tqdm import tqdm
-            file_iter = tqdm(jsonl_files, desc="Processing sessions", unit="session")
+            pbar = tqdm(total=len(jsonl_files), desc="Processing sessions", unit="session")
         except ImportError:
-            file_iter = jsonl_files
+            pass
 
-        for jsonl_file in file_iter:
-            try:
-                result = self.run_session(jsonl_file, repo_path=repo_path)
-                results.append(result)
-                total_events += result.get("event_count", 0)
-                total_episodes += result.get("episode_count", 0)
-                if result.get("errors"):
-                    batch_errors.extend(result["errors"])
-            except Exception as e:
-                logger.error("Unexpected error processing {}: {}", jsonl_file.name, e)
-                batch_errors.append(f"{jsonl_file.name}: {e}")
+        def create_session_observable(jsonl_file):
+            """Factory: wraps run_session() in a cold observable."""
+            def subscribe(observer, scheduler=None):
+                try:
+                    result = self.run_session(jsonl_file, repo_path=repo_path)
+                    observer.on_next(result)
+                    observer.on_completed()
+                except Exception as e:
+                    logger.error("Unexpected error processing {}: {}", jsonl_file.name, e)
+                    batch_errors.append(f"{jsonl_file.name}: {e}")
+                    observer.on_completed()  # Complete (not error) -- errors collected, not raised
+                return Disposable()
+            return rx.create(subscribe)
+
+        def on_session_result(result):
+            results.append(result)
+            total_events_holder[0] += result.get("event_count", 0)
+            total_episodes_holder[0] += result.get("episode_count", 0)
+            if result.get("errors"):
+                batch_errors.extend(result["errors"])
+            if pbar is not None:
+                pbar.update(1)
+
+        rx.from_iterable(jsonl_files).pipe(
+            ops.map(create_session_observable),
+            ops.merge(max_concurrent=max_concurrent),
+        ).subscribe(
+            on_next=on_session_result,
+            on_error=lambda e: batch_errors.append(f"Observable error: {e}"),
+            on_completed=lambda: None,
+        )
+
+        if pbar is not None:
+            pbar.close()
+
+        total_events = total_events_holder[0]
+        total_episodes = total_episodes_holder[0]
 
         # Aggregate tag distribution and episode stats
         agg_tags: Counter[str] = Counter()

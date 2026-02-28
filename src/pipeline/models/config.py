@@ -355,6 +355,12 @@ class PipelineConfig(BaseModel):
     gate_patterns: dict[str, Any] = Field(default_factory=dict)
     constraint_patterns: dict[str, Any] = Field(default_factory=dict)
 
+    # Batch processing concurrency (Phase 27 RxPY adoption)
+    batch_max_concurrent: int = Field(
+        default=1,
+        description="Maximum concurrent sessions in run_batch(). 1 = sequential (default).",
+    )
+
     @field_validator("episode_timeout_seconds")
     @classmethod
     def timeout_positive(cls, v: int) -> int:
@@ -362,6 +368,13 @@ class PipelineConfig(BaseModel):
             raise ValueError(
                 f"episode_timeout_seconds must be positive, got {v}"
             )
+        return v
+
+    @field_validator("batch_max_concurrent")
+    @classmethod
+    def batch_max_concurrent_positive(cls, v: int) -> int:
+        if v < 1:
+            raise ValueError(f"batch_max_concurrent must be >= 1, got {v}")
         return v
 
 

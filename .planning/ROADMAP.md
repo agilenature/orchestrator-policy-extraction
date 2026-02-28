@@ -532,10 +532,31 @@ The Genus-Check Gate is not new infrastructure — it is PAG + three extensions:
 
 ---
 
+### Phase 25: Genus Protocol Propagation
+
+**Goal:** Genus-first behavior propagates beyond OPE to every Claude Code session in the ecosystem. Three deliverables: (1) `~/.claude/CLAUDE.md` gains the official GENUS field format in the Premise Declaration Protocol — making genus declaration part of the global writing contract for all sessions; (2) `session_start.py` surfaces a genus hint in the `[OPE]` briefing when prior genera exist in `axis_edges` for the current repo scope; (3) the OPE governance bus gains a `/api/genus-consult` endpoint — co-governed sessions (modernizing tool, objectivism library, any orchestrated project) can POST a problem description and receive the best-matching genus from OPE's `axis_edges` history, with 2 citable instances and a fundamentality verdict. The `/genus-first` skill is updated to use the bus oracle as Mode A when `OPE_BUS_SOCKET` is set but `data/ope.db` is absent.
+**Depends on:** Phase 24 (GENUS field + FundamentalityChecker proven); Phase 19 (governance bus with `/api/register` and `/api/check` operational)
+**Requirements**: GENEXT-01 (CLAUDE.md extension), GENEXT-02 (session_start hint), GENORACLE-01 (bus endpoint), GENORACLE-02 (axis_edges search), GENORACLE-03 (/genus-first bus escalation)
+**Success Criteria** (what must be TRUE):
+  1. `~/.claude/CLAUDE.md` Premise Declaration Protocol section includes the optional GENUS line format, the fundamentality criterion (≥2 instances + causal explanation), and the mechanism-vs-symptom distinction — additive only, no changes to existing PREMISE fields
+  2. `session_start.py` emits `[OPE] GENUS: N prior genera available — /genus-first before writing` when `axis_edges` has ≥1 `genus_of` edge scoped to the current session's repo
+  3. `POST /api/genus-consult {"problem": "...", "session_id": "...", "repo": "..."}` returns `{"genus": "...", "instances": [...], "valid": true/false, "confidence": 0.0–1.0}` within 500ms; handler queries `axis_edges` on `axis_a` + `evidence` fields using the problem string; returns top-1 match by confidence
+  4. `/genus-first` SKILL.md Mode A extended: when `data/ope.db` is absent AND `OPE_BUS_SOCKET` is set, POST to `/api/genus-consult` and embed the response as grounding evidence in the output prompt
+  5. Integration test: a simulated non-OPE session (`data/ope.db` absent, `OPE_BUS_SOCKET` set) receives a valid genus response for the A7/CRAD entry from `axis_edges`
+**Plans:** 4 plans in 3 waves
+
+Plans:
+- [ ] 25-01-PLAN.md — CLAUDE.md GENUS field extension + session_start.py genus hint (Wave 1)
+- [ ] 25-02-PLAN.md — /api/genus-consult endpoint + GenusConsultRequest/Response models (Wave 2)
+- [ ] 25-03-PLAN.md — GenusOracleHandler: axis_edges search + confidence scoring (Wave 2)
+- [ ] 25-04-PLAN.md — /genus-first skill bus escalation path + integration tests (Wave 3)
+
+---
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.3 -> 14 -> 14.1 -> 15 -> 16 -> 16.1 -> 17 -> 18 -> 19 -> 20 -> 21 -> 22 -> 23 -> 24
+Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.3 -> 14 -> 14.1 -> 15 -> 16 -> 16.1 -> 17 -> 18 -> 19 -> 20 -> 21 -> 22 -> 23 -> 24 -> 25
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -568,3 +589,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 22. Unified Discriminated Query Interface | 3/3 | ✓ Complete | 2026-02-27 |
 | 23. Autonomous Loop Mode-Switch Detection | 3/3 | ✓ Complete | 2026-02-27 |
 | 24. Genus-Check Gate | 3/3 | ✓ Complete | 2026-02-28 |
+| 25. Genus Protocol Propagation | 0/4 | ○ Pending | — |

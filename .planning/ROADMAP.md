@@ -516,12 +516,26 @@ Plans:
 - [x] 23-02-PLAN.md — CLI --plan flag, STATE.md injector, /project:autonomous-loop-mode-switch command (Wave 2)
 - [x] 23-03-PLAN.md — Integration tests, behavioral pattern detection (tool ratio signals) (Wave 3)
 
+### Phase 24: Genus-Check Gate
+
+**Goal:** Extend the PAG PreToolUse hook with genus declaration enforcement: before any write-class tool call, the AI must declare the genus of the problem being solved. The PAG validates using the fundamentality criterion (two citable instances + causal explanation), blocks writes lacking valid genus, writes accepted genera as weighted nodes to `axis_edges`, and tags Genus-Shift events in `ai_flame_events`. Test: apply the gate to the A7 per-file searchability failure in the Objectivism Library project and verify the CRAD (Corpus-Relative Aspect Differentiation) solution emerges from correct genus identification — without knowing CRAD in advance.
+**Depends on:** Phase 23 (PAG infrastructure from Phase 14.1; axis_edges from Phase 16.1; ai_flame_events from Phase 15)
+**Plans:** 3 plans in 3 waves
+
+Plans:
+- [ ] 24-01-PLAN.md — Parser extension + ParsedPremise genus fields + config (Wave 1)
+- [ ] 24-02-PLAN.md — FundamentalityChecker + PAG hook step 6.5 (Wave 2)
+- [ ] 24-03-PLAN.md — GenusEdgeWriter + runner Step 11.6 staging ingestion (Wave 3)
+
+**Details:**
+The Genus-Check Gate is not new infrastructure — it is PAG + three extensions: (1) GENUS field in PREMISE block (`GENUS: [name] | INSTANCES: [A, B]`), (2) FundamentalityChecker extending the PAG foil checker to validate two citable instances and causal explanation, (3) axis_edges write on accepted genus declaration. The test case (A7 → CRAD) validates the gate by demonstrating that correct genus identification makes the CRAD solution self-evident: once "conceptual identity retrieval" is named as the genus of the A7 failure, Pass 1/2/3 of CRAD follow directly from genus + differentia structure.
+
 ---
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.3 -> 14 -> 14.1 -> 15 -> 16 -> 16.1 -> 17 -> 18 -> 19 -> 20 -> 21 -> 22 -> 23
+Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.3 -> 14 -> 14.1 -> 15 -> 16 -> 16.1 -> 17 -> 18 -> 19 -> 20 -> 21 -> 22 -> 23 -> 24
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|

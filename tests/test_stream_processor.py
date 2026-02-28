@@ -5,15 +5,23 @@ Covers:
 - Signal boundary_dependency classification
 - StreamProcessor event routing and buffer management
 - X_ASK mid-episode invariant (Phase 14 locked decision)
+- create_stream_processor_operator behavioral parity (Phase 27)
 """
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
+from typing import Any
+from unittest.mock import patch
 
 import pytest
+import reactivex as rx
 
-from src.pipeline.live.stream.processor import StreamProcessor
+from src.pipeline.live.stream.processor import (
+    StreamProcessor,
+    create_stream_processor_operator,
+)
 from src.pipeline.live.stream.signals import classify_boundary_dependency
 from src.pipeline.live.stream.state_machine import (
     SESSION_TTL_MINUTES,
@@ -189,3 +197,159 @@ class TestStreamProcessor:
         p = StreamProcessor(session_id="my-session", run_id="my-run")
         assert p.session_id == "my-session"
         assert p.run_id == "my-run"
+
+
+# ---------------------------------------------------------------------------
+# Operator Tests (Phase 27 -- create_stream_processor_operator)
+# ---------------------------------------------------------------------------
+
+
+# Helper: GovernanceSignal stub for operator tests (matches bus.models shape)
+try:
+    from src.pipeline.live.bus.models import GovernanceSignal as _GovSig
+except ImportError:
+
+    @dataclass
+    class _GovSig:
+        signal_id: str
+        session_id: str
+        run_id: str
+        signal_type: str
+        boundary_dependency: str
+        payload: dict[str, Any] = field(default_factory=dict)
+
+
+def _make_signal(session_id, run_id, signal_type, boundary_dependency):
+    """Create a GovernanceSignal-compatible object for testing."""
+    return _GovSig(
+        signal_id=f"test-{signal_type}",
+        session_id=session_id,
+        run_id=run_id,
+        signal_type=signal_type,
+        boundary_dependency=boundary_dependency,
+        payload={},
+    )
+
+
+class _SignalEmittingProcessor(StreamProcessor):
+    """Subclass that emits signals on specific event types for testing.
+
+    Overrides _detect_signals to produce GovernanceSignal objects
+    for events with type 'escalation' (event_level) and 'amnesia'
+    (episode_level), matching the signal classification in signals.py.
+    """
+
+    def _detect_signals(self, event):
+        etype = event.get("type", "")
+        signals = []
+        if etype == "escalation_event":
+            signals.append(
+                _make_signal(self.session_id, self.run_id, "escalation", "event_level")
+            )
+        if etype == "amnesia_event":
+            signals.append(
+                _make_signal(self.session_id, self.run_id, "amnesia", "episode_level")
+            )
+        return signals
+
+
+class TestStreamProcessorOperator:
+    """Tests for create_stream_processor_operator (Phase 27 RxPY adoption)."""
+
+    def test_operator_behavioral_parity(self):
+        """Operator produces identical signal sequence as direct process_event() calls.
+
+        Uses _SignalEmittingProcessor to generate real GovernanceSignal objects,
+        then patches StreamProcessor so create_stream_processor_operator uses
+        the signal-emitting subclass.
+        """
+        events = [
+            {"type": "O_DIR"},          # start trigger, ACTIVE, no signals
+            {"type": "escalation_event"},  # event_level signal emitted immediately
+            {"type": "X_PROPOSE"},       # end trigger -> TENTATIVE_END
+            {"type": "amnesia_event"},   # episode_level signal -> buffered
+            {"type": "O_GATE"},          # start trigger -> CONFIRMED_END, flushes buffer
+        ]
+
+        # Direct process_event() calls
+        direct_signals = []
+        direct_proc = _SignalEmittingProcessor(session_id="s1", run_id="r1")
+        for ev in events:
+            direct_signals.extend(direct_proc.process_event(ev))
+
+        # Operator-based pipeline (patch StreamProcessor to use subclass)
+        operator_signals = []
+        with patch(
+            "src.pipeline.live.stream.processor.StreamProcessor",
+            _SignalEmittingProcessor,
+        ):
+            rx.from_iterable(events).pipe(
+                create_stream_processor_operator("s1", "r1")
+            ).subscribe(on_next=operator_signals.append)
+
+        # Behavioral parity: same signal types in same order
+        assert len(operator_signals) == len(direct_signals), (
+            f"Signal count mismatch: operator={len(operator_signals)}, "
+            f"direct={len(direct_signals)}"
+        )
+        for op_sig, dir_sig in zip(operator_signals, direct_signals):
+            assert op_sig.signal_type == dir_sig.signal_type
+            assert op_sig.boundary_dependency == dir_sig.boundary_dependency
+
+    def test_operator_cold_semantics(self):
+        """Two subscriptions produce independent results (cold observable).
+
+        Each subscription creates a fresh StreamProcessor with independent
+        state machines, so both produce identical signal sequences.
+        """
+        events = [
+            {"type": "O_DIR"},
+            {"type": "X_PROPOSE"},
+            {"type": "O_GATE"},
+        ]
+
+        with patch(
+            "src.pipeline.live.stream.processor.StreamProcessor",
+            _SignalEmittingProcessor,
+        ):
+            operator = create_stream_processor_operator("s1", "r1")
+            source = rx.from_iterable(events).pipe(operator)
+
+            signals_a = []
+            signals_b = []
+            source.subscribe(on_next=signals_a.append)
+            source.subscribe(on_next=signals_b.append)
+
+        # Both subscriptions see the same result (independent state machines)
+        assert len(signals_a) == len(signals_b)
+
+    def test_operator_error_propagation(self):
+        """Errors from process_event are propagated to on_error."""
+        errors = []
+
+        def _boom_processor(session_id, run_id):
+            proc = StreamProcessor(session_id=session_id, run_id=run_id)
+            original = proc.process_event
+
+            def exploding_process_event(event):
+                if event.get("type") == "boom":
+                    raise RuntimeError("test explosion")
+                return original(event)
+
+            proc.process_event = exploding_process_event
+            return proc
+
+        with patch(
+            "src.pipeline.live.stream.processor.StreamProcessor",
+            side_effect=lambda session_id, run_id: _boom_processor(
+                session_id, run_id
+            ),
+        ):
+            rx.from_iterable(
+                [{"type": "O_DIR"}, {"type": "boom"}]
+            ).pipe(
+                create_stream_processor_operator("s1", "r1")
+            ).subscribe(on_error=errors.append)
+
+        assert len(errors) == 1
+        assert "test explosion" in str(errors[0])

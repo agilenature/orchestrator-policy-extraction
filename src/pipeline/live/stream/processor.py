@@ -16,6 +16,9 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
 
+import reactivex as rx
+from reactivex.disposable import Disposable
+
 from .signals import classify_boundary_dependency
 from .state_machine import SessionState, SessionStateMachine
 
@@ -108,3 +111,51 @@ class StreamProcessor:
         via dependency injection or subclass override.
         """
         return []
+
+
+def create_stream_processor_operator(session_id: str, run_id: str):
+    """Create a cold observable operator that wraps StreamProcessor.
+
+    Each subscription creates a fresh StreamProcessor instance. Events
+    flowing through the source observable are processed sequentially;
+    GovernanceSignal objects are emitted downstream.
+
+    This is a cold observable: two subscriptions produce independent
+    results with independent state machines.
+
+    Usage:
+        signals = []
+        rx.from_iterable(events).pipe(
+            create_stream_processor_operator("sess-1", "run-1")
+        ).subscribe(on_next=signals.append)
+
+    Args:
+        session_id: Session identifier for the processor.
+        run_id: Run identifier for the processor.
+
+    Returns:
+        Operator function suitable for use in observable.pipe().
+    """
+
+    def _operator(source):
+        def subscribe(observer, scheduler=None):
+            processor = StreamProcessor(session_id=session_id, run_id=run_id)
+
+            def on_next(event):
+                try:
+                    signals = processor.process_event(event)
+                    for sig in signals:
+                        observer.on_next(sig)
+                except Exception as e:
+                    observer.on_error(e)
+
+            return source.subscribe(
+                on_next=on_next,
+                on_error=observer.on_error,
+                on_completed=observer.on_completed,
+                scheduler=scheduler,
+            )
+
+        return rx.create(subscribe)
+
+    return _operator

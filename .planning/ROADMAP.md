@@ -523,9 +523,9 @@ Plans:
 **Plans:** 3 plans in 3 waves
 
 Plans:
-- [ ] 24-01-PLAN.md — Parser extension + ParsedPremise genus fields + config (Wave 1)
-- [ ] 24-02-PLAN.md — FundamentalityChecker + PAG hook step 6.5 (Wave 2)
-- [ ] 24-03-PLAN.md — GenusEdgeWriter + runner Step 11.6 staging ingestion (Wave 3)
+- [x] 24-01-PLAN.md — Parser extension + ParsedPremise genus fields + config (Wave 1)
+- [x] 24-02-PLAN.md — FundamentalityChecker + PAG hook step 6.5 (Wave 2)
+- [x] 24-03-PLAN.md — GenusEdgeWriter + runner Step 11.6 staging ingestion (Wave 3)
 
 **Details:**
 The Genus-Check Gate is not new infrastructure — it is PAG + three extensions: (1) GENUS field in PREMISE block (`GENUS: [name] | INSTANCES: [A, B]`), (2) FundamentalityChecker extending the PAG foil checker to validate two citable instances and causal explanation, (3) axis_edges write on accepted genus declaration. The test case (A7 → CRAD) validates the gate by demonstrating that correct genus identification makes the CRAD solution self-evident: once "conceptual identity retrieval" is named as the genus of the A7 failure, Pass 1/2/3 of CRAD follow directly from genus + differentia structure.
@@ -567,3 +567,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 21. Doc Index Floating Corpus Bridge | 4/4 | ✓ Complete | 2026-02-27 |
 | 22. Unified Discriminated Query Interface | 3/3 | ✓ Complete | 2026-02-27 |
 | 23. Autonomous Loop Mode-Switch Detection | 3/3 | ✓ Complete | 2026-02-27 |
+| 24. Genus-Check Gate | 3/3 | ✓ Complete | 2026-02-28 |

@@ -315,6 +315,60 @@ class TestEpisodeEmbedder:
         count = db_conn.execute("SELECT count(*) FROM episode_embeddings").fetchone()[0]
         assert count == 1
 
+    def test_embed_episodes_rx_behavioral_parity(self, db_conn):
+        """RxPY adoption produces identical DuckDB state and return values.
+
+        Validates the full contract: return dict values, row counts in both
+        tables, episode_id presence, and idempotency (second call skips all).
+        """
+        # Insert N=3 test episodes with distinct content
+        episodes = [
+            _make_episode(
+                episode_id=f"ep-parity-{i:03d}",
+                recent_summary=f"Parity test episode {i}",
+                goal=f"Goal for episode {i}",
+            )
+            for i in range(3)
+        ]
+        write_episodes(db_conn, episodes)
+
+        embedder = EpisodeEmbedder()
+
+        # First call: embed all 3
+        stats = embedder.embed_episodes(db_conn)
+        assert stats == {"embedded": 3, "skipped": 0}
+
+        # Verify episode_embeddings has exactly 3 rows
+        emb_rows = db_conn.execute(
+            "SELECT episode_id FROM episode_embeddings ORDER BY episode_id"
+        ).fetchall()
+        assert len(emb_rows) == 3
+
+        # Verify episode_search_text has exactly 3 rows
+        txt_rows = db_conn.execute(
+            "SELECT episode_id FROM episode_search_text ORDER BY episode_id"
+        ).fetchall()
+        assert len(txt_rows) == 3
+
+        # All 3 episode_ids present in both tables
+        expected_ids = {f"ep-parity-{i:03d}" for i in range(3)}
+        assert {r[0] for r in emb_rows} == expected_ids
+        assert {r[0] for r in txt_rows} == expected_ids
+
+        # Idempotency: second call skips all
+        stats2 = embedder.embed_episodes(db_conn)
+        assert stats2 == {"embedded": 0, "skipped": 3}
+
+        # Row counts unchanged after second call
+        emb_count = db_conn.execute(
+            "SELECT count(*) FROM episode_embeddings"
+        ).fetchone()[0]
+        txt_count = db_conn.execute(
+            "SELECT count(*) FROM episode_search_text"
+        ).fetchone()[0]
+        assert emb_count == 3
+        assert txt_count == 3
+
     def test_rebuild_fts_index(self, db_conn):
         """rebuild_fts_index(conn) creates FTS index on episode_search_text."""
         # Insert search text directly

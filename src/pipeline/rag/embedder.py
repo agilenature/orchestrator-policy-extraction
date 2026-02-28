@@ -4,6 +4,10 @@ Generates 384-dim embeddings from episode observation text using
 sentence-transformers all-MiniLM-L6-v2. Stores embeddings in DuckDB
 with HNSW cosine index for similarity search.
 
+Uses RxPY observables with ThreadPoolScheduler for parallel embedding
+computation (Phase 27 adoption). DuckDB writes remain sequential on the
+subscriber thread for predictability.
+
 Exports:
     observation_to_text: Convert structured observation to searchable text
     EpisodeEmbedder: Episode embedding generator with DuckDB storage
@@ -14,7 +18,12 @@ from __future__ import annotations
 import json
 
 import duckdb
+import reactivex as rx
 from loguru import logger
+from reactivex import operators as ops
+from reactivex.scheduler import ThreadPoolScheduler
+
+from src.pipeline.rx_operators import create_work_observable
 
 
 def observation_to_text(
@@ -118,6 +127,10 @@ class EpisodeEmbedder:
         generates embeddings, and writes to episode_embeddings and
         episode_search_text tables. Skips already-embedded episodes.
 
+        Uses RxPY observable pipeline with ThreadPoolScheduler for parallel
+        embedding computation. DuckDB writes are sequential on the subscriber
+        thread (on_next callbacks serialize after merge).
+
         Args:
             conn: DuckDB connection with schema already created.
 
@@ -138,8 +151,24 @@ class EpisodeEmbedder:
         total_episodes = conn.execute("SELECT count(*) FROM episodes").fetchone()[0]
         skipped = total_episodes - len(rows)
 
-        embedded = 0
-        for row in rows:
+        if not rows:
+            logger.info(
+                "Embedded {} episodes ({} skipped, already embedded)",
+                0,
+                skipped,
+            )
+            return {"embedded": 0, "skipped": skipped}
+
+        # --- RxPY observable pipeline ---
+        scheduler = ThreadPoolScheduler(max_workers=4)
+        embedded_ids: list[str] = []
+        error_holder: list[Exception] = []
+
+        def _process_row(row: tuple) -> dict:
+            """Extract text and compute embedding for one episode row.
+
+            Runs on ThreadPoolScheduler threads (CPU-bound model.encode).
+            """
             episode_id = row[0]
             obs_struct = row[1]
             action_json = row[2]
@@ -161,22 +190,51 @@ class EpisodeEmbedder:
             # Extract search text
             search_text = observation_to_text(obs_dict, action_dict)
 
-            # Generate embedding
+            # Generate embedding (CPU-bound -- runs on thread pool)
             embedding = self.embed_text(search_text)
 
-            # Write to episode_search_text
+            return {
+                "episode_id": episode_id,
+                "search_text": search_text,
+                "embedding": embedding,
+            }
+
+        def _write_to_db(result: dict) -> None:
+            """Write embedding result to DuckDB tables.
+
+            Runs sequentially on subscriber thread (serialized by merge).
+            """
             conn.execute(
                 "INSERT INTO episode_search_text (episode_id, search_text) VALUES (?, ?)",
-                [episode_id, search_text],
+                [result["episode_id"], result["search_text"]],
             )
-
-            # Write to episode_embeddings
             conn.execute(
                 "INSERT INTO episode_embeddings (episode_id, embedding, model_name) VALUES (?, ?::FLOAT[384], ?)",
-                [episode_id, embedding, self._model_name],
+                [result["episode_id"], result["embedding"], self._model_name],
             )
+            embedded_ids.append(result["episode_id"])
 
-            embedded += 1
+        rx.from_iterable(rows).pipe(
+            ops.map(
+                lambda row: create_work_observable(_process_row, row).pipe(
+                    ops.subscribe_on(scheduler),
+                )
+            ),
+            ops.merge(max_concurrent=4),
+            ops.do_action(on_next=_write_to_db),
+        ).subscribe(
+            on_next=lambda _: None,
+            on_error=lambda e: error_holder.append(e),
+            on_completed=lambda: None,
+        )
+
+        # Cleanup thread pool
+        scheduler.executor.shutdown(wait=True)
+
+        if error_holder:
+            raise error_holder[0]
+
+        embedded = len(embedded_ids)
 
         if embedded > 0:
             self.rebuild_fts_index(conn)

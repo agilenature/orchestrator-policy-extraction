@@ -108,6 +108,15 @@ Explicitly excluded to prevent scope creep.
 | Real-time deployment without shadow mode | Unsafe -- distribution shift in imitation learning is mathematically proven; shadow mode is non-negotiable |
 | Single unified ML model | Wrong architecture -- RAG baseline, preference model, and RL policy are distinct stages with different purposes |
 
+### Genus Protocol Propagation
+
+- [ ] **GENEXT-01**: System extends `~/.claude/CLAUDE.md` Premise Declaration Protocol with optional GENUS field format (5th line: `GENUS: [name] | INSTANCES: [A, B]`), fundamentality criterion (>=2 instances + causal explanation), and mechanism-vs-symptom distinction -- additive only, no changes to existing fields
+- [ ] **GENEXT-02**: System emits `[OPE] GENUS: N prior genera available -- /genus-first before writing` at session start when axis_edges has >=1 genus_of edge scoped to the current session's repo; silent when 0
+- [ ] **GENORACLE-01**: System provides `POST /api/genus-consult` bus endpoint accepting `{problem, session_id, repo}` and returning `{genus, instances, valid, confidence}` within 500ms using keyword-overlap scoring against axis_edges genus_of entries
+- [ ] **GENORACLE-02**: System implements GenusOracleHandler with tokenization-based search over axis_edges (adapted from doc_query.py pattern), confidence scoring as matched_tokens/total_genus_tokens, instance extraction from evidence JSON, and repo scoping via bus_sessions JOIN
+- [ ] **GENORACLE-03**: System extends `/genus-first` SKILL.md with Mode A bus path: when data/ope.db absent AND OPE_BUS_SOCKET set, POST to /api/genus-consult for genus grounding; result embedded in genus-first output prompt
+- [ ] **REFRAME-01**: System provides global `/reframe` skill at `~/.claude/skills/reframe/` that detects capability tier (OPE-local / OPE-via-bus / Lightweight), selects a reasoning protocol (Premise-Declare-First / Axis-Before-Fix / Pattern-Not-Symptom) given any problem, uses genus oracle for grounding when bus reachable, emits verbatim protocol directive
+
 ## Traceability
 
 Mapping requirements to roadmap phases. Updated during roadmap creation.
@@ -147,12 +156,19 @@ Mapping requirements to roadmap phases. Updated during roadmap creation.
 | LIVE-03 | Phase 14: Live Session Governance Research | Pending |
 | LIVE-04 | Phase 14: Live Session Governance Research | Pending |
 | LIVE-05 | Phase 14: Live Session Governance Research | Pending |
+| GENEXT-01 | Phase 25: Genus Protocol Propagation | Pending |
+| GENEXT-02 | Phase 25: Genus Protocol Propagation | Pending |
+| GENORACLE-01 | Phase 25: Genus Protocol Propagation | Pending |
+| GENORACLE-02 | Phase 25: Genus Protocol Propagation | Pending |
+| GENORACLE-03 | Phase 25: Genus Protocol Propagation | Pending |
+| REFRAME-01 | Phase 25: Genus Protocol Propagation | Pending |
 
 **Coverage:**
 - v1 requirements: 23 total (Phases 1–6, all complete)
 - Identification transparency requirements: 5 (IDTRANS-01 through IDTRANS-05, Phase 13.3)
 - Live governance requirements: 5 (LIVE-01 through LIVE-05, Phase 14)
-- Mapped to phases: 33
+- Genus protocol propagation requirements: 6 (GENEXT-01, GENEXT-02, GENORACLE-01 through GENORACLE-03, REFRAME-01, Phase 25)
+- Mapped to phases: 39
 - Unmapped: 0
 
 ---

@@ -101,7 +101,6 @@ class PipelineRunner:
         )
 
         # EBC (External Behavioral Contract) for drift detection (Phase 23)
-        # Set via external caller before run_session; Plan 02 adds set_ebc().
         self._ebc = None
 
         self._config_hash = self._compute_config_hash(config)
@@ -110,6 +109,18 @@ class PipelineRunner:
             db_path,
             self._config_hash,
         )
+
+    def set_ebc(self, ebc: Any) -> None:
+        """Set the External Behavioral Contract for drift detection.
+
+        Must be called before run_session() to enable EBC drift detection.
+        The EBC defines expected files modified and artifacts, enabling the
+        drift detector to compare actual session behavior against the plan.
+
+        Args:
+            ebc: An ExternalBehavioralContract instance (from ebc.parser).
+        """
+        self._ebc = ebc
 
     def run_session(
         self,

@@ -40,12 +40,17 @@ from src.pipeline.runner import PipelineRunner
 @click.option("--config", "config_path", default="data/config.yaml", help="Config YAML path.")
 @click.option("--repo", default=None, help="Git repo path for temporal alignment.")
 @click.option("--verbose", "-v", is_flag=True, help="Verbose logging (DEBUG level).")
+@click.option("--plan", "plan_path", default=None, help="Path to PLAN.md file for EBC drift detection.")
+@click.option("--inject-state", "inject_state_path", default=None,
+              help="Path to STATE.md for drift alert injection.")
 def main(
     input_path: str,
     db: str,
     config_path: str,
     repo: str | None,
     verbose: bool,
+    plan_path: str | None,
+    inject_state_path: str | None,
 ) -> None:
     """Process Claude Code JSONL sessions into tagged, segmented events in DuckDB.
 
@@ -71,6 +76,23 @@ def main(
     # Initialize runner
     runner = PipelineRunner(config, db_path=db)
 
+    # Parse EBC from plan if provided
+    ebc = None
+    if plan_path:
+        try:
+            from src.pipeline.ebc.parser import parse_ebc_from_plan
+
+            ebc = parse_ebc_from_plan(plan_path)
+            if ebc is not None:
+                runner.set_ebc(ebc)
+                click.echo(f"EBC loaded from: {plan_path} (phase={ebc.phase}, plan={ebc.plan})")
+            else:
+                click.echo(f"Warning: Could not parse EBC from {plan_path}", err=True)
+        except ImportError:
+            click.echo("Warning: EBC module not available, --plan flag ignored", err=True)
+        except Exception as e:
+            click.echo(f"Warning: EBC parsing failed: {e}", err=True)
+
     try:
         input_p = Path(input_path)
 
@@ -80,6 +102,23 @@ def main(
             result = runner.run_session(input_p, repo_path=repo)
             _print_session_summary(result)
             has_errors = bool(result.get("errors"))
+
+            # Inject drift alert into STATE.md if requested and drift detected
+            if inject_state_path and result.get("ebc_drift_detected"):
+                try:
+                    from src.pipeline.ebc.state_injector import inject_alert_into_state
+
+                    alert_filename = f"{result['session_id']}-ebc-drift.json"
+                    alert_block = _format_state_alert_block(result, ebc, alert_filename)
+                    injected = inject_alert_into_state(
+                        Path(inject_state_path), alert_block
+                    )
+                    if injected:
+                        click.echo(f"Drift alert injected into {inject_state_path}")
+                except ImportError:
+                    pass
+                except Exception as e:
+                    click.echo(f"Warning: STATE.md injection failed: {e}", err=True)
         elif input_p.is_dir():
             # Batch mode
             click.echo(f"Batch processing directory: {input_p}")
@@ -94,6 +133,18 @@ def main(
         runner.close()
 
     sys.exit(1 if has_errors else 0)
+
+
+def _format_state_alert_block(result: dict, ebc: object | None, alert_filename: str) -> str:
+    """Format a drift alert block for STATE.md injection."""
+    lines = [f"> **WARNING:** Session `{result['session_id']}` drifted from EBC"]
+    if ebc is not None:
+        lines.append(f"> - Phase: {ebc.phase}, Plan: {ebc.plan}")  # type: ignore[attr-defined]
+    lines.extend([
+        f"> - Alert artifact: `data/alerts/{alert_filename}`",
+        "> - Recovery: Run `/project:autonomous-loop-mode-switch` for options",
+    ])
+    return "\n".join(lines)
 
 
 def _print_session_summary(result: dict) -> None:

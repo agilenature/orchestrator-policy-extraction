@@ -6,24 +6,26 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 22 (Unified Discriminated Query Interface) -- COMPLETE. All 3 plans executed.
+**Current focus:** Phase 23 (Autonomous Loop Mode-Switch Detection) -- IN PROGRESS. Plan 01 complete.
 
 ## Current Position
 
-Phase: 22 (Unified Discriminated Query Interface)
-Plan: 3 of 3
-Status: Phase complete
-Last activity: 2026-02-27 -- Completed 22-03-PLAN.md (cross-project ATTACH queries + 32 integration tests)
+Phase: 23 (Autonomous Loop Mode-Switch Detection)
+Plan: 1 of 3 complete
+Status: In progress
+Last activity: 2026-02-28 -- Completed 23-01-PLAN.md (EBC core pipeline: models, parser, detector, writer, config, runner)
 
-Progress: [████████████████████████████████] 100% (3/3 plans in phase 22)
-Overall:  [███████████████████████████████████████████████████████████████████████████████████████████████] 93/93 plans total
+Next Plan: 23-02-PLAN.md (Runner integration with set_ebc + PLAN.md auto-discovery)
+
+Progress: [███████████░░░░░░░░░░░░░░░░░░░░░░] 33% (1/3 plans in phase 23)
+Overall:  [████████████████████████████████████████████████████████████████████████████████████████████████] 94/96 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 93 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 4 Phase 21 + 3 Phase 22)
+- Total plans completed: 94 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 4 Phase 21 + 3 Phase 22 + 1 Phase 23)
 - Average duration: 5.5 min
-- Total execution time: 8.83 hours
+- Total execution time: 8.95 hours
 
 **By Phase:**
 
@@ -59,9 +61,11 @@ Overall:  [███████████████████████
 
 | 22-unified-discriminated-query-interface | 3/3 | 17 min | 5.7 min |
 
+| 23-autonomous-loop-mode-switch-detection | 1/3 | 7 min | 7.0 min |
+
 **Recent Trend:**
-- Last 5 plans: 3 min, 9 min, 4 min, 5 min, 7 min
-- Trend: Phase 22 Plan 03 (cross-project ATTACH queries) complete in 7 min. Phase 22 complete.
+- Last 5 plans: 9 min, 4 min, 5 min, 7 min, 7 min
+- Trend: Phase 23 Plan 01 (EBC core pipeline) complete in 7 min.
 
 *Updated after each plan completion*
 
@@ -856,3 +860,7 @@ Phase 22 delivered the Unified Discriminated Query Interface (all 3 plans, all 6
 - **Key modules**: src/pipeline/session_query.py, src/pipeline/code_query.py, src/pipeline/doc_query.py, src/pipeline/cli/query.py
 - **CLI**: `python -m src.pipeline.cli query [--source docs|sessions|code|all] [--project ID] [--db PATH] [--top N] QUERY`
 - **Project milestone**: All 93 plans across 22 phases complete. Unified query interface operational for cross-project knowledge retrieval.
+
+## Roadmap Evolution
+
+- Phase 23 added: Autonomous Loop Mode-Switch Detection — EBC-Drift detection system for operating-mode mismatch. Detects when a project has transitioned from Execution Mode (known state space) to Discovery Mode (unknown state space) and notifies the human before false completions accumulate. CCD axis: `operating-mode-epistemic-mismatch`.

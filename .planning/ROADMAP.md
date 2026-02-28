@@ -613,5 +613,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> ... -> 13 -> 13.1 -> 13.2 -> 13.
 | 22. Unified Discriminated Query Interface | 3/3 | ✓ Complete | 2026-02-27 |
 | 23. Autonomous Loop Mode-Switch Detection | 3/3 | ✓ Complete | 2026-02-27 |
 | 24. Genus-Check Gate | 3/3 | ✓ Complete | 2026-02-28 |
-| 25. Genus Protocol Propagation | 0/5 | ○ Pending | — |
-| 27. ReactiveX Reactive Adoption | 0/4 | ○ Pending | — |
+| 25. Genus Protocol Propagation | 5/5 | ✓ Complete | 2026-02-28 |
+| 27. ReactiveX Reactive Adoption | 4/4 | ✓ Complete | 2026-02-28 |

@@ -173,3 +173,14 @@ class TestParsedPremiseModel:
         )
         with pytest.raises(Exception):
             premise.claim = "Modified"
+
+    def test_parsed_premise_genus_fields_optional(self):
+        """ParsedPremise can be created without genus args."""
+        p = ParsedPremise(
+            claim="test",
+            validated_by="evidence",
+            is_unvalidated=False,
+            scope="test",
+        )
+        assert p.genus_name is None
+        assert p.genus_instances is None

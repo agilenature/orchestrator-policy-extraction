@@ -374,3 +374,34 @@ constraint_patterns:
     - "use"
     - "prefer"
     - "better to"
+
+# Genus-Check Gate (Phase 24)
+# Controls PAG enforcement of genus declaration in PREMISE blocks.
+genus_check:
+  enabled: true
+  block_on_invalid: false   # warn-only by default; set true to block writes
+  causal_indicator_words:
+    - retrieval
+    - identification
+    - formation
+    - derivation
+    - detection
+    - synchronization
+    - propagation
+    - extraction
+    - resolution
+    - scoping
+    - isolation
+    - drift
+    - failure
+    - mechanism
+    - process
+    - computation
+    - generation
+    - validation
+    - discrimination
+    - differentiation
+    - selection
+    - projection
+    - instantiation
+    - classification

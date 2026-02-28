@@ -304,3 +304,81 @@ class TestParseFoilVerifiedBlocks:
         assert len(results) == 2
         assert results[0]["premise_claim"] == "Claim one"
         assert results[1]["premise_claim"] == "Claim two"
+
+
+class TestParsePremiseBlocksGenus:
+    """Tests for GENUS field parsing in PREMISE blocks."""
+
+    def test_genus_field_parsed(self):
+        """5-line block with GENUS field is parsed correctly."""
+        text = (
+            "PREMISE: File exists at /src/main.py\n"
+            "VALIDATED_BY: Read output confirmed\n"
+            "FOIL: wrong path | directory matches\n"
+            "SCOPE: this project\n"
+            "GENUS: corpus-relative identity retrieval | INSTANCES: [A7 failure, MOTM dedup]\n"
+        )
+        results = parse_premise_blocks(text)
+        assert len(results) == 1
+        p = results[0]
+        assert p.genus_name == "corpus-relative identity retrieval"
+        assert p.genus_instances == ["A7 failure", "MOTM dedup"]
+
+    def test_genus_field_absent(self):
+        """4-line block without GENUS has None genus fields."""
+        text = (
+            "PREMISE: Some claim\n"
+            "VALIDATED_BY: Evidence\n"
+            "FOIL: confusable | distinction\n"
+            "SCOPE: test scope\n"
+        )
+        results = parse_premise_blocks(text)
+        assert len(results) == 1
+        assert results[0].genus_name is None
+        assert results[0].genus_instances is None
+
+    def test_genus_without_instances(self):
+        """GENUS line without INSTANCES sub-field: genus_name set, instances None."""
+        text = (
+            "PREMISE: Some claim\n"
+            "VALIDATED_BY: Evidence\n"
+            "FOIL: confusable | distinction\n"
+            "SCOPE: test scope\n"
+            "GENUS: simple genus name\n"
+        )
+        results = parse_premise_blocks(text)
+        assert len(results) == 1
+        assert results[0].genus_name == "simple genus name"
+        assert results[0].genus_instances is None
+
+    def test_genus_instances_with_brackets(self):
+        """GENUS instances with brackets are stripped correctly."""
+        text = (
+            "PREMISE: Some claim\n"
+            "VALIDATED_BY: Evidence\n"
+            "FOIL: confusable | distinction\n"
+            "SCOPE: test scope\n"
+            "GENUS: my genus | INSTANCES: [inst1, inst2, inst3]\n"
+        )
+        results = parse_premise_blocks(text)
+        assert len(results) == 1
+        assert results[0].genus_instances == ["inst1", "inst2", "inst3"]
+
+    def test_genus_backward_compatibility(self):
+        """All fields from standard 4-line block still parsed correctly."""
+        text = (
+            "PREMISE: File exists at /src/main.py\n"
+            "VALIDATED_BY: Read output confirmed file presence\n"
+            "FOIL: wrong file path | directory matches src/\n"
+            "SCOPE: this project\n"
+        )
+        results = parse_premise_blocks(text)
+        assert len(results) == 1
+        p = results[0]
+        assert p.claim == "File exists at /src/main.py"
+        assert p.validated_by == "Read output confirmed file presence"
+        assert p.foil == "wrong file path"
+        assert p.distinguishing_prop == "directory matches src/"
+        assert p.scope == "this project"
+        assert p.genus_name is None
+        assert p.genus_instances is None

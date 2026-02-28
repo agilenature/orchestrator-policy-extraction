@@ -2,18 +2,18 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-10)
+See: .planning/PROJECT.md (updated 2026-02-28)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 27 (ReactiveX Reactive Adoption) -- COMPLETE. All 4 plans executed. All 5 RXA requirements satisfied.
+**Current focus:** v1.0 milestone complete. Planning v2.0 (graduated autonomy, OpenClaw integration, preference model training).
 
 ## Current Position
 
-Phase: 27 (ReactiveX Reactive Adoption)
-Plan: 4 of 4
-Status: Phase complete
-Last activity: 2026-02-28 -- Completed 27-04-PLAN.md (stream processor RxPY adoption + regression suite)
+Phase: v1.0 milestone complete
+Plan: All 108 plans complete
+Status: Ready to plan v2.0
+Last activity: 2026-02-28 — v1.0 milestone archived (27 phases, 108 plans, shipped)
 
 Progress: [████████████████████████████████] 100% (4/4 plans in phase 27)
 Overall:  [████████████████████████████████████████████████████████████████████████████████████████████████████] 108/108 plans total

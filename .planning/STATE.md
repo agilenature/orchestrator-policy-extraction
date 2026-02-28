@@ -6,24 +6,24 @@ See: .planning/PROJECT.md (updated 2026-02-10)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** Phase 25 (Genus Protocol Propagation) -- In progress. Wave 3: /reframe skill created as process-level companion to /elevate.
+**Current focus:** Phase 25 (Genus Protocol Propagation) -- Complete. All 5 plans executed.
 
 ## Current Position
 
 Phase: 25 (Genus Protocol Propagation)
-Plan: 4 of 5
-Status: In progress
-Last activity: 2026-02-28 -- Completed 25-05 /reframe skill creation
+Plan: 5 of 5
+Status: Phase complete
+Last activity: 2026-02-28 -- Completed 25-04 /genus-first skill bus escalation + integration tests
 
-Progress: [█████████████████████████░░░░░░░] 80% (4/5 plans in phase 25)
-Overall:  [████████████████████████████████████████████████████████████████████████████████████████████████████] 103/104 plans total
+Progress: [████████████████████████████████] 100% (5/5 plans in phase 25)
+Overall:  [████████████████████████████████████████████████████████████████████████████████████████████████████] 104/104 plans total
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 103 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 4 Phase 21 + 3 Phase 22 + 3 Phase 23 + 3 Phase 24 + 4 Phase 25)
+- Total plans completed: 104 (75 plans + 1 gap closure + 5 Phase 19 + 5 Phase 20 + 4 Phase 21 + 3 Phase 22 + 3 Phase 23 + 3 Phase 24 + 5 Phase 25)
 - Average duration: 5.4 min
-- Total execution time: 9.30 hours
+- Total execution time: 9.37 hours
 
 **By Phase:**
 
@@ -63,11 +63,11 @@ Overall:  [███████████████████████
 
 | 24-genus-check-gate | 3/3 | 11 min | 3.7 min |
 
-| 25-genus-protocol-propagation | 4/5 | 9 min | 2.3 min |
+| 25-genus-protocol-propagation | 5/5 | 13 min | 2.6 min |
 
 **Recent Trend:**
-- Last 5 plans: 6 min, 3 min, 2 min, 2 min, 2 min
-- Trend: Phase 25 progressing (4/5 plans). /reframe skill created. Plan 04 remaining.
+- Last 5 plans: 3 min, 2 min, 2 min, 2 min, 4 min
+- Trend: Phase 25 COMPLETE (5/5 plans). All genus protocol propagation deliverables shipped.
 
 *Updated after each plan completion*
 

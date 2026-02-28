@@ -770,3 +770,125 @@ class TestNeverBlocks:
             # There should be no permissionDecision field, or it should not be "deny"
             hook_output = response.get("hookSpecificOutput", {})
             assert hook_output.get("permissionDecision") != "deny"
+
+
+class TestGenusCheck:
+    """Tests for genus declaration checking in PAG hook (Phase 24)."""
+
+    def test_genus_absent_no_warning(self, monkeypatch, tmp_path):
+        """PREMISE block without GENUS field: no GENUS_INVALID warning (fail-open)."""
+        transcript = tmp_path / "t.jsonl"
+        _write_transcript(
+            str(transcript),
+            [
+                _user_entry("edit file"),
+                _assistant_tool_use("Read"),
+                _assistant_text(
+                    "PREMISE: File exists\n"
+                    "VALIDATED_BY: Read confirmed\n"
+                    "FOIL: wrong path | right dir\n"
+                    "SCOPE: project\n"
+                ),
+            ],
+        )
+        stdin_data = _make_hook_input(
+            tool_name="Edit",
+            transcript_path=str(transcript),
+            session_id="test-genus-absent",
+        )
+        captured = io.StringIO()
+        monkeypatch.setattr("sys.stdin", io.StringIO(stdin_data))
+        monkeypatch.setattr("sys.stdout", captured)
+        monkeypatch.setattr(
+            "src.pipeline.live.hooks.premise_gate.append_to_staging",
+            lambda records, **kw: len(records),
+        )
+
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+        assert exc_info.value.code == 0
+        output = captured.getvalue()
+        if output:
+            resp = json.loads(output)
+            ctx = resp.get("hookSpecificOutput", {}).get("additionalContext", "")
+            assert "GENUS_INVALID" not in ctx
+
+    def test_genus_valid_no_warning(self, monkeypatch, tmp_path):
+        """PREMISE block with valid GENUS (2 instances + causal word): no GENUS_INVALID."""
+        transcript = tmp_path / "t.jsonl"
+        _write_transcript(
+            str(transcript),
+            [
+                _user_entry("edit file"),
+                _assistant_tool_use("Read"),
+                _assistant_text(
+                    "PREMISE: File exists\n"
+                    "VALIDATED_BY: Read confirmed\n"
+                    "FOIL: wrong path | right dir\n"
+                    "SCOPE: project\n"
+                    "GENUS: corpus-relative identity retrieval | INSTANCES: [A7 failure, MOTM failure]\n"
+                ),
+            ],
+        )
+        stdin_data = _make_hook_input(
+            tool_name="Edit",
+            transcript_path=str(transcript),
+            session_id="test-genus-valid",
+        )
+        captured = io.StringIO()
+        monkeypatch.setattr("sys.stdin", io.StringIO(stdin_data))
+        monkeypatch.setattr("sys.stdout", captured)
+        monkeypatch.setattr(
+            "src.pipeline.live.hooks.premise_gate.append_to_staging",
+            lambda records, **kw: len(records),
+        )
+
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+        assert exc_info.value.code == 0
+        output = captured.getvalue()
+        if output:
+            resp = json.loads(output)
+            ctx = resp.get("hookSpecificOutput", {}).get("additionalContext", "")
+            assert "GENUS_INVALID" not in ctx
+
+    def test_genus_invalid_warns(self, monkeypatch, tmp_path):
+        """PREMISE block with GENUS field but only 1 instance: GENUS_INVALID warning."""
+        transcript = tmp_path / "t.jsonl"
+        _write_transcript(
+            str(transcript),
+            [
+                _user_entry("edit file"),
+                _assistant_tool_use("Read"),
+                _assistant_text(
+                    "PREMISE: File exists\n"
+                    "VALIDATED_BY: Read confirmed\n"
+                    "FOIL: wrong path | right dir\n"
+                    "SCOPE: project\n"
+                    "GENUS: identity retrieval | INSTANCES: [only one instance]\n"
+                ),
+            ],
+        )
+        stdin_data = _make_hook_input(
+            tool_name="Edit",
+            transcript_path=str(transcript),
+            session_id="test-genus-invalid",
+        )
+        captured = io.StringIO()
+        monkeypatch.setattr("sys.stdin", io.StringIO(stdin_data))
+        monkeypatch.setattr("sys.stdout", captured)
+        monkeypatch.setattr(
+            "src.pipeline.live.hooks.premise_gate.append_to_staging",
+            lambda records, **kw: len(records),
+        )
+
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+        # Hook must exit 0 (no blocking)
+        assert exc_info.value.code == 0
+        # Response must contain GENUS_INVALID
+        output = captured.getvalue()
+        assert output, "Hook should produce output"
+        resp = json.loads(output)
+        ctx = resp.get("hookSpecificOutput", {}).get("additionalContext", "")
+        assert "GENUS_INVALID" in ctx

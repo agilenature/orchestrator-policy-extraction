@@ -431,6 +431,55 @@ def _check_cross_axis(
     return warnings
 
 
+def _check_genus(
+    premises: list,
+    session_id: str,
+    cwd: str,
+    tool_use_id: str,
+) -> list[str]:
+    """Check genus declarations in PREMISE blocks against fundamentality criterion.
+
+    Fail-open: missing GENUS = no check, no warning.
+    Invalid GENUS = GENUS_INVALID warning (exit 0, never blocking).
+
+    Args:
+        premises: List of ParsedPremise objects with optional genus_name/genus_instances.
+        session_id: Current session ID (for future staging writes in Wave 3).
+        cwd: Current working directory.
+        tool_use_id: Tool use ID (for future staging writes in Wave 3).
+
+    Returns:
+        List of GENUS_INVALID warning strings (empty if all genera valid or absent).
+    """
+    try:
+        from src.pipeline.premise.fundamentality import FundamentalityChecker
+        checker = FundamentalityChecker()
+    except ImportError:
+        return []  # fail-open if fundamentality module unavailable
+
+    warnings: list[str] = []
+
+    for premise in premises:
+        genus_name = getattr(premise, "genus_name", None)
+        genus_instances = getattr(premise, "genus_instances", None)
+
+        # Fail-open: no GENUS field = skip check
+        if genus_name is None:
+            continue
+
+        result = checker.check(genus_name=genus_name, instances=genus_instances)
+
+        if not result.valid:
+            warnings.append(
+                f"GENUS_INVALID: {result.reason}. "
+                f"Declare genus with >= 2 citable instances and a causal explanation. "
+                f"Example: GENUS: corpus-relative identity retrieval | "
+                f"INSTANCES: [per-file searchability failure, shared-aspect collision]"
+            )
+
+    return warnings
+
+
 def main() -> None:
     """PAG PreToolUse hook entry point.
 
@@ -544,6 +593,10 @@ def main() -> None:
     # 6. Phase 16.1: Cross-axis verification check
     cross_axis_warnings = _check_cross_axis(all_premises, session_id, cwd)
     additional_context.extend(cross_axis_warnings)
+
+    # 6.5. Phase 24: Genus declaration check (fail-open, warn-only by default)
+    genus_warnings = _check_genus(all_premises, session_id, cwd, tool_use_id)
+    additional_context.extend(genus_warnings)
 
     # 7. OPE Control Plane: bus /api/check call (fail-open)
     bus_session = _OPE_SESSION_ID or session_id

@@ -82,6 +82,61 @@ BMAD (orthogonal to the hierarchy)
            ↓ David reviews PRD at L4 before any code is written
 ```
 
+### RKS Protocol Interface — How the GO Queries Any Project
+
+The GO must be able to query any project's epistemic state without project-specific code. The
+mechanism is the Reflexive Knowledge System (RKS) protocol — a four-operation interface that
+every project in the ecosystem implements. The GO calls these operations identically regardless
+of which project it is querying.
+
+**The four protocol operations:**
+
+```
+Conformance Probe:
+  IN:  { project_id }
+  OUT: { conformant: bool, layers_present: int[], interface_version: string }
+  — First call to any new project. Failure = project not admitted to ecosystem.
+
+Epistemic Status Query:
+  IN:  { project_id, as_of?: timestamp }
+  OUT: { project_id, status: "healthy"|"stale"|"degraded"|"unresponsive",
+         last_updated, constraint_violations: int, coverage_pct: float,
+         stale_pointer_count: int }
+  — The governance query. Identical across all projects. No project-specific parameters.
+
+Knowledge Retrieval:
+  IN:  { project_id, query: string, filters?: { layer?: int, artifact_type?: string } }
+  OUT: { snippets: [{ content, ground_truth_pointer, layer, confidence }] }
+  — What Canon calls for semantic queries. ground_truth_pointer is mandatory.
+
+Evidence Write:
+  IN:  { project_id, evidence: { agent_id, action, outcome, source_artifact,
+                                  timestamp, correlation_id } }
+  OUT: { accepted: bool, artifact_id, layer_written }
+  — What EVA/MARK call after task execution. Closes the reflexive loop.
+```
+
+**GOVERNANCE_PULSE** — the GO's supervision cycle, identical for all registered projects:
+```
+1. Epistemic Status Query → { status, last_updated, constraint_violations, ... }
+2. If "unresponsive" → escalate to David
+3. If last_updated > staleness_threshold → dispatch EVA re-indexing task
+4. If constraint_violations > 0 → retrieve via Knowledge Retrieval; route to review queue
+5. Compose project health record → write to GO's own RKS evidence store
+```
+
+**The constraint:** The GO may not use project-specific branching logic to query any project.
+If a project requires special handling, it is not protocol-compliant and must not be admitted
+to the ecosystem until it is. This constraint is load-bearing — violating it causes the GO's
+query logic to grow with the number of projects, making autonomous governance impossible at scale.
+
+**Registered projects (9 confirmed):** orchestrator-policy-extraction, reflexive-knowledge-system,
+eva, mark, canon, knowledge-infrastructure (MT), vb-canon (MT), modernization-governance (MT),
+objectivism-library. Full inventory and architecture:
+`/Users/david/projects/reflexive-knowledge-system/design/CAPABILITIES.md`
+
+---
+
 ### Dimension Separation Rule
 
 Each layer governs a **different dimension**. If two layers attempt to govern the same dimension, conflict and instability begin — this is the structural source of all drift and evasion failures.

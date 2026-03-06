@@ -1,5 +1,9 @@
 # Orchestrator Policy Extraction (OPE)
 
+## Description
+
+A Claude Code session analysis pipeline that extracts orchestration policies from turn-level observations of AI-assisted decision-making and learns safe delegation patterns for staged autonomous promotion to OpenClaw.
+
 **Learn orchestration policies from Claude Code sessions to enable safe, staged autonomous delegation**
 
 [![Status: In Development](https://img.shields.io/badge/status-in%20development-yellow)](https://github.com/agilenature/orchestrator-policy-extraction)

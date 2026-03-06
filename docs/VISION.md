@@ -590,6 +590,48 @@ Review at your convenience: [View PR] [Dismiss]
 
 ---
 
+## OPE's Position in the Larger Ecosystem
+
+OPE is not a standalone governance tool. It is the intelligence substrate of the Governing
+Orchestrator — the Layer 7 supervisory component of a 9-project ecosystem governed by the
+Reflexive Knowledge System (RKS) protocol.
+
+**OPE's layer position:** Layer 7 (Meta/Supervisory) — the component that holds the GO's
+intelligence: episodes, constraints, causal chains, and the CCDs that make the GO's decisions
+improvable rather than repeatable.
+
+**The ecosystem OPE governs:**
+
+| # | Project | Role |
+|---|---------|------|
+| 1 | `orchestrator-policy-extraction` | GO intelligence substrate — this project |
+| 2 | `reflexive-knowledge-system` | Universal knowledge substrate architecture |
+| 3 | `eva` | Shared execution agent |
+| 4 | `mark` | Shared code interaction agent |
+| 5 | `canon` | Shared semantic retrieval layer |
+| 6 | `knowledge-infrastructure` (MT) | Migration platform graph + parsers |
+| 7 | `vb-canon` (MT) | Migration domain concept library |
+| 8 | `modernization-governance` (MT) | Migration governance engine |
+| 9 | `objectivism-library` | Standalone knowledge library |
+
+The GO queries all 9 projects without project-specific code — using the four RKS protocol
+operations (Conformance Probe, Epistemic Status Query, Knowledge Retrieval, Evidence Write).
+
+**The long-term picture:** Every project the GO supervises is governed by the same query logic
+because every project exposes the same four protocol operations. Adding a 10th project to the
+ecosystem requires implementing the protocol in that project's repo — not modifying the GO.
+The GO's query logic does not grow with the number of projects. This is what makes autonomous
+governance possible at scale.
+
+**v2.0 sequencing:** OPE's protocol compliance (exposing the four operations over its existing
+DuckDB + JSONL infrastructure) is a prerequisite for the graduated autonomy described in the
+sections below. The GO cannot autonomously decide whether to intervene in OPE without first
+being able to query OPE's epistemic status via the protocol.
+
+Full RKS architecture: `/Users/david/projects/reflexive-knowledge-system/design/`
+
+---
+
 ## The North Star
 
 **Ultimate success:** You spend 80% of your time on strategic decisions (architecture, requirements, tradeoffs) and 20% on tactical review. The orchestrator handles:

@@ -63,6 +63,11 @@
       "$ref": "#/$defs/Provenance"
     },
 
+    "parent_episode_id": {
+      "type": ["string", "null"],
+      "description": "Optional reference to a parent episode for hierarchical grouping."
+    },
+
     "x_extensions": {
       "type": "object",
       "additionalProperties": true,

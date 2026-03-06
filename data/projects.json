@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "last_updated": "2026-02-27T17:05:00Z",
+  "last_updated": "2026-03-06T14:19:28Z",
   "projects": [
     {
       "id": "modernizing-tool",
@@ -75,13 +75,29 @@
         "git_location": "https://github.com/agilenature/objectivism-library-semantic-search.git",
         "session_count": 12
       }
+    },
+    {
+      "id": "pim",
+      "name": "Pim",
+      "metadata_path": "data/raw/pim/metadata.json",
+      "status": "ready",
+      "added_date": "2026-03-06",
+      "notes": "",
+      "data_status": {
+        "sessions_available": true,
+        "sessions_location": "~/.claude/projects/-Users-david-projects-pim/",
+        "git_clone_needed": false,
+        "metadata_complete": false,
+        "git_location": "https://github.com/agilenature/pim.git",
+        "session_count": 14
+      }
     }
   ],
   "statistics": {
-    "total_projects": 4,
-    "ready_projects": 4,
+    "total_projects": 5,
+    "ready_projects": 5,
     "pending_projects": 0,
-    "total_sessions": 141,
+    "total_sessions": 155,
     "total_commits": 37,
     "commits_with_session_ids": 4,
     "commits_with_claude_attribution": 14

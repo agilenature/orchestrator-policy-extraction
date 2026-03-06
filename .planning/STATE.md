@@ -6,7 +6,7 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 **Cross-project sequencing:** See `.planning/PROGRAM-SEQUENCE.md` — canonical tracker for OPE + Modernizing Tool execution order, wave dependencies, and step verification criteria.
 
 **Core value:** Episodes capture how to decide what to do next (orchestrator decisions), not just what was delivered (commits), enabling policy learning that scales human judgment.
-**Current focus:** v1.0 milestone complete. Planning v2.0 (graduated autonomy, OpenClaw integration, preference model training).
+**Current focus:** v1.0 milestone complete. Planning v2.0. **RKS prerequisite constraint:** OPE's v2.0 phases must be sequenced against the Reflexive Knowledge System bootstrap. Protocol compliance (exposing the four RKS protocol operations over OPE's existing Layer 1–2 infrastructure) is a prerequisite for graduated autonomy — the GO cannot autonomously govern OPE without querying its epistemic status via the protocol. Planned v2.0 phase ordering: (1) RKS protocol compliance, (2) Layer 3–4 upgrade (MEMORY.md CCDs become Layer 3 validation rules), (3) Canon registration, then (4) graduated autonomy, (5) OpenClaw integration, (6) preference model training. Full RKS architecture: `/Users/david/projects/reflexive-knowledge-system/design/`.
 
 ## Current Position
 
